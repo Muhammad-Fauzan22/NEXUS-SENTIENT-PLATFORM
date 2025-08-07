@@ -1,0 +1,51 @@
+# NEXUS: The Sentient Development Platform - Dependencies
+
+# --- Web Framework & ASGI Server ---
+fastapi>=0.100.0,<0.105.0 # Web framework untuk API
+uvicorn[standard]>=0.22.0,<0.25.0 # Server ASGI untuk menjalankan FastAPI
+python-multipart>=0.0.6,<0.0.7 # Untuk menangani form data dan file upload
+
+# --- HTTP Client ---
+requests>=2.31.0,<3.0.0 # Untuk memanggil API eksternal (AI, lainnya)
+
+# --- Database ---
+pymongo>=4.4.0,<5.0.0 # Driver MongoDB untuk Python
+supabase>=2.4.5,<3.0.0 # Client resmi Supabase untuk Python
+
+# --- Google APIs & Authentication ---
+google-api-python-client>=2.100.0,<3.0.0 # Client untuk Google Drive API dan lainnya
+google-auth>=2.23.0,<3.0.0 # Autentikasi Google
+google-auth-httplib2>=0.1.1,<0.2.0
+google-auth-oauthlib>=1.1.0,<2.0.0
+pydrive2>=1.15.0,<2.0.0 # Library untuk memudahkan interaksi dengan Google Drive
+
+# --- Data Processing & Analysis ---
+pandas>=2.0.3,<3.0.0 # Untuk manipulasi dan analisis data
+numpy>=1.24.3,<2.0.0 # Komputasi numerik
+pyarrow==12.0.1 # Untuk membaca/menulis format Parquet (jika digunakan)
+
+# --- AI & NLP ---
+# Note: Banyak API AI diakses via requests, tetapi library ini bisa membantu
+# openai>=1.3.6,<2.0.0 # Jika menggunakan OpenAI SDK resmi
+# anthropic>=0.5.0,<1.0.0 # Jika menggunakan Claude SDK resmi
+
+# --- Templating (untuk IDP Generator) ---
+jinja2>=3.1.2,<4.0.0 # Template engine untuk mengisi data ke dokumen IDP
+
+# --- Telegram Bot ---
+python-telegram-bot>=20.5,<21.0 # Library untuk membuat Telegram Bot
+
+# --- Environment Variables ---
+python-dotenv>=1.0.0,<2.0.0 # Untuk memuat variabel dari file .env
+
+# --- Logging & Utilities ---
+loguru>=0.7.0,<1.0.0 # Logging yang lebih baik dan mudah
+tenacity>=8.2.0,<9.0.0 # Untuk retry mechanism yang kuat (penting untuk API calls)
+pydantic>=2.0.0,<3.0.0 # Untuk validasi data dan pengaturan konfigurasi
+typing_extensions>=4.5.0,<5.0.0 # Backport fitur typing terbaru
+python-dateutil>=2.8.2,<3.0.0 # Untuk parsing dan manipulasi tanggal/waktu
+
+# --- Development & Testing (Opsional, bisa diinstal terpisah jika perlu) ---
+# pytest>=7.4.0,<8.0.0
+# pytest-asyncio>=0.21.0,<1.0.0
+# httpx>=0.24.1,<1.0.0 # Untuk testing API
