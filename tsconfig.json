@@ -1,19 +1,42 @@
 ﻿{
 	"extends": "./.svelte-kit/tsconfig.json",
 	"compilerOptions": {
+		// --- Strictness & Type Checking ---
+		// Mengaktifkan semua opsi pemeriksaan tipe yang ketat.
+		"strict": true,
+		// Melaporkan error pada variabel lokal yang tidak digunakan.
+		"noUnusedLocals": true,
+		// Melaporkan error pada parameter fungsi yang tidak digunakan.
+		"noUnusedParameters": true,
+		// Memastikan semua jalur kode dalam sebuah fungsi mengembalikan nilai.
+		"noImplicitReturns": true,
+		// Mencegah "fallthrough" yang tidak disengaja dalam switch statements.
+		"noFallthroughCasesInSwitch": true,
+		// Memastikan konsistensi penamaan file (case-sensitive).
+		"forceConsistentCasingInFileNames": true,
+
+		// --- Module Resolution & Path Aliases ---
+		"moduleResolution": "bundler",
+		"baseUrl": ".",
+		"paths": {
+			"$lib": ["src/lib"],
+			"$lib/*": ["src/lib/*"],
+			"$components": ["src/lib/components"],
+			"$components/*": ["src/lib/components/*"],
+			"$stores": ["src/lib/stores"],
+			"$stores/*": ["src/lib/stores/*"],
+			"$types": ["src/lib/types"],
+			"$types/*": ["src/lib/types/*"],
+			"$utils": ["src/lib/utils"],
+			"$utils/*": ["src/lib/utils/*"]
+		},
+
+		// --- Interoperability & Output ---
+		"esModuleInterop": true,
 		"allowJs": true,
 		"checkJs": true,
-		"esModuleInterop": true,
-		"forceConsistentCasingInFileNames": true,
 		"resolveJsonModule": true,
 		"skipLibCheck": true,
-		"sourceMap": true,
-		"strict": true,
-		"moduleResolution": "bundler"
+		"sourceMap": true
 	}
-	// Path aliases are handled by https://svelte.dev/docs/kit/configuration#alias
-	// except $lib which is handled by https://svelte.dev/docs/kit/configuration#files
-	//
-	// If you want to overwrite includes/excludes, make sure to copy over the relevant includes/excludes
-	// from the referenced tsconfig.json - TypeScript does not merge them in
 }
