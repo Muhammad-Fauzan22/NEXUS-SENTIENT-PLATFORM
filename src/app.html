@@ -1,11 +1,33 @@
 <!doctype html>
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		%sveltekit.head%
-	</head>
-	<body data-sveltekit-preload-data="hover">
-		<div style="display: contents">%sveltekit.body%</div>
-	</body>
+<html lang="id">
+<head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%sveltekit.assets%/favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <!-- Meta tags untuk SEO dan sosial media -->
+    <meta name="description" content="NEXUS: The Sentient Development Platform untuk PPSDM ITS. Platform cerdas untuk memetakan dan mengembangkan potensi mahasiswa Teknik Mesin ITS berdasarkan data dan AI.">
+    <meta name="keywords" content="ITS, Teknik Mesin, PPSDM, IDP, RIASEC, VARK, AI, Machine Learning, Career Guidance, Student Development">
+    <meta name="author" content="PPSDM Keluarga Mahasiswa Mesin ITS">
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://nexus-ppsdm.its.ac.id/"> <!-- Ganti dengan URL produksi Anda -->
+    <meta property="og:title" content="NEXUS: The Sentient Development Platform">
+    <meta property="og:description" content="Platform cerdas untuk memetakan dan mengembangkan potensi mahasiswa Teknik Mesin ITS berdasarkan data dan AI.">
+    <meta property="og:image" content="%sveltekit.assets%/logo-nexus.png"> <!-- Ganti dengan path logo Anda -->
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://nexus-ppsdm.its.ac.id/"> <!-- Ganti dengan URL produksi Anda -->
+    <meta property="twitter:title" content="NEXUS: The Sentient Development Platform">
+    <meta property="twitter:description" content="Platform cerdas untuk memetakan dan mengembangkan potensi mahasiswa Teknik Mesin ITS berdasarkan data dan AI.">
+    <meta property="twitter:image" content="%sveltekit.assets%/logo-nexus.png"> <!-- Ganti dengan path logo Anda -->
+
+    <!-- %sveltekit.head% akan diganti dengan injeksi CSS, JS, dan meta tags lainnya dari komponen Svelte -->
+    %sveltekit.head%
+</head>
+<body data-sveltekit-preload-data="hover">
+    <div style="display: contents">
+        <!-- %sveltekit.body% akan diganti dengan konten HTML dari komponen SvelteKit (+page.svelte, +layout.svelte, dll.) -->
+        %sveltekit.body%
+    </div>
+</body>
 </html>

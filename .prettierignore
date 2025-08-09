@@ -1,9 +1,95 @@
-# Package Managers
-package-lock.json
-pnpm-lock.yaml
-yarn.lock
-bun.lock
-bun.lockb
+# .prettierignore
+# Daftar file, folder, dan pola yang diabaikan oleh Prettier.
+# Dihasilkan untuk proyek NEXUS-SENTIENT-PLATFORM.
 
-# Miscellaneous
-/static/
+# --- Node Modules ---
+node_modules/
+
+# --- Build Outputs ---
+.svelte-kit/
+.netlify/
+.vercel/
+dist/
+build/
+out/
+
+# --- Logs ---
+logs/
+*.log
+
+# --- Temporary Directories ---
+tmp/
+temp/
+.cache/
+
+# --- Environment Files ---
+.env
+.env.*
+!.env.example
+
+# --- Configuration Files ---
+# Jangan format file konfigurasi yang sensitif terhadap format tertentu
+.prettierrc
+.eslintrc.cjs
+tailwind.config.js
+postcss.config.js
+svelte.config.js
+vite.config.js
+tsconfig.json
+
+# --- Data Files ---
+# Abaikan file data mentah atau hasil proses yang besar
+src/lib/data/raw/
+src/lib/data/chunked/
+src/lib/data/vectorized/
+src/lib/data/processed/
+src/lib/data/scraped/
+
+# --- Generated Files ---
+# Abaikan file yang dihasilkan secara otomatis
+src/lib/server/db/schema.generated.ts
+# atau file-file dengan ekstensi .generated.*
+
+# --- Binary Files ---
+# Abaikan file biner yang tidak bisa diformat dengan Prettier
+*.pdf
+*.docx
+*.xlsx
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.ico
+*.webp
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.zip
+*.tar.gz
+*.exe
+*.dll
+*.so
+
+# --- IDE/Editor Files ---
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# --- OS Generated Files ---
+.DS_Store
+Thumbs.db
+
+# --- Git Files ---
+.git/
+.gitignore # Biasanya tidak perlu diformat, tapi bisa diabaikan jika diinginkan
+
+# --- Coverage Reports ---
+coverage/
+*.lcov
+
+# --- Specific Project Files to Ignore ---
+# Tambahkan file spesifik proyek Anda yang tidak ingin diformat jika ada
+# Contoh:
+# src/lib/assets/specific-unformatted-file.txt

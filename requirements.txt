@@ -1,51 +1,110 @@
-# NEXUS: The Sentient Development Platform - Dependencies
+# requirements.txt
+# Daftar dependensi Python untuk NEXUS-SENTIENT-PLATFORM
+# Dihasilkan berdasarkan analisis repo-structure.txt.pdf dan casca_merged.pdf
 
-# --- Web Framework & ASGI Server ---
-fastapi>=0.100.0,<0.105.0 # Web framework untuk API
-uvicorn[standard]>=0.22.0,<0.25.0 # Server ASGI untuk menjalankan FastAPI
-python-multipart>=0.0.6,<0.0.7 # Untuk menangani form data dan file upload
+# --- 1. AI & Machine Learning Libraries ---
+# OpenAI API
+openai>=1.59.0,<2.0.0
 
-# --- HTTP Client ---
-requests>=2.31.0,<3.0.0 # Untuk memanggil API eksternal (AI, lainnya)
+# Google Generative AI (Gemini)
+google-generativeai>=0.8.5,<0.9.0
 
-# --- Database ---
-pymongo>=4.4.0,<5.0.0 # Driver MongoDB untuk Python
-supabase>=2.4.5,<3.0.0 # Client resmi Supabase untuk Python
+# Cohere API
+cohere>=5.13.0,<6.0.0
 
-# --- Google APIs & Authentication ---
-google-api-python-client>=2.100.0,<3.0.0 # Client untuk Google Drive API dan lainnya
-google-auth>=2.23.0,<3.0.0 # Autentikasi Google
-google-auth-httplib2>=0.1.1,<0.2.0
-google-auth-oauthlib>=1.1.0,<2.0.0
-pydrive2>=1.15.0,<2.0.0 # Library untuk memudahkan interaksi dengan Google Drive
+# Hugging Face Transformers & Datasets (Opsional, jika diperlukan untuk model lokal/custom)
+# transformers>=4.40.0,<5.0.0
+# datasets>=3.0.0,<4.0.0
+# torch>=2.0.0,<3.0.0 # Untuk model PyTorch (opsional)
+# sentence-transformers>=3.0.0,<4.0.0 # Untuk embedding teks (opsional)
 
-# --- Data Processing & Analysis ---
-pandas>=2.0.3,<3.0.0 # Untuk manipulasi dan analisis data
-numpy>=1.24.3,<2.0.0 # Komputasi numerik
-pyarrow==12.0.1 # Untuk membaca/menulis format Parquet (jika digunakan)
+# --- 2. Google Drive Integration ---
+# Google API Client Libraries
+google-api-python-client>=2.149.0,<3.0.0
+google-auth>=2.36.0,<3.0.0
+google-auth-oauthlib>=1.2.1,<2.0.0
+google-auth-httplib2>=0.2.0,<1.0.0
 
-# --- AI & NLP ---
-# Note: Banyak API AI diakses via requests, tetapi library ini bisa membantu
-# openai>=1.3.6,<2.0.0 # Jika menggunakan OpenAI SDK resmi
-# anthropic>=0.5.0,<1.0.0 # Jika menggunakan Claude SDK resmi
+# --- 3. PDF Generation & Manipulation ---
+# pdfkit (Python wrapper untuk wkhtmltopdf)
+# CATATAN: Ini memerlukan instalasi wkhtmltopdf di sistem Anda secara terpisah.
+pdfkit>=1.0.0,<2.0.0
 
-# --- Templating (untuk IDP Generator) ---
-jinja2>=3.1.2,<4.0.0 # Template engine untuk mengisi data ke dokumen IDP
+# WeasyPrint (Untuk konversi HTML ke PDF tanpa wkhtmltopdf)
+# CATATAN: Ini bisa memiliki dependensi sistem yang kompleks.
+weasyprint>=62.0,<63.0
 
-# --- Telegram Bot ---
-python-telegram-bot>=20.5,<21.0 # Library untuk membuat Telegram Bot
+# pdf-parse (Untuk mengekstrak teks dari PDF)
+# pdf-parse>=1.3.0,<2.0.0 # Ini adalah paket npm, bukan pip. Dihapus dari sini.
 
-# --- Environment Variables ---
-python-dotenv>=1.0.0,<2.0.0 # Untuk memuat variabel dari file .env
+# --- 4. Document Processing ---
+# python-docx (Untuk membaca/menulis file .docx)
+python-docx>=1.1.0,<2.0.0
 
-# --- Logging & Utilities ---
-loguru>=0.7.0,<1.0.0 # Logging yang lebih baik dan mudah
-tenacity>=8.2.0,<9.0.0 # Untuk retry mechanism yang kuat (penting untuk API calls)
-pydantic>=2.0.0,<3.0.0 # Untuk validasi data dan pengaturan konfigurasi
-typing_extensions>=4.5.0,<5.0.0 # Backport fitur typing terbaru
-python-dateutil>=2.8.2,<3.0.0 # Untuk parsing dan manipulasi tanggal/waktu
+# mammoth (Untuk mengekstrak teks dari file .docx - Alternatif untuk python-docx)
+# mammoth>=1.8.0,<2.0.0 # Ini adalah paket npm, bukan pip. Dihapus dari sini.
 
-# --- Development & Testing (Opsional, bisa diinstal terpisah jika perlu) ---
-# pytest>=7.4.0,<8.0.0
-# pytest-asyncio>=0.21.0,<1.0.0
-# httpx>=0.24.1,<1.0.0 # Untuk testing API
+# --- 5. Data Science & Utilities ---
+# pandas (Untuk manipulasi data)
+pandas>=2.2.0,<3.0.0
+
+# openpyxl (Untuk membaca/menulis file Excel .xlsx)
+openpyxl>=3.1.0,<4.0.0
+
+# numpy (Dependensi untuk pandas dan scientific computing)
+numpy>=1.26.0,<2.0.0
+
+# python-dotenv (Untuk memuat variabel lingkungan dari .env)
+python-dotenv>=1.0.0,<2.0.0
+
+# loguru (Untuk logging yang lebih baik)
+loguru>=0.7.0,<1.0.0
+
+# requests (Untuk HTTP requests)
+requests>=2.31.0,<3.0.0
+
+# beautifulsoup4 (Untuk parsing HTML/XML)
+beautifulsoup4>=4.12.0,<5.0.0
+
+# playwright (Untuk web scraping dan automation)
+playwright>=1.40.0,<2.0.0
+
+# --- 6. Web Framework & Server (Opsional, jika menggunakan FastAPI/Flask untuk microservice) ---
+# fastapi>=0.100.0,<1.0.0
+# uvicorn>=0.23.0,<1.0.0
+# flask>=3.0.0,<4.0.0
+
+# --- 7. Database Clients (Opsional, jika menggunakan Python untuk koneksi langsung) ---
+psycopg2-binary>=2.9.0,<3.0.0 # Untuk PostgreSQL
+supabase>=2.0.0,<3.0.0 # Client Python resmi Supabase (jika diperlukan)
+
+# --- 8. Lainnya ---
+# uuid (Biasanya sudah built-in, tapi bisa disebutkan jika diperlukan secara eksplisit)
+# uuid>=1.30,<2.0 # Paket 'uuid' di PyPI berbeda dari modul standar. Biasanya tidak perlu diinstal.
+
+# --- CATATAN PENTING ---
+# 1. Instalasi:
+#    Jalankan perintah berikut di terminal Anda:
+#    pip install -r requirements.txt
+#
+# 2. Virtual Environment:
+#    Sangat disarankan untuk menggunakan virtual environment Python.
+#    Buat: python -m venv .venv
+#    Aktifkan (Windows): .venv\Scripts\activate
+#    Aktifkan (Mac/Linux): source .venv/bin/activate
+#    Lalu jalankan pip install -r requirements.txt
+#
+# 3. Dependensi Sistem:
+#    - `weasyprint`: Mungkin memerlukan instalasi dependensi sistem seperti GTK, Cairo, Pango.
+#      Lihat dokumentasi resmi WeasyPrint untuk instruksi instalasi.
+#    - `pdfkit`: Memerlukan instalasi `wkhtmltopdf` di sistem Anda secara terpisah.
+#      Unduh dari: https://wkhtmltopdf.org/downloads.html
+#
+# 4. Versi:
+#    Versi yang ditentukan menggunakan >= dan < untuk memastikan kompatibilitas
+#    sambil memungkinkan patch releases. Anda bisa menyematkan versi spesifik
+#    (misalnya, openai==1.59.0) jika diperlukan untuk stabilitas.
+#
+# 5. Opsional:
+#    Beberapa library ditandai sebagai opsional karena mungkin tidak digunakan
+#    dalam setiap konfigurasi proyek. Hapus tanda komentar (#) jika diperlukan.
