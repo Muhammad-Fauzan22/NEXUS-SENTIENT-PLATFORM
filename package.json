@@ -13,14 +13,24 @@
 		"lint": "eslint ."
 	},
 	"dependencies": {
-		"clsx": "^2.1.1",
+		"@supabase/supabase-js": "2.54.0",
+		"bits-ui": "2.9.2",
+		"clsx": "2.1.1",
+		"dotenv": "17.2.1",
+		"mammoth": "1.10.0",
+		"pdf-parse": "1.1.1",
+		"pino": "9.8.0",
 		"svelte-sonner": "1.0.5",
+		"tailwind-merge": "3.3.1",
+		"tailwind-variants": "2.1.0",
 		"zod": "^3.23.8"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^3.2.0",
 		"@sveltejs/kit": "^2.5.10",
 		"@sveltejs/vite-plugin-svelte": "^3.1.1",
+		"@types/pdf-parse": "1.1.5",
+		"@types/pino": "7.0.4",
 		"autoprefixer": "^10.4.19",
 		"eslint": "^9.3.0",
 		"eslint-plugin-svelte": "^2.39.0",

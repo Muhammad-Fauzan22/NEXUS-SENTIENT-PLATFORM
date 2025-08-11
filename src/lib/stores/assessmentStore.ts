@@ -1,14 +1,10 @@
 import { writable, derived } from 'svelte/store';
-import { z } from 'zod';
 import { assessmentSchema, type AssessmentSubmission, type GeneratedIDP } from '$lib/types/schemas';
 import { apiClient, ApiClientError } from '$lib/client/apiClient';
 
-const TOTAL_STEPS = 3; // Total langkah dalam asesmen kita
-
-// Definisikan state yang mungkin untuk proses submit
+const TOTAL_STEPS = 3;
 type SubmissionStatus = 'idle' | 'submitting' | 'success' | 'error';
 
-// Definisikan struktur state dari store kita
 interface AssessmentState {
 	currentStep: number;
 	status: SubmissionStatus;
@@ -41,12 +37,10 @@ function createAssessmentStore() {
 	const store = writable<AssessmentState>(initialState);
 	const { subscribe, update, set } = store;
 
-	// Store turunan (derived store) untuk validasi real-time
 	const validation = derived(store, ($store) => {
 		return assessmentSchema.safeParse($store.data);
 	});
 
-	// Metode-metode untuk berinteraksi dengan store
 	const methods = {
 		nextStep: () =>
 			update((s) => (s.currentStep < TOTAL_STEPS ? { ...s, currentStep: s.currentStep + 1 } : s)),
@@ -59,7 +53,7 @@ function createAssessmentStore() {
 			update((s) => ({ ...s, status: 'submitting', error: null }));
 
 			let currentData: AssessmentSubmission;
-			store.subscribe((s) => (currentData = s.data))(); // Dapatkan data terbaru
+			store.subscribe((s) => (currentData = s.data))();
 
 			const validationResult = assessmentSchema.safeParse(currentData!);
 			if (!validationResult.success) {
@@ -94,7 +88,7 @@ function createAssessmentStore() {
 	return {
 		subscribe,
 		...methods,
-		validation // Ekspor hasil validasi agar bisa digunakan di UI
+		validation
 	};
 }
 

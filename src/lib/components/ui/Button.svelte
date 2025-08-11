@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { type VariantProps, tv } from 'tailwind-variants';
-	import { type Button as ButtonPrimitive } from 'bits-ui';
-	import { cn } from '$lib/utils/style';
+	import type { Button as ButtonPrimitive } from 'bits-ui';
+	import { cn } from '$lib/utils/cn';
 
 	type $$Props = ButtonPrimitive.Props;
 	type $$Events = ButtonPrimitive.Events;
@@ -36,6 +36,11 @@
 	export { className as class };
 </script>
 
-<button class="{cn(buttonVariants({ variant, size, class: className }))}" {...$$restProps} on:click on:keydown>
+<ButtonPrimitive.Root
+	class="{cn(buttonVariants({ variant, size, class: className }))}"
+	{...$$restProps}
+	on:click
+	on:keydown
+>
 	<slot />
-</button>
+</ButtonPrimitive.Root>

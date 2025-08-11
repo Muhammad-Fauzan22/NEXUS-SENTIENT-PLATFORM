@@ -1,41 +1,21 @@
 ﻿{
-  "extends": "./.svelte-kit/tsconfig.json",
-	"include": ["src/**/*.js", "src/**/*.ts", "src/**/*.svelte"],
+	"extends": "./.svelte-kit/tsconfig.json",
 	"compilerOptions": {
-    // --- Strictness & Type Checking ---
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "forceConsistentCasingInFileNames": true,
+		"allowJs": true,
+		"checkJs": true,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"resolveJsonModule": true,
+		"skipLibCheck": true,
+		"sourceMap": true,
 
-    // --- Module Resolution & Path Aliases ---
-    "moduleResolution": "node",
-    "module": "ESNext",
-    "target": "ESNext",
-    "baseUrl": ".",
-    "paths": {
-      "$lib": ["src/lib"],
-      "$lib/*": ["src/lib/*"],
-      "$components": ["src/lib/components"],
-      "$components/*": ["src/lib/components/*"],
-      "$stores": ["src/lib/stores"],
-      "$stores/*": ["src/lib/stores/*"],
-      "$types": ["src/lib/types"],
-      "$types/*": ["src/lib/types/*"],
-      "$utils": ["src/lib/utils"],
-      "$utils/*": ["src/lib/utils/*"]
-    },
-
-    // --- Interoperability & Output ---
-    "esModuleInterop": true,
-    "allowJs": true,
-    "checkJs": true,
-    "resolveJsonModule": true,
-    "skipLibCheck": true,
-    "sourceMap": true
-  },
-  "include": ["src/**/*.ts", "scripts/**/*.ts"],
-  "exclude": ["node_modules", ".svelte-kit"]
+		// --- ABSOLUTE STRICTNESS PROTOCOL ---
+		"strict": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"noFallthroughCasesInSwitch": true,
+		"noImplicitReturns": true,
+		"useUnknownInCatchVariables": true,
+		"verbatimModuleSyntax": true
+	}
 }

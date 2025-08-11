@@ -1,6 +1,5 @@
 // scripts/etl.ts
 // Pipeline ETL (Extract, Transform, Load) lengkap untuk membangun Knowledge Base.
-// Menjalankan semua langkah secara berurutan: Ekstrak, Chunk, Vektorisasi, dan Muat ke Supabase.
 
 import fs from 'fs/promises';
 import path from 'path';
@@ -10,13 +9,13 @@ import { v4 as uuidv4 } from 'uuid';
 import { logger } from '../src/lib/server/utils/logger';
 import { azureProvider } from '../src/lib/server/ai/providers/azure';
 import { supabaseAdmin } from '../src/lib/server/supabaseAdmin';
-import { config } from '../src/lib/server/config';
+import { InternalServerError } from '../src/lib/server/utils/errors';
 
 // --- Konfigurasi ---
 const RAW_DATA_DIR = path.join(process.cwd(), 'data', 'raw');
 const KNOWLEDGE_CHUNKS_TABLE = 'knowledge_chunks';
-const CHUNK_SIZE = 1500; // Ukuran karakter per chunk
-const CHUNK_OVERLAP = 200; // Tumpang tindih antar chunk
+const CHUNK_SIZE = 1500;
+const CHUNK_OVERLAP = 200;
 
 // --- Tipe Data ---
 interface RawDocument {
@@ -59,25 +58,20 @@ async function extractAllRawData(): Promise<RawDocument[]> {
 		const content = await extractTextFromDoc(filePath);
 		if (content) {
 			documents.push({ source: file, content });
-			logger.debug(`Berhasil mengekstrak teks dari ${file}`);
 		}
 	}
-	logger.info(`Ekstraksi selesai. ${documents.length} dokumen diproses.`);
 	return documents;
 }
 
 // --- Langkah 2: Chunking Teks ---
 function chunkDocument(doc: RawDocument): Omit<KnowledgeChunk, 'content_embedding' | 'id'>[] {
 	const chunks: Omit<KnowledgeChunk, 'content_embedding' | 'id'>[] = [];
-	let i = 0;
-	while (i < doc.content.length) {
-		const end = i + CHUNK_SIZE;
-		const chunkText = doc.content.substring(i, end);
+	for (let i = 0; i < doc.content.length; i += CHUNK_SIZE - CHUNK_OVERLAP) {
+		const chunkText = doc.content.substring(i, i + CHUNK_SIZE);
 		chunks.push({
 			source_document: doc.source,
 			content_text: chunkText
 		});
-		i += CHUNK_SIZE - CHUNK_OVERLAP;
 	}
 	return chunks;
 }
@@ -91,17 +85,12 @@ async function vectorizeChunks(
 	for (const [index, chunk] of chunks.entries()) {
 		try {
 			const embedding = await azureProvider.generateEmbedding(chunk.content_text);
-			vectorizedChunks.push({
-				...chunk,
-				id: uuidv4(),
-				content_embedding: embedding
-			});
+			vectorizedChunks.push({ ...chunk, id: uuidv4(), content_embedding: embedding });
 			logger.debug(`Chunk ${index + 1}/${chunks.length} berhasil divektorisasi.`);
 		} catch (error) {
 			logger.error({ err: error, chunk }, `Gagal memvektorisasi chunk ${index + 1}.`);
 		}
 	}
-	logger.info('Vektorisasi selesai.');
 	return vectorizedChunks;
 }
 
@@ -110,40 +99,32 @@ async function loadToSupabase(chunks: KnowledgeChunk[]) {
 	logger.info('Memulai fase pemuatan data ke Supabase...');
 
 	// Hapus data lama
-	logger.debug(`Menghapus data lama dari tabel ${KNOWLEDGE_CHUNKS_TABLE}...`);
-	const { error: deleteError } = await supabaseAdmin.from(KNOWLEDGE_CHUNKS_TABLE).delete().neq('id', uuidv4()); // delete all
+	const { error: deleteError } = await supabaseAdmin.from(KNOWLEDGE_CHUNKS_TABLE).delete().neq('id', uuidv4());
 	if (deleteError) {
-		logger.error({ error: deleteError }, 'Gagal menghapus data lama.');
 		throw new InternalServerError('Gagal membersihkan knowledge base lama.');
 	}
 
-	// Masukkan data baru
-	logger.debug(`Memasukkan ${chunks.length} chunk baru...`);
-	const { error: insertError } = await supabaseAdmin.from(KNOWLEDGE_CHUNKS_TABLE).insert(chunks);
+	// Ubah embedding menjadi string dan masukkan data baru
+	const chunksToInsert = chunks.map(chunk => ({
+        ...chunk,
+        content_embedding: `[${chunk.content_embedding.join(',')}]`
+    }));
+
+	const { error: insertError } = await supabaseAdmin.from(KNOWLEDGE_CHUNKS_TABLE).insert(chunksToInsert);
 	if (insertError) {
 		logger.error({ error: insertError }, 'Gagal memasukkan chunk baru.');
 		throw new InternalServerError('Gagal memuat knowledge base baru.');
 	}
-
-	logger.info('Pemuatan data ke Supabase selesai.');
 }
 
 // --- Fungsi Utama Pipeline ETL ---
 async function runEtlPipeline() {
 	logger.info('--- MEMULAI PIPELINE ETL KNOWLEDGE BASE ---');
 	try {
-		// 1. Ekstrak
 		const rawDocs = await extractAllRawData();
-
-		// 2. Transform (Chunk)
 		const allChunksToVectorize = rawDocs.flatMap(chunkDocument);
-
-		// 3. Transform (Vectorize)
 		const vectorizedChunks = await vectorizeChunks(allChunksToVectorize);
-
-		// 4. Load
 		await loadToSupabase(vectorizedChunks);
-
 		logger.info('--- PIPELINE ETL KNOWLEDGE BASE BERHASIL ---');
 	} catch (error) {
 		logger.error({ err: error }, '--- PIPELINE ETL KNOWLEDGE BASE GAGAL ---');
@@ -151,5 +132,4 @@ async function runEtlPipeline() {
 	}
 }
 
-// Jalankan pipeline
 runEtlPipeline();
