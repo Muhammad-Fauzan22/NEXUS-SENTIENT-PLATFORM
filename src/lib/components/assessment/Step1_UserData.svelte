@@ -1,65 +1,77 @@
 <script lang="ts">
-	import { assessmentStore } from '$stores/assessmentStore';
-	import FormField from '$components/ui/FormField.svelte';
-	import Input from '$components/ui/Input.svelte';
-	import Textarea from '$components/ui/Textarea.svelte';
-	import { assessmentSchema } from '$lib/types/schemas';
-	import { z } from 'zod';
+	import { assessmentStore } from '../../../stores/assessmentStore';
+	import type { UserData } from '$lib/types/schemas/assessment';
+	import Button from '$lib/components/ui/Button.svelte';
+	import Card from '$lib/components/ui/Card.svelte';
+	import Input from '$lib/components/ui/Input.svelte';
 
-	// Turunkan tipe data spesifik untuk langkah ini dari skema utama
-	type UserData = z.infer<typeof assessmentSchema.shape.portfolio_text | typeof assessmentSchema.shape.aspirations>;
-
-	// State untuk error validasi lokal
-	let errors: Record<keyof UserData, string | null> = {
-		portfolio_text: null,
-		aspirations: null
+	let userData: UserData = {
+		name: '',
+		email: '',
+		age: 0,
+		occupation: ''
 	};
 
-	function validateField(fieldName: keyof UserData, value: string) {
-		const fieldSchema = assessmentSchema.shape[fieldName];
-		const result = fieldSchema.safeParse(value);
-		if (!result.success) {
-			errors[fieldName] = result.error.errors[0].message;
+	function handleSubmit(): void {
+		// Basic validation can happen here if needed, but for now we trust the user
+		// and let the store handle the logic.
+		if (userData.name && userData.email && userData.age > 0 && userData.occupation) {
+			assessmentStore.setUserData(userData);
 		} else {
-			errors[fieldName] = null;
+			alert('Please fill in all fields before continuing.');
 		}
 	}
 </script>
 
-<div class="space-y-6 p-2">
-	<h2 class="text-2xl font-serif font-semibold text-text">Langkah 1: Profil & Aspirasi Anda</h2>
-	<p class="text-neutral-600">
-		Ceritakan tentang diri Anda, pengalaman yang telah membentuk Anda, dan ke mana Anda ingin melangkah.
-		Jawaban Anda akan menjadi fondasi dari roadmap pengembangan Anda.
+<Card>
+	<h2 class="text-2xl font-bold text-gray-800 mb-2">Welcome to Nexus</h2>
+	<p class="text-gray-600 mb-6">
+		Let's start by getting to know you a little better. This information will help us personalize
+		your development plan.
 	</p>
 
-	<FormField
-		label="Portofolio & Pengalaman Diri"
-		forId="portfolio_text"
-		errorMessage={errors.portfolio_text}
-	>
-		<Textarea
-			id="portfolio_text"
-			placeholder="Ceritakan pengalaman organisasi, kepanitiaan, prestasi, atau proyek relevan yang pernah Anda ikuti. Jelaskan peran dan kontribusi Anda..."
-			rows={8}
-			bind:value={$assessmentStore.portfolio_text}
-			on:blur={() => validateField('portfolio_text', $assessmentStore.portfolio_text)}
-			hasError={!!errors.portfolio_text}
+	<form on:submit|preventDefault={handleSubmit} class="space-y-4">
+		<Input
+			id="name"
+			label="Full Name"
+			type="text"
+			placeholder="e.g., Alex Doe"
 			required
+			bind:value={userData.name}
 		/>
-		<p class="text-xs text-neutral-500">Minimal 100 karakter.</p>
-	</FormField>
 
-	<FormField label="Aspirasi Karir & Tujuan Jangka Panjang" forId="aspirations" errorMessage={errors.aspirations}>
-		<Textarea
-			id="aspirations"
-			placeholder="Jelaskan secara spesifik cita-cita atau peran profesional yang ingin Anda capai setelah lulus. Contoh: 'Menjadi Human Capital consultant di Deloitte' atau 'Mendirikan startup di bidang energi terbarukan'."
-			rows={4}
-			bind:value={$assessmentStore.aspirations}
-			on:blur={() => validateField('aspirations', $assessmentStore.aspirations)}
-			hasError={!!errors.aspirations}
+		<Input
+			id="email"
+			label="Email Address"
+			type="email"
+			placeholder="e.g., alex.doe@example.com"
 			required
+			bind:value={userData.email}
 		/>
-		<p class="text-xs text-neutral-500">Minimal 20 karakter.</p>
-	</FormField>
-</div>
+
+		<Input
+			id="age"
+			label="Age"
+			type="number"
+			placeholder="e.g., 30"
+			required
+			min="1"
+			bind:value={userData.age}
+		/>
+
+		<Input
+			id="occupation"
+			label="Current Occupation or Field of Study"
+			type="text"
+			placeholder="e.g., Software Engineer"
+			required
+			bind:value={userData.occupation}
+		/>
+
+		<div class="pt-4">
+			<Button type="submit" variant="primary" class="w-full">
+				Continue to RIASEC Assessment
+			</Button>
+		</div>
+	</form>
+</Card>
