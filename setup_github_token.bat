@@ -19,3 +19,10 @@ gh auth login
 
 REM Set remote URL with authentication
 echo Setting up remote repository...
+git remote set-url origin https://github.com/Muhammad-Fauzan22/NEXUS-SENTIENT-PLATFORM.git
+
+echo.
+echo GitHub authentication setup complete!
+echo You can now run the auto-sync system.
+echo.
+pause
