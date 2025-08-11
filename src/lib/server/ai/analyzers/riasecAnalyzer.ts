@@ -14,8 +14,6 @@ export interface RIASECAnalysisResult {
 }
 
 // --- Constants ---
-// Mapping of question IDs to their corresponding RIASEC category.
-// This is a critical part of the business logic.
 const RIASEC_QUESTION_MAP: { [key: number]: RIASECCode } = {
 	1: 'R', 2: 'I', 3: 'A', 4: 'S', 5: 'E', 6: 'C',
 	7: 'R', 8: 'I', 9: 'A', 10: 'S', 11: 'E', 12: 'C',
@@ -54,17 +52,17 @@ function getTopRIASECCodes(scores: Record<RIASECCode, number>): RIASECCode[] {
 }
 
 /**
- * Builds a detailed prompt for the AI to analyze RIASEC results.
+ * Builds a detailed prompt for the AI to analyze RIASEC results based on Holland's theory.
  * @param topCodes The user's top 3 RIASEC codes.
  * @returns A string containing the full prompt for the AI.
  */
 function buildRIASECPrompt(topCodes: RIASECCode[]): string {
 	const codeStr = topCodes.join(', ');
 	return `
-    Analyze the following Holland Code (RIASEC) combination: ${codeStr}.
+    **Role:** You are a career counselor AI specializing in John Holland's RIASEC model.
+    **Task:** Analyze the Holland Code combination: **${codeStr}**. Provide a detailed, insightful, and encouraging analysis. The output MUST be a single, minified JSON object with no markdown formatting.
 
-    **Context:**
-    The codes represent personality types related to career interests:
+    **Context - RIASEC Definitions:**
     - R (Realistic): The "Doers" - practical, hands-on, physical.
     - I (Investigative): The "Thinkers" - analytical, observant, scientific.
     - A (Artistic): The "Creators" - expressive, original, independent.
@@ -72,31 +70,28 @@ function buildRIASECPrompt(topCodes: RIASECCode[]): string {
     - E (Enterprising): The "Persuaders" - leaders, persuasive, ambitious.
     - C (Conventional): The "Organizers" - detail-oriented, structured, precise.
 
-    **Task:**
-    Provide a detailed analysis for the combination "${codeStr}". Your response MUST be a single, minified JSON object with no markdown formatting.
-
-    **JSON Schema:**
+    **JSON Output Schema:**
     {
-      "topCode": "The three-letter code, e.g., 'S.E.A'",
-      "summary": "A detailed paragraph describing the personality profile, work style, and typical environment for someone with this code combination. Explain how the three traits interact.",
-      "keywords": ["An array of 5-7 keywords that describe this personality type, e.g., 'Empathetic', 'Leader', 'Creative', 'Organized'"],
-      "careers": ["An array of 5-7 specific job titles that are an excellent match for this profile, e.g., 'Social Worker', 'HR Manager', 'Event Coordinator'"]
+      "topCode": "The three-letter code, formatted with periods, e.g., 'S.E.A'",
+      "summary": "A detailed paragraph describing the personality profile, work style, and typical environment for someone with this code combination. Explain how the three traits interact to create a unique professional identity.",
+      "keywords": ["An array of exactly 6 keywords that describe this personality type, e.g., 'Empathetic', 'Leader', 'Creative', 'Organized', 'Communicative', 'Strategic'"],
+      "careers": ["An array of exactly 5 specific job titles that are an excellent match for this profile, e.g., 'Public Relations Manager', 'Fundraising Director', 'Art Director', 'Non-Profit Program Manager', 'Corporate Trainer'"]
     }
 
     **Example for S, E, A:**
     {"topCode":"S.E.A","summary":"Individuals with an SEA code are sociable, ambitious, and creative. They thrive in roles where they can lead and persuade others while also using their artistic and expressive talents. They are often found in leadership positions within creative industries, enjoying both the social interaction and the opportunity for innovation.","keywords":["Empathetic","Persuasive","Expressive","Leader","Communicative","Innovative"],"careers":["Public Relations Manager","Fundraising Director","Art Director","Non-Profit Program Manager","Corporate Trainer"]}
 
-    **Your JSON Response:**
+    **Your JSON Response for ${codeStr}:**
   `;
 }
 
 /**
- * Analyzes a set of RIASEC answers using an AI model.
+ * Analyzes a set of RIASEC answers using an AI model, following Holland's theory.
  * @param answers The array of RIASEC answers.
  * @returns A structured analysis of the user's RIASEC profile.
  */
 async function analyze(answers: RIASECAnswer[]): Promise<RIASECAnalysisResult> {
-	logger.info('Starting RIASEC analysis.');
+	logger.info('Starting RIASEC analysis based on Holland\'s theory.');
 
 	const scores = calculateRIASECScores(answers);
 	const topCodes = getTopRIASECCodes(scores);
@@ -106,13 +101,16 @@ async function analyze(answers: RIASECAnswer[]): Promise<RIASECAnalysisResult> {
 		const rawResponse = await aiService.callClaude(prompt);
 		const parsedResponse: RIASECAnalysisResult = JSON.parse(rawResponse);
 
+		// Rigorous validation against the expected schema
 		if (
-			!parsedResponse.topCode ||
-			!parsedResponse.summary ||
+			typeof parsedResponse.topCode !== 'string' ||
+			typeof parsedResponse.summary !== 'string' ||
 			!Array.isArray(parsedResponse.keywords) ||
-			!Array.isArray(parsedResponse.careers)
+			!Array.isArray(parsedResponse.careers) ||
+			parsedResponse.keywords.length === 0 ||
+			parsedResponse.careers.length === 0
 		) {
-			throw new Error('AI response for RIASEC analysis did not match the expected schema.');
+			throw new Error('AI response for RIASEC analysis did not match the required scientific schema.');
 		}
 
 		logger.info('Successfully completed RIASEC analysis.', { topCode: parsedResponse.topCode });
