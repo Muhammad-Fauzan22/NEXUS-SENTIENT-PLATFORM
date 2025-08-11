@@ -69,14 +69,7 @@ for (const key of requiredKeys) {
 }
 
 // --- Freeze to prevent runtime mutations and assert type ---
-export const env = Object.freeze(config as EnvironmentVariables);```
-
----
-
-3.  **Ganti Konten `logger.ts`:** Buka file `src/lib/server/utils/logger.ts` dan gantikan seluruh isinya dengan kode yang diperbaiki di bawah ini. Perubahan ini secara eksplisit mendefinisikan `context` sebagai parameter opsional di setiap fungsi yang diekspor.
-
-**PATH:** `src/lib/server/utils/logger.ts`
-```typescript
+export const env = Object.freeze(config as EnvironmentVariables);
 type LogLevel = 'INFO' | 'WARN' | 'ERROR';
 type LogContext = Record<string, unknown>;
 
