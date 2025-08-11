@@ -1,79 +1,74 @@
 <script lang="ts">
-	import { assessmentStore } from '$stores/assessmentStore';
-	import RadioGroup from '$components/ui/RadioGroup.svelte';
-	import RadioGroupItem from '$components/ui/RadioGroupItem.svelte';
-	import FormField from '$components/ui/FormField.svelte';
+	import { assessmentStore } from '../../../stores/assessmentStore';
+	import type { RIASECAnswer } from '$lib/types/schemas/assessment';
+	import { riasecQuestions } from '$lib/data/raw/riasecQuestions';
+	import Button from '$lib/components/ui/Button.svelte';
+	import Card from '$lib/components/ui/Card.svelte';
 
-	// Inisialisasi state RIASEC jika belum ada
-	if (!$assessmentStore.riasec_scores) {
-		$assessmentStore.riasec_scores = { R: 1, I: 1, A: 1, S: 1, E: 1, C: 1 };
+	let answers: { [key: number]: 'yes' | 'no' } = {};
+
+	function handleSubmit() {
+		if (Object.keys(answers).length !== riasecQuestions.length) {
+			alert('Please answer all questions before continuing.');
+			return;
+		}
+
+		const formattedAnswers: RIASECAnswer[] = Object.entries(answers).map(([id, answer]) => ({
+			question_id: parseInt(id, 10),
+			answer: answer
+		}));
+
+		assessmentStore.setRiasecAnswers(formattedAnswers);
 	}
 
-	const questions = [
-		{
-			id: 'R',
-			label: 'Realistic (Doers)',
-			description: 'Saya suka bekerja dengan tangan, mesin, atau alat; memperbaiki atau membuat sesuatu.'
-		},
-		{
-			id: 'I',
-			label: 'Investigative (Thinkers)',
-			description: 'Saya suka memecahkan masalah yang kompleks, melakukan riset, dan bekerja dengan ide.'
-		},
-		{
-			id: 'A',
-			label: 'Artistic (Creators)',
-			description: 'Saya suka terlibat dalam aktivitas kreatif seperti seni, drama, musik, atau menulis.'
-		},
-		{
-			id: 'S',
-			label: 'Social (Helpers)',
-			description: 'Saya suka membantu, mengajar, atau memberikan pelayanan kepada orang lain.'
-		},
-		{
-			id: 'E',
-			label: 'Enterprising (Persuaders)',
-			description: 'Saya suka memimpin, membujuk orang lain, dan menjual ide atau produk.'
-		},
-		{
-			id: 'C',
-			label: 'Conventional (Organizers)',
-			description: 'Saya suka bekerja dengan data, memiliki aturan yang jelas, dan menjaga semuanya terorganisir.'
-		}
-	];
-
-	const scoreOptions = [
-		{ value: 1, label: 'Sangat Tidak Sesuai' },
-		{ value: 2, label: 'Tidak Sesuai' },
-		{ value: 3, label: 'Netral' },
-		{ value: 4, label: 'Sesuai' },
-		{ value: 5, label: 'Sangat Sesuai' }
-	];
+	function goBack() {
+		assessmentStore.goToStep(1);
+	}
 </script>
 
-<div class="space-y-8 p-2">
-	<div class="text-center">
-		<h2 class="text-2xl font-serif font-semibold text-text">Langkah 2: Minat Vokasional (RIASEC)</h2>
-		<p class="text-neutral-600 mt-2">
-			Seberapa sesuai pernyataan-pernyataan berikut dengan diri Anda?
-		</p>
-	</div>
+<Card>
+	<h2 class="text-2xl font-bold text-gray-800 mb-2">RIASEC Assessment</h2>
+	<p class="text-gray-600 mb-6">
+		For each statement, choose whether you agree ("Yes") or disagree ("No"). This helps understand
+		your career interests.
+	</p>
 
-	{#each questions as question (question.id)}
-		<RadioGroup bind:value={$assessmentStore.riasec_scores[question.id]} name={`riasec-${question.id}`}>
-			<FormField label="" forId="">
-				<div class="p-4 border rounded-lg">
-					<p class="font-semibold">{question.label}</p>
-					<p class="text-sm text-neutral-600 mb-4">{question.description}</p>
-					<div class="flex flex-wrap justify-between gap-4">
-						{#each scoreOptions as option (option.value)}
-							<RadioGroupItem value={option.value} id={`riasec-${question.id}-${option.value}`}>
-								{option.label}
-							</RadioGroupItem>
-						{/each}
+	<form on:submit|preventDefault={handleSubmit} class="space-y-6">
+		<div class="space-y-4 max-h-[50vh] overflow-y-auto pr-4">
+			{#each riasecQuestions as question (question.id)}
+				<fieldset class="border-t border-gray-200 pt-4">
+					<legend class="text-md font-medium text-gray-700">{question.id}. {question.text}</legend>
+					<div class="flex items-center space-x-4 mt-2">
+						<label class="flex items-center cursor-pointer">
+							<input
+								type="radio"
+								name="q{question.id}"
+								value="yes"
+								class="radio radio-primary"
+								bind:group={answers[question.id]}
+								required
+							/>
+							<span class="ml-2">Yes</span>
+						</label>
+						<label class="flex items-center cursor-pointer">
+							<input
+								type="radio"
+								name="q{question.id}"
+								value="no"
+								class="radio"
+								bind:group={answers[question.id]}
+								required
+							/>
+							<span class="ml-2">No</span>
+						</label>
 					</div>
-				</div>
-			</FormField>
-		</RadioGroup>
-	{/each}
-</div>
+				</fieldset>
+			{/each}
+		</div>
+
+		<div class="flex justify-between pt-4">
+			<Button on:click={goBack} variant="secondary">Back</Button>
+			<Button type="submit" variant="primary">Continue to PWB Assessment</Button>
+		</div>
+	</form>
+</Card>
