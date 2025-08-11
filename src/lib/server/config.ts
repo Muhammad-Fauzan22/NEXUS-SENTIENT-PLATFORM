@@ -1,40 +1,143 @@
-import { z } from 'zod';
 import dotenv from 'dotenv';
 
-// Muat variabel dari file .env ke dalam process.env
-// Path disesuaikan untuk memastikan file .env di root proyek ditemukan
-import path from 'path';
-dotenv.config({ path: path.resolve(process.cwd(), '.env') });
+// Load environment variables from .env file at the very start
+dotenv.config();
 
-// Definisikan skema validasi untuk semua variabel lingkungan yang dibutuhkan
-const configSchema = z.object({
-	// Konfigurasi Supabase
-	PUBLIC_SUPABASE_URL: z.string().url('Invalid Supabase URL'),
-	PUBLIC_SUPABASE_ANON_KEY: z.string().startsWith('ey', 'Invalid Supabase Anon Key'),
-	SUPABASE_SERVICE_ROLE_KEY: z.string().min(1, 'Supabase Service Role Key is required'),
+// Define an interface for type safety
+interface EnvironmentVariables {
+	VITE_PUBLIC_SUPABASE_URL: string;
+	VITE_PUBLIC_SUPABASE_ANON_KEY: string;
+	SUPABASE_URL: string;
+	SUPABASE_SERVICE_ROLE_KEY: string;
+	GOOGLE_CREDENTIALS_JSON: string;
+	GDRIVE_FOLDER_ID: string;
+	CLAUDE_API_KEY: string;
+	GEMINI_API_KEY: string;
+	PERPLEXITY_API_KEY: string;
+	OPENAI_API_KEY: string;
+	DEEPSEEK_API_KEYS: string;
+	COHERE_API_KEYS: string;
+	SMTP_HOST: string;
+	SMTP_PORT: string;
+	SMTP_USER: string;
+	SMTP_PASS: string;
+}
 
-	// Konfigurasi Google API
-	GOOGLE_CREDENTIALS_JSON: z.string().min(1, 'Google Credentials JSON is required'),
+const config: Partial<EnvironmentVariables> = {
+	VITE_PUBLIC_SUPABASE_URL: process.env.VITE_PUBLIC_SUPABASE_URL,
+	VITE_PUBLIC_SUPABASE_ANON_KEY: process.env.VITE_PUBLIC_SUPABASE_ANON_KEY,
+	SUPABASE_URL: process.env.SUPABASE_URL,
+	SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
+	GOOGLE_CREDENTIALS_JSON: process.env.GOOGLE_CREDENTIALS_JSON,
+	GDRIVE_FOLDER_ID: process.env.GDRIVE_FOLDER_ID,
+	CLAUDE_API_KEY: process.env.CLAUDE_API_KEY,
+	GEMINI_API_KEY: process.env.GEMINI_API_KEY,
+	PERPLEXITY_API_KEY: process.env.PERPLEXITY_API_KEY,
+	OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+	DEEPSEEK_API_KEYS: process.env.DEEPSEEK_API_KEYS,
+	COHERE_API_KEYS: process.env.COHERE_API_KEYS,
+	SMTP_HOST: process.env.SMTP_HOST,
+	SMTP_PORT: process.env.SMTP_PORT,
+	SMTP_USER: process.env.SMTP_USER,
+	SMTP_PASS: process.env.SMTP_PASS
+};
 
-	// Konfigurasi API AI (contoh, tambahkan semua yang Anda gunakan)
-	AZURE_OPENAI_KEY: z.string().min(1, 'Azure OpenAI Key is required').optional(),
-	GEMINI_API_KEY: z.string().min(1, 'Gemini API Key is required').optional(),
-	CLAUDE_API_KEY: z.string().min(1, 'Claude API Key is required').optional(),
-	// ...tambahkan kunci API lainnya di sini
+// --- Validation ---
+const requiredKeys: Array<keyof EnvironmentVariables> = [
+	'VITE_PUBLIC_SUPABASE_URL',
+	'VITE_PUBLIC_SUPABASE_ANON_KEY',
+	'SUPABASE_URL',
+	'SUPABASE_SERVICE_ROLE_KEY',
+	'GOOGLE_CREDENTIALS_JSON',
+	'GDRIVE_FOLDER_ID',
+	'CLAUDE_API_KEY',
+	'GEMINI_API_KEY',
+	'PERPLEXITY_API_KEY',
+	'OPENAI_API_KEY',
+	'DEEPSEEK_API_KEYS',
+	'COHERE_API_KEYS',
+	'SMTP_HOST',
+	'SMTP_PORT',
+	'SMTP_USER',
+	'SMTP_PASS'
+];
 
-	// Konfigurasi SMTP untuk pengiriman email
-	SMTP_HOST: z.string().min(1, 'SMTP Host is required').optional(),
-	SMTP_PORT: z.coerce.number().int().positive('SMTP Port must be a positive integer').optional(),
-	SMTP_USER: z.string().min(1, 'SMTP User is required').optional(),
-	SMTP_PASS: z.string().min(1, 'SMTP Pass is required').optional(),
+for (const key of requiredKeys) {
+	if (!config[key]) {
+		throw new Error(`FATAL: Missing required environment variable: ${key}`);
+	}
+}
 
-	// Mode aplikasi
-	NODE_ENV: z.enum(['development', 'production', 'test']).default('development')
-});
+// --- Freeze to prevent runtime mutations and assert type ---
+export const env = Object.freeze(config as EnvironmentVariables);```
+
+---
+
+3.  **Ganti Konten `logger.ts`:** Buka file `src/lib/server/utils/logger.ts` dan gantikan seluruh isinya dengan kode yang diperbaiki di bawah ini. Perubahan ini secara eksplisit mendefinisikan `context` sebagai parameter opsional di setiap fungsi yang diekspor.
+
+**PATH:** `src/lib/server/utils/logger.ts`
+```typescript
+type LogLevel = 'INFO' | 'WARN' | 'ERROR';
+type LogContext = Record<string, unknown>;
 
 /**
- * Objek konfigurasi yang divalidasi dan aman secara tipe.
- * Jika ada variabel lingkungan yang hilang atau tidak valid saat startup,
- * aplikasi akan gagal dengan error yang jelas.
+ * The core logging function. Avoid using this directly.
+ * @param level The severity level of the log.
+ * @param message The main log message.
+ * @param context Optional additional data to include in the log.
  */
-export const config = configSchema.parse(process.env);
+function log(level: LogLevel, message: string, context: LogContext = {}): void {
+	const logObject = {
+		timestamp: new Date().toISOString(),
+		level,
+		message,
+		...context
+	};
+
+	const logString = JSON.stringify(logObject);
+
+	switch (level) {
+		case 'INFO':
+			console.info(logString);
+			break;
+		case 'WARN':
+			console.warn(logString);
+			break;
+		case 'ERROR':
+			console.error(logString);
+			break;
+	}
+}
+
+/**
+ * Logs an informational message. Use for general application flow events.
+ * @param message The main log message.
+ * @param context Optional additional data.
+ */
+export function info(message: string, context?: LogContext): void {
+	log('INFO', message, context);
+}
+
+/**
+ * Logs a warning message. Use for non-critical issues that should be investigated.
+ * @param message The main log message.
+ * @param context Optional additional data.
+ */
+export function warn(message: string, context?: LogContext): void {
+	log('WARN', message, context);
+}
+
+/**
+ * Logs an error message. Use for critical failures, exceptions, and unexpected states.
+ * @param message The main log message.
+ * @param context Optional additional data, often including an error object.
+ */
+export function error(message: string, context?: LogContext): void {
+	log('ERROR', message, context);
+}
+
+export const logger = {
+	info,
+	warn,
+	error
+};
