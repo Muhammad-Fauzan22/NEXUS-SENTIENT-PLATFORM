@@ -1,14 +1,6 @@
 import type { GeneratedIDP } from '$lib/types/schemas';
 
 /**
- * Opsi konfigurasi standar untuk setiap provider AI.
- */
-export interface AIProviderConfig {
-	apiKey: string;
-	apiEndpoint: string;
-}
-
-/**
  * Antarmuka (Interface) yang mendefinisikan "kontrak" untuk semua provider AI.
  * Setiap provider yang kita buat (Azure, Gemini, Claude, dll.) HARUS
  * mengimplementasikan metode-metode ini. Ini memastikan konsistensi
