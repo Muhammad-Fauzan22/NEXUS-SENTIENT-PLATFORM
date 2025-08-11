@@ -1,49 +1,79 @@
-export interface RIASECQuestion {
-	id: number;
-	text: string;
-}
+<script lang="ts">
+	import { assessmentStore } from '$stores/assessmentStore';
+	import RadioGroup from '$components/ui/RadioGroup.svelte';
+	import RadioGroupItem from '$components/ui/RadioGroupItem.svelte';
+	import FormField from '$components/ui/FormField.svelte';
 
-export const riasecQuestions: RIASECQuestion[] = [
-    { id: 1, text: 'Saya suka bekerja dengan perkakas.' },
-    { id: 2, text: 'Saya suka melakukan eksperimen ilmiah.' },
-    { id: 3, text: 'Saya suka menggambar atau melukis.' },
-    { id: 4, text: 'Saya suka membantu orang lain.' },
-    { id: 5, text: 'Saya suka memimpin sebuah tim.' },
-    { id: 6, text: 'Saya suka bekerja dengan angka.' },
-    { id: 7, text: 'Saya bisa memperbaiki barang-barang elektronik.' },
-    { id: 8, text: 'Saya bisa memahami teori-teori ilmiah.' },
-    { id: 9, text: 'Saya bisa bermain alat musik.' },
-    { id: 10, text: 'Saya pandai mengajar orang lain.' },
-    { id: 11, text: 'Saya pandai meyakinkan orang lain.' },
-    { id: 12, text: 'Saya pandai menjaga catatan yang rapi.' },
-    { id: 13, text: 'Saya suka bekerja di luar ruangan.' },
-    { id: 14, text: 'Saya suka membaca buku-buku ilmiah.' },
-    { id: 15, text: 'Saya suka menulis cerita atau puisi.' },
-    { id: 16, text: 'Saya suka bekerja dalam tim.' },
-    { id: 17, text: 'Saya suka memulai bisnis sendiri.' },
-    { id: 18, text: 'Saya suka mengikuti prosedur yang jelas.' },
-    { id: 19, text: 'Saya suka membangun sesuatu.' },
-    { id: 20, text: 'Saya suka memecahkan masalah matematika.' },
-    { id: 21, text: 'Saya suka mendesain sesuatu.' },
-    { id: 22, text: 'Saya suka menjadi sukarelawan.' },
-    { id: 23, text: 'Saya suka memberikan pidato.' },
-    { id: 24, text: 'Saya suka mengelola anggaran.' },
-    { id: 25, text: 'Saya suka bekerja dengan mesin.' },
-    { id: 26, text: 'Saya suka melakukan penelitian.' },
-    { id: 27, text: 'Saya suka fotografi.' },
-    { id: 28, text: 'Saya suka mendengarkan masalah orang lain.' },
-    { id: 29, text: 'Saya suka menjual produk atau ide.' },
-    { id: 30, text: 'Saya suka membuat jadwal.' },
-    { id: 31, text: 'Saya suka berolahraga.' },
-    { id: 32, text: 'Saya suka menganalisis data.' },
-    { id: 33, text: 'Saya suka berakting dalam drama.' },
-    { id: 34, text: 'Saya suka merawat orang sakit.' },
-    { id: 35, text: 'Saya suka bernegosiasi.' },
-    { id: 36, text: 'Saya suka memeriksa dokumen untuk mencari kesalahan.' },
-    { id: 37, text: 'Saya suka bekerja dengan tangan saya.' },
-    { id: 38, text: 'Saya suka belajar tentang alam semesta.' },
-    { id: 39, text: 'Saya suka menciptakan resep baru.' },
-    { id: 40, text: 'Saya suka menasihati teman-teman saya.' },
-    { id: 41, text: 'Saya suka mengorganisir acara.' },
-    { id: 42, text: 'Saya suka bekerja di kantor.' }
-];
+	// Inisialisasi state RIASEC jika belum ada
+	if (!$assessmentStore.riasec_scores) {
+		$assessmentStore.riasec_scores = { R: 1, I: 1, A: 1, S: 1, E: 1, C: 1 };
+	}
+
+	const questions = [
+		{
+			id: 'R',
+			label: 'Realistic (Doers)',
+			description: 'Saya suka bekerja dengan tangan, mesin, atau alat; memperbaiki atau membuat sesuatu.'
+		},
+		{
+			id: 'I',
+			label: 'Investigative (Thinkers)',
+			description: 'Saya suka memecahkan masalah yang kompleks, melakukan riset, dan bekerja dengan ide.'
+		},
+		{
+			id: 'A',
+			label: 'Artistic (Creators)',
+			description: 'Saya suka terlibat dalam aktivitas kreatif seperti seni, drama, musik, atau menulis.'
+		},
+		{
+			id: 'S',
+			label: 'Social (Helpers)',
+			description: 'Saya suka membantu, mengajar, atau memberikan pelayanan kepada orang lain.'
+		},
+		{
+			id: 'E',
+			label: 'Enterprising (Persuaders)',
+			description: 'Saya suka memimpin, membujuk orang lain, dan menjual ide atau produk.'
+		},
+		{
+			id: 'C',
+			label: 'Conventional (Organizers)',
+			description: 'Saya suka bekerja dengan data, memiliki aturan yang jelas, dan menjaga semuanya terorganisir.'
+		}
+	];
+
+	const scoreOptions = [
+		{ value: 1, label: 'Sangat Tidak Sesuai' },
+		{ value: 2, label: 'Tidak Sesuai' },
+		{ value: 3, label: 'Netral' },
+		{ value: 4, label: 'Sesuai' },
+		{ value: 5, label: 'Sangat Sesuai' }
+	];
+</script>
+
+<div class="space-y-8 p-2">
+	<div class="text-center">
+		<h2 class="text-2xl font-serif font-semibold text-text">Langkah 2: Minat Vokasional (RIASEC)</h2>
+		<p class="text-neutral-600 mt-2">
+			Seberapa sesuai pernyataan-pernyataan berikut dengan diri Anda?
+		</p>
+	</div>
+
+	{#each questions as question (question.id)}
+		<RadioGroup bind:value={$assessmentStore.riasec_scores[question.id]} name={`riasec-${question.id}`}>
+			<FormField label="" forId="">
+				<div class="p-4 border rounded-lg">
+					<p class="font-semibold">{question.label}</p>
+					<p class="text-sm text-neutral-600 mb-4">{question.description}</p>
+					<div class="flex flex-wrap justify-between gap-4">
+						{#each scoreOptions as option (option.value)}
+							<RadioGroupItem value={option.value} id={`riasec-${question.id}-${option.value}`}>
+								{option.label}
+							</RadioGroupItem>
+						{/each}
+					</div>
+				</div>
+			</FormField>
+		</RadioGroup>
+	{/each}
+</div>
