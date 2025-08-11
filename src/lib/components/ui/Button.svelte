@@ -1,46 +1,27 @@
 <script lang="ts">
-	import { type VariantProps, tv } from 'tailwind-variants';
-	import type { Button as ButtonPrimitive } from 'bits-ui';
-	import { cn } from '$lib/utils/cn';
+	import clsx from 'clsx';
 
-	type $$Props = ButtonPrimitive.Props;
-	type $$Events = ButtonPrimitive.Events;
+	type Variant = 'primary' | 'secondary';
 
-	const buttonVariants = tv({
-		base: 'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
-		variants: {
-			variant: {
-				default: 'bg-primary text-primary-foreground hover:bg-primary/90',
-				destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
-				outline: 'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
-				secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
-				ghost: 'hover:bg-accent hover:text-accent-foreground',
-				link: 'text-primary underline-offset-4 hover:underline'
-			},
-			size: {
-				default: 'h-10 px-4 py-2',
-				sm: 'h-9 rounded-md px-3',
-				lg: 'h-11 rounded-md px-8',
-				icon: 'h-10 w-10'
-			}
-		},
-		defaultVariants: {
-			variant: 'default',
-			size: 'default'
-		}
-	});
+	export let variant: Variant = 'primary';
+	export let disabled: boolean = false;
 
-	let className: $$Props['class'] = undefined;
-	export let variant: VariantProps<typeof buttonVariants>['variant'] = 'default';
-	export let size: VariantProps<typeof buttonVariants>['size'] = 'default';
-	export { className as class };
+	const baseClasses =
+		'px-4 py-2 rounded-md font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200';
+
+	const variantClasses: Record<Variant, string> = {
+		primary: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500',
+		secondary: 'bg-gray-200 text-gray-800 hover:bg-gray-300 focus:ring-gray-400'
+	};
+
+	const disabledClasses = 'opacity-50 cursor-not-allowed';
 </script>
 
-<ButtonPrimitive.Root
-	class="{cn(buttonVariants({ variant, size, class: className }))}"
+<button
 	{...$$restProps}
+	class={clsx(baseClasses, variantClasses[variant], disabled && disabledClasses, $$props.class)}
+	{disabled}
 	on:click
-	on:keydown
 >
 	<slot />
-</ButtonPrimitive.Root>
+</button>
