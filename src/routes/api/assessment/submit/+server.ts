@@ -1,65 +1,74 @@
-import { json, type RequestHandler } from '@svelte/kit';
-import { assessmentSchema } from '$lib/types/schemas';
-import { dbService } from '$lib/server/services/dbService';
-import { analyzeProfile } from '$lib/server/ai/profile.analyzer';
-import { generateIdp } from '$lib/server/ai/idp.generator';
-import { formatIdp } from '$lib/server/ai/idp.formatter';
-import { handleApiError } from '$lib/server/utils/errors';
+import type { RequestHandler } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+import { supabase } from '$lib/db/supabase'; // Assuming supabase client is in lib/db
+import { pwbAnalyzer } from '$lib/server/ai/analyzers/pwbAnalyzer';
+import { riasecAnalyzer } from '$lib/server/ai/analyzers/riasecAnalyzer';
+import { idpGenerator } from '$lib/server/ai/generators/idpGenerator';
 import { logger } from '$lib/server/utils/logger';
+import { BadRequestError, InternalServerError } from '$lib/server/utils/errors';
 
 /**
- * @description API Endpoint for submitting assessment data and triggering the full IDP generation pipeline.
+ * API Endpoint to submit assessment data, generate analysis, and create an IDP.
  */
 export const POST: RequestHandler = async ({ request }) => {
-	const transactionId = crypto.randomUUID();
-	logger.info({ transactionId }, `Menerima pengajuan asesmen baru.`);
-
 	try {
-		const rawData = await request.json();
-		logger.debug({ transactionId }, `Mem-parsing dan memvalidasi body permintaan.`);
+		const assessmentData = await request.json();
 
-		const assessmentData = assessmentSchema.parse(rawData);
-		logger.info({ transactionId }, `Validasi berhasil.`);
+		// Basic validation
+		if (!assessmentData || !assessmentData.user_data || !assessmentData.riasec_answers || !assessmentData.pwb_answers) {
+			throw new BadRequestError('Invalid assessment data payload.');
+		}
 
-		const rawAssessmentId = await dbService.saveRawAssessment({
-			submission_data: assessmentData as any
+		// 1. Analyze RIASEC and PWB in parallel
+		const [riasecResult, pwbResult] = await Promise.all([
+			riasecAnalyzer.analyze(assessmentData.riasec_answers),
+			pwbAnalyzer.analyze(assessmentData.pwb_answers)
+		]);
+
+		// 2. Generate the Individual Development Plan (IDP)
+		const idpResult = await idpGenerator.generate({
+			userData: assessmentData.user_data,
+			riasecAnalysis: riasecResult,
+			pwbAnalysis: pwbResult
 		});
-		logger.info({ transactionId, rawAssessmentId }, `Asesmen mentah berhasil disimpan.`);
 
-		const structuredProfile = await analyzeProfile(assessmentData);
-		logger.info({ transactionId }, `Analisis profil selesai.`);
+		// 3. Store everything in Supabase
+		const { data: submissionData, error: submissionError } = await supabase
+			.from('assessment_submissions')
+			.insert([
+				{
+					user_info: assessmentData.user_data,
+					riasec_answers: assessmentData.riasec_answers,
+					pwb_answers: assessmentData.pwb_answers,
+					riasec_result: riasecResult,
+					pwb_result: pwbResult,
+					generated_idp: idpResult,
+					// TODO: Link to a user ID if you have authentication
+					// user_id: '...'
+				}
+			])
+			.select()
+			.single();
 
-		const profileId = await dbService.saveStructuredProfile({
-			...structuredProfile,
-			raw_assessment_id: rawAssessmentId
-		});
-		logger.info({ transactionId, profileId }, `Profil terstruktur berhasil disimpan.`);
+		if (submissionError) {
+			throw new InternalServerError('Failed to store assessment results.', { dbError: submissionError });
+		}
 
-        const fullProfile = await dbService.getProfileById(profileId);
+		logger.info('Successfully processed and stored new assessment.', { submissionId: submissionData.id });
 
-		const idpJsonContent = await generateIdp(fullProfile);
-		logger.info({ transactionId }, `Konten IDP JSON berhasil digenerate.`);
+		return json({
+			success: true,
+			submissionId: submissionData.id,
+			idp: idpResult
+		}, { status: 201 });
 
-		const idpHtmlContent = formatIdp(idpJsonContent);
-		logger.info({ transactionId }, `Konten IDP HTML berhasil diformat.`);
+	} catch (err) {
+		if (err instanceof ApiError) {
+			logger.warn(`API Error: ${err.message}`, { status: err.status, context: err.context });
+			return json({ message: err.message }, { status: err.status });
+		}
 
-		const idpRecord = await dbService.saveIdpRecord({
-			profile_id: profileId,
-			json_content: idpJsonContent as any,
-			html_content: idpHtmlContent
-		});
-		logger.info({ transactionId, idpRecordId: idpRecord.id }, `Record IDP final berhasil disimpan.`);
-
-		return json(
-			{
-				success: true,
-				message: 'IDP berhasil digenerate.',
-				idpRecordId: idpRecord.id
-			},
-			{ status: 201 }
-		);
-
-	} catch (error) {
-		return handleApiError(error, transactionId);
+		logger.error('An unexpected error occurred in the submission endpoint.', { error: err });
+		return json({ message: 'An unexpected error occurred.' }, { status: 500 });
 	}
 };
