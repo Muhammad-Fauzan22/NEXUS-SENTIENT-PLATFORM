@@ -1,88 +1,74 @@
 <script lang="ts">
-	import { assessmentStore } from '$stores/assessmentStore';
-	import RadioGroup from '$components/ui/RadioGroup.svelte';
-	import RadioGroupItem from '$components/ui/RadioGroupItem.svelte';
-	import FormField from '$components/ui/FormField.svelte';
+	import { assessmentStore } from '../../../stores/assessmentStore';
+	import type { PWBAnswer } from '$lib/types/schemas/assessment';
+	import { pwbQuestions } from '$lib/data/raw/pwbQuestions';
+	import Button from '$lib/components/ui/Button.svelte';
+	import Card from '$lib/components/ui/Card.svelte';
 
-	// Inisialisasi state PWB jika belum ada
-	if (!$assessmentStore.pwb_scores) {
-		$assessmentStore.pwb_scores = {
-			self_acceptance: 1,
-			positive_relations: 1,
-			autonomy: 1,
-			environmental_mastery: 1,
-			purpose_in_life: 1,
-			personal_growth: 1
-		};
+	// Use a map to store raw selections from radio buttons (as strings)
+	let selections: Map<number, string> = new Map();
+
+	function handleSubmit() {
+		if (selections.size !== pwbQuestions.length) {
+			alert('Please answer all questions before submitting.');
+			return;
+		}
+
+		const formattedAnswers: PWBAnswer[] = [];
+		for (const question of pwbQuestions) {
+			let score = parseInt(selections.get(question.id) || '0', 10);
+			if (question.reversed) {
+				score = 7 - score; // Reverse score (1->6, 2->5, ..., 6->1)
+			}
+			formattedAnswers.push({ question_id: question.id, score });
+		}
+
+		assessmentStore.setPwbAnswers(formattedAnswers);
+		assessmentStore.submitAssessment(); // Trigger the final submission
 	}
 
-	const questions = [
-		{
-			id: 'self_acceptance',
-			label: 'Penerimaan Diri',
-			description: 'Saya memiliki pandangan positif terhadap diri saya sendiri.'
-		},
-		{
-			id: 'positive_relations',
-			label: 'Hubungan Positif',
-			description: 'Saya merasa memiliki hubungan yang hangat dan memuaskan dengan orang lain.'
-		},
-		{
-			id: 'autonomy',
-			label: 'Otonomi',
-			description: 'Saya yakin dengan pendapat saya, bahkan jika berbeda dari konsensus umum.'
-		},
-		{
-			id: 'environmental_mastery',
-			label: 'Penguasaan Lingkungan',
-			description: 'Saya mampu mengelola tanggung jawab kehidupan sehari-hari dengan baik.'
-		},
-		{
-			id: 'purpose_in_life',
-			label: 'Tujuan Hidup',
-			description: 'Saya merasa hidup saya memiliki arah dan makna.'
-		},
-		{
-			id: 'personal_growth',
-			label: 'Pertumbuhan Pribadi',
-			description: 'Saya melihat diri saya berkembang sebagai pribadi dan terus menjadi lebih baik.'
-		}
-	];
-
-	const scoreOptions = [
-		{ value: 1, label: 'Sangat Tidak Setuju' },
-		{ value: 2, label: 'Tidak Setuju' },
-		{ value: 3, label: 'Netral' },
-		{ value: 4, label: 'Setuju' },
-		{ value: 5, label: 'Sangat Setuju' }
-	];
+	function goBack() {
+		assessmentStore.goToStep(2);
+	}
 </script>
 
-<div class="space-y-8 p-2">
-	<div class="text-center">
-		<h2 class="text-2xl font-serif font-semibold text-text">
-			Langkah 3: Kesejahteraan Psikologis (PWB)
-		</h2>
-		<p class="text-neutral-600 mt-2">
-			Seberapa setuju Anda dengan pernyataan-pernyataan berikut?
-		</p>
+<Card>
+	<h2 class="text-2xl font-bold text-gray-800 mb-2">Psychological Well-Being Scale</h2>
+	<p class="text-gray-600 mb-6">
+		Rate each statement on a scale of 1 to 6 based on how much you agree.
+	</p>
+	<div class="text-sm text-center text-gray-500 mb-6 p-2 bg-gray-50 rounded-md">
+		1 = Strongly Disagree | 2 = Disagree | 3 = Slightly Disagree | 4 = Slightly Agree | 5 = Agree | 6
+		= Strongly Agree
 	</div>
 
-	{#each questions as question (question.id)}
-		<RadioGroup bind:value={$assessmentStore.pwb_scores[question.id]} name={`pwb-${question.id}`}>
-			<FormField label="" forId="">
-				<div class="p-4 border rounded-lg">
-					<p class="font-semibold">{question.label}</p>
-					<p class="text-sm text-neutral-600 mb-4">{question.description}</p>
-					<div class="flex flex-wrap justify-between gap-4">
-						{#each scoreOptions as option (option.value)}
-							<RadioGroupItem value={option.value} id={`pwb-${question.id}-${option.value}`}>
-								{option.label}
-							</RadioGroupItem>
+	<form on:submit|preventDefault={handleSubmit} class="space-y-6">
+		<div class="space-y-5 max-h-[50vh] overflow-y-auto pr-4">
+			{#each pwbQuestions as question (question.id)}
+				<fieldset class="border-t border-gray-200 pt-4">
+					<legend class="text-md font-medium text-gray-700">{question.id}. {question.text}</legend>
+					<div class="flex justify-around items-center mt-3">
+						{#each { 1, 2, 3, 4, 5, 6 } as score}
+							<label class="flex flex-col items-center cursor-pointer">
+								<input
+									type="radio"
+									name="q{question.id}"
+									value={score}
+									class="radio radio-sm"
+									on:change={() => selections.set(question.id, String(score))}
+									required
+								/>
+								<span class="text-xs mt-1">{score}</span>
+							</label>
 						{/each}
 					</div>
-				</div>
-			</FormField>
-		</RadioGroup>
-	{/each}
-</div>
+				</fieldset>
+			{/each}
+		</div>
+
+		<div class="flex justify-between pt-4">
+			<Button on:click={goBack} variant="secondary">Back</Button>
+			<Button type="submit" variant="primary">Submit & Generate My Plan</Button>
+		</div>
+	</form>
+</Card>
