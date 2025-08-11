@@ -22,7 +22,6 @@ export const pwbSchema = z.object({
 
 /**
  * Skema validasi Zod untuk data asesmen lengkap yang dikirim dari frontend.
- * Ini adalah "kontrak" data yang ketat antara frontend dan backend.
  */
 export const assessmentSchema = z.object({
 	riasec_scores: riasecSchema,
@@ -31,23 +30,41 @@ export const assessmentSchema = z.object({
 	aspirations: z.string().min(20, 'Aspirasi karir minimal harus 20 karakter.')
 });
 
-/**
- * Tipe TypeScript yang diinferensi secara otomatis dari skema Zod.
- * Ini memastikan bahwa tipe data kita selalu sinkron dengan aturan validasi.
- */
 export type AssessmentSubmission = z.infer<typeof assessmentSchema>;
 
+// --- Tipe Spesifik untuk Output IDP dari AI ---
+
+const developmentAreaSchema = z.object({
+    focus: z.string(),
+    courses: z.array(z.string()).optional(),
+    development_programs: z.array(z.string()).optional(),
+    clubs: z.array(z.string()).optional(),
+    mentors: z.array(z.string()).optional(),
+    knowledge: z.string(),
+    skills: z.string(),
+    attitude: z.string(),
+    kpis: z.array(z.string())
+});
+
+const semesterRoadmapSchema = z.object({
+    semester: z.number(),
+    theme: z.string(),
+    academic: developmentAreaSchema,
+    non_academic: developmentAreaSchema
+});
+
 /**
- * Tipe untuk objek IDP yang digenerate oleh AI.
+ * Skema Zod untuk memvalidasi output JSON dari AI.
+ * Ini memastikan bahwa data yang kita terima memiliki struktur yang kita harapkan.
  */
-export interface GeneratedIDP {
-	linkedin_summary: string;
-	potential_analysis: string;
-	career_goals_analysis: string;
-	roadmap: Array<{
-		semester: number;
-		theme: string;
-		academic: object;
-		non_academic: object;
-	}>;
-}
+export const generatedIdpSchema = z.object({
+    linkedin_summary: z.string(),
+    potential_analysis: z.string(),
+    career_goals_analysis: z.string(),
+    roadmap: z.array(semesterRoadmapSchema)
+});
+
+/**
+ * Tipe TypeScript yang diinferensi dari skema Zod untuk IDP.
+ */
+export type GeneratedIDP = z.infer<typeof generatedIdpSchema>;

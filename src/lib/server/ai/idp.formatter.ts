@@ -28,16 +28,16 @@ export function formatIdp(idpJson: GeneratedIDP): string {
           <div class="development-area">
             <h4>Akademik</h4>
             <p><strong>Fokus:</strong> ${semester.academic.focus}</p>
-            <p><strong>Mata Kuliah Relevan:</strong> ${semester.academic.courses.join(', ')}</p>
+            <p><strong>Mata Kuliah Relevan:</strong> ${semester.academic.courses?.join(', ') ?? 'N/A'}</p>
             <p><strong>KPIs:</strong></p>
-            <ul>${semester.academic.kpis.map((kpi) => `<li>${kpi}</li>`).join('')}</ul>
+            <ul>${semester.academic.kpis.map((kpi: string) => `<li>${kpi}</li>`).join('')}</ul>
           </div>
           <div class="development-area">
             <h4>Non-Akademik</h4>
             <p><strong>Fokus:</strong> ${semester.non_academic.focus}</p>
-            <p><strong>Program Pengembangan:</strong> ${semester.non_academic.development_programs.join(', ')}</p>
+            <p><strong>Program Pengembangan:</strong> ${semester.non_academic.development_programs?.join(', ') ?? 'N/A'}</p>
             <p><strong>KPIs:</strong></p>
-            <ul>${semester.non_academic.kpis.map((kpi) => `<li>${kpi}</li>`).join('')}</ul>
+            <ul>${semester.non_academic.kpis.map((kpi: string) => `<li>${kpi}</li>`).join('')}</ul>
           </div>
         </div>
       `;

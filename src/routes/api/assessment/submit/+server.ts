@@ -1,64 +1,75 @@
-import { json } from '@sveltejs/kit';
-import { assessmentSchema } from '$lib/types/schemas';
+import { json, type RequestHandler } from '@sveltejs/kit';
 import { ZodError } from 'zod';
-import { saveAssessment } from '$lib/server/services/dbService';
+import { assessmentSchema } from '$lib/types/schemas';
+import { dbService } from '$lib/server/services/dbService';
+import { analyzeProfile } from '$lib/server/ai/profile.analyzer';
+import { generateIdp } from '$lib/server/ai/idp.generator';
+import { formatIdp } from '$lib/server/ai/idp.formatter';
+import { handleApiError } from '$lib/server/utils/errors';
 import { logger } from '$lib/server/utils/logger';
-import { AppError } from '$lib/server/utils/errors';
-import type { RequestHandler } from './$types';
 
+/**
+ * @description API Endpoint for submitting assessment data and triggering the full IDP generation pipeline.
+ */
 export const POST: RequestHandler = async ({ request }) => {
-	// TODO: Implement actual session authentication
-	const mockUserId = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'; // Placeholder
+	const transactionId = crypto.randomUUID();
+	logger.info({ transactionId }, `Menerima pengajuan asesmen baru.`);
 
 	try {
-		const body = await request.json();
-		logger.info('Received new assessment request...');
+		const rawData = await request.json();
+		logger.debug({ transactionId }, `Mem-parsing dan memvalidasi body permintaan.`);
 
-		// 1. Validate input using Zod
-		const submissionData = assessmentSchema.parse(body);
-		logger.debug({ data: submissionData }, 'Assessment data is valid.');
+		// 1. Validasi input terhadap skema
+		const assessmentData = assessmentSchema.parse(rawData);
+		logger.info({ transactionId }, `Validasi berhasil.`);
 
-		// 2. Save raw assessment data to database
-		const assessment = await saveAssessment(mockUserId, submissionData);
-
-		// 3. Trigger IDP generation pipeline (placeholder for now)
-		const idp = {
-			id: 'mock-idp-id-' + Date.now(),
-			assessmentId: assessment.id,
-			userId: mockUserId,
-			createdAt: new Date().toISOString(),
-			status: 'generated'
-		};
-
-		logger.info({ userId: mockUserId, idpId: idp.id }, 'IDP successfully generated.');
-		return json(idp, { status: 200 });
-	} catch (e) {
-		if (e instanceof ZodError) {
-			logger.warn('Invalid assessment request.', { errors: e.errors });
-			return json({ 
-				error: 'Invalid input.', 
-				details: e.flatten() 
-			}, { status: 400 });
-		}
-		if (e instanceof AppError) {
-			logger.warn(`API Error: ${e.message}`, { 
-				statusCode: e.statusCode, 
-				errorCode: e.errorCode 
-			});
-			return json({ 
-				error: e.message, 
-				errorCode: e.errorCode 
-			}, { status: e.statusCode });
-		}
-
-		// Handle unexpected errors
-		const error = e as Error;
-		logger.error('Fatal error on assessment submit endpoint:', {
-			message: error.message,
-			stack: error.stack
+		// 2. Simpan data asesmen mentah ke database
+		const rawAssessmentId = await dbService.saveRawAssessment({
+			submission_data: assessmentData as any
 		});
-		return json({ 
-			error: 'Internal server error occurred.' 
-		}, { status: 500 });
+		logger.info({ transactionId, rawAssessmentId }, `Asesmen mentah berhasil disimpan.`);
+
+		// 3. Analisis data mentah untuk membuat profil terstruktur
+		const structuredProfile = await analyzeProfile(assessmentData);
+		logger.info({ transactionId }, `Analisis profil selesai.`);
+
+		// 4. Simpan profil terstruktur ke database
+		const profileId = await dbService.saveStructuredProfile({
+			...structuredProfile,
+			raw_assessment_id: rawAssessmentId
+		});
+		logger.info({ transactionId, profileId }, `Profil terstruktur berhasil disimpan.`);
+
+        // Ambil profil yang baru disimpan untuk mendapatkan semua kolom (termasuk ID)
+        const fullProfile = await dbService.getProfileById(profileId);
+
+		// 5. Hasilkan Individual Development Plan (IDP)
+		const idpJsonContent = await generateIdp(fullProfile);
+		logger.info({ transactionId }, `Konten IDP JSON berhasil digenerate.`);
+
+		// 6. Format IDP JSON menjadi HTML terstruktur
+		const idpHtmlContent = formatIdp(idpJsonContent);
+		logger.info({ transactionId }, `Konten IDP HTML berhasil diformat.`);
+
+		// 7. Simpan record IDP final ke database
+		const idpRecord = await dbService.saveIdpRecord({
+			profile_id: profileId,
+			json_content: idpJsonContent as any,
+			html_content: idpHtmlContent
+		});
+		logger.info({ transactionId, idpRecordId: idpRecord.id }, `Record IDP final berhasil disimpan.`);
+
+		// 8. Kembalikan ID dari IDP yang digenerate ke klien
+		return json(
+			{
+				success: true,
+				message: 'IDP berhasil digenerate.',
+				idpRecordId: idpRecord.id
+			},
+			{ status: 201 }
+		);
+
+	} catch (error) {
+		return handleApiError(error, transactionId);
 	}
 };
