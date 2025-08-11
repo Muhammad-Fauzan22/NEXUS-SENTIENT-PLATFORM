@@ -1,94 +1,105 @@
-import { writable, derived } from 'svelte/store';
-import { assessmentSchema, type AssessmentSubmission, type GeneratedIDP } from '$lib/types/schemas';
-import { apiClient, ApiClientError } from '$lib/client/apiClient';
+import { writable } from 'svelte/store';
+import type { UserData, RIASECAnswer, PWBAnswer } from '$lib/types/schemas/assessment';
+import { apiClient } from '$lib/utils/apiClient';
+import type { IDPResult } from '$lib/server/ai/generators/idpGenerator';
 
-const TOTAL_STEPS = 3;
-type SubmissionStatus = 'idle' | 'submitting' | 'success' | 'error';
+// --- State Definition ---
 
-interface AssessmentState {
+type SubmissionState = 'idle' | 'loading' | 'success' | 'error';
+
+export interface AssessmentState {
 	currentStep: number;
-	status: SubmissionStatus;
-	error: string | null;
-	data: AssessmentSubmission;
-	result: GeneratedIDP | null;
+	userData: UserData | null;
+	riasecAnswers: RIASECAnswer[];
+	pwbAnswers: PWBAnswer[];
+	submission: {
+		state: SubmissionState;
+		error: string | null;
+	};
+	result: IDPResult | null;
 }
 
+const initialState: AssessmentState = {
+	currentStep: 1,
+	userData: null,
+	riasecAnswers: [],
+	pwbAnswers: [],
+	submission: {
+		state: 'idle',
+		error: null
+	},
+	result: null
+};
+
+// --- Custom Store Logic ---
+
 function createAssessmentStore() {
-	const initialState: AssessmentState = {
-		currentStep: 1,
-		status: 'idle',
-		error: null,
-		result: null,
-		data: {
-			portfolio_text: '',
-			aspirations: '',
-			riasec_scores: { R: 3, I: 3, A: 3, S: 3, E: 3, C: 3 },
-			pwb_scores: {
-				self_acceptance: 3,
-				positive_relations: 3,
-				autonomy: 3,
-				environmental_mastery: 3,
-				purpose_in_life: 3,
-				personal_growth: 3
-			}
-		}
-	};
+	const { subscribe, update, set } = writable<AssessmentState>(initialState);
 
-	const store = writable<AssessmentState>(initialState);
-	const { subscribe, update, set } = store;
+	return {
+		subscribe,
 
-	const validation = derived(store, ($store) => {
-		return assessmentSchema.safeParse($store.data);
-	});
+		setUserData: (data: UserData) => {
+			update((state) => ({ ...state, userData: data, currentStep: 2 }));
+		},
 
-	const methods = {
-		nextStep: () =>
-			update((s) => (s.currentStep < TOTAL_STEPS ? { ...s, currentStep: s.currentStep + 1 } : s)),
-		prevStep: () =>
-			update((s) => (s.currentStep > 1 ? { ...s, currentStep: s.currentStep - 1 } : s)),
-		goToStep: (step: number) =>
-			update((s) => (step > 0 && step <= TOTAL_STEPS ? { ...s, currentStep: step } : s)),
+		setRiasecAnswers: (answers: RIASECAnswer[]) => {
+			update((state) => ({ ...state, riasecAnswers: answers, currentStep: 3 }));
+		},
 
-		submit: async () => {
-			update((s) => ({ ...s, status: 'submitting', error: null }));
+		setPwbAnswers: (answers: PWBAnswer[]) => {
+			update((state) => ({ ...state, pwbAnswers: answers }));
+		},
 
-			let currentData: AssessmentSubmission;
-			store.subscribe((s) => (currentData = s.data))();
+		submitAssessment: async () => {
+			let currentState: AssessmentState | undefined;
+			const unsubscribe = subscribe(state => currentState = state);
+			unsubscribe();
 
-			const validationResult = assessmentSchema.safeParse(currentData!);
-			if (!validationResult.success) {
-				update((s) => ({
-					...s,
-					status: 'error',
-					error: 'Data tidak valid. Silakan periksa kembali isian Anda.'
+			if (!currentState || !currentState.userData || currentState.riasecAnswers.length === 0 || currentState.pwbAnswers.length === 0) {
+				update(state => ({
+					...state,
+					submission: { state: 'error', error: 'Incomplete data. Cannot submit.' }
 				}));
 				return;
 			}
 
+			update(state => ({ ...state, submission: { state: 'loading', error: null } }));
+
 			try {
-				const idpResult = await apiClient.post<GeneratedIDP>(
-					'/api/assessment/submit',
-					validationResult.data
-				);
-				update((s) => ({ ...s, status: 'success', result: idpResult }));
-			} catch (err) {
-				let errorMessage = 'Terjadi kesalahan yang tidak diketahui.';
-				if (err instanceof ApiClientError) {
-					errorMessage = err.response.error || err.message;
-				} else if (err instanceof Error) {
-					errorMessage = err.message;
+				const payload = {
+					user_data: currentState.userData,
+					riasec_answers: currentState.riasecAnswers,
+					pwb_answers: currentState.pwbAnswers
+				};
+
+				const response = await apiClient.post<{ success: boolean; submissionId: string; idp: IDPResult }>('/api/assessment/submit', payload);
+
+				if (response.success) {
+					update(state => ({
+						...state,
+						result: response.idp,
+						submission: { state: 'success', error: null }
+					}));
+				} else {
+					throw new Error('API indicated submission was not successful.');
 				}
-				update((s) => ({ ...s, status: 'error', error: errorMessage }));
+			} catch (err) {
+				const message = err instanceof Error ? err.message : 'An unknown error occurred.';
+				update(state => ({
+					...state,
+					submission: { state: 'error', error: message }
+				}));
 			}
 		},
 
-		reset: () => set(initialState)
-	};
+		goToStep: (step: number) => {
+			update((state) => ({ ...state, currentStep: step }));
+		},
 
-	return {
-		subscribe,
-		...methods,
-		validation
+		reset: () => {
+			set(initialState);
+		}
 	};
 }
 
