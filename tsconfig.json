@@ -1,42 +1,41 @@
 ﻿{
-	"extends": "./.svelte-kit/tsconfig.json",
+  "extends": "./.svelte-kit/tsconfig.json",
+	"include": ["src/**/*.js", "src/**/*.ts", "src/**/*.svelte"],
 	"compilerOptions": {
-		// --- Strictness & Type Checking ---
-		// Mengaktifkan semua opsi pemeriksaan tipe yang ketat.
-		"strict": true,
-		// Melaporkan error pada variabel lokal yang tidak digunakan.
-		"noUnusedLocals": true,
-		// Melaporkan error pada parameter fungsi yang tidak digunakan.
-		"noUnusedParameters": true,
-		// Memastikan semua jalur kode dalam sebuah fungsi mengembalikan nilai.
-		"noImplicitReturns": true,
-		// Mencegah "fallthrough" yang tidak disengaja dalam switch statements.
-		"noFallthroughCasesInSwitch": true,
-		// Memastikan konsistensi penamaan file (case-sensitive).
-		"forceConsistentCasingInFileNames": true,
+    // --- Strictness & Type Checking ---
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
 
-		// --- Module Resolution & Path Aliases ---
-		"moduleResolution": "bundler",
-		"baseUrl": ".",
-		"paths": {
-			"$lib": ["src/lib"],
-			"$lib/*": ["src/lib/*"],
-			"$components": ["src/lib/components"],
-			"$components/*": ["src/lib/components/*"],
-			"$stores": ["src/lib/stores"],
-			"$stores/*": ["src/lib/stores/*"],
-			"$types": ["src/lib/types"],
-			"$types/*": ["src/lib/types/*"],
-			"$utils": ["src/lib/utils"],
-			"$utils/*": ["src/lib/utils/*"]
-		},
+    // --- Module Resolution & Path Aliases ---
+    "moduleResolution": "node",
+    "module": "ESNext",
+    "target": "ESNext",
+    "baseUrl": ".",
+    "paths": {
+      "$lib": ["src/lib"],
+      "$lib/*": ["src/lib/*"],
+      "$components": ["src/lib/components"],
+      "$components/*": ["src/lib/components/*"],
+      "$stores": ["src/lib/stores"],
+      "$stores/*": ["src/lib/stores/*"],
+      "$types": ["src/lib/types"],
+      "$types/*": ["src/lib/types/*"],
+      "$utils": ["src/lib/utils"],
+      "$utils/*": ["src/lib/utils/*"]
+    },
 
-		// --- Interoperability & Output ---
-		"esModuleInterop": true,
-		"allowJs": true,
-		"checkJs": true,
-		"resolveJsonModule": true,
-		"skipLibCheck": true,
-		"sourceMap": true
-	}
+    // --- Interoperability & Output ---
+    "esModuleInterop": true,
+    "allowJs": true,
+    "checkJs": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "sourceMap": true
+  },
+  "include": ["src/**/*.ts", "scripts/**/*.ts"],
+  "exclude": ["node_modules", ".svelte-kit"]
 }
