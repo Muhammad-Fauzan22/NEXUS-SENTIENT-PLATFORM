@@ -22,15 +22,15 @@ export interface AssessmentSubmissionPayload {
  * @throws {InternalServerError} if the database operation fails.
  */
 async function createAssessmentSubmission(submission: AssessmentSubmissionPayload) {
-	const { data, error } = await supabaseAdmin
+	const { data, error: dbError } = await supabaseAdmin
 		.from('assessment_submissions')
 		.insert(submission)
 		.select()
 		.single();
 
-	if (error) {
+	if (dbError) {
 		logger.error('Failed to insert assessment submission into database', {
-			dbError: { message: error.message, details: error.details, code: error.code }
+			dbError: { message: dbError.message, details: dbError.details, code: dbError.code }
 		});
 		throw new InternalServerError('Database operation failed to store assessment.');
 	}
