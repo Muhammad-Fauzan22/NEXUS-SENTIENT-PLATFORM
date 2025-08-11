@@ -1,19 +1,17 @@
 <script lang="ts">
-	import type { HTMLInputAttributes } from 'svelte/elements';
-	import { cn } from '$lib/utils/cn';
-
-	type $$Props = HTMLInputAttributes;
-
-	let className: $$Props['class'] = undefined;
-	export let value: $$Props['value'] = undefined;
-	export { className as class };
+	export let id: string;
+	export let label: string;
+	export let value: string | number;
+	export let type: 'text' | 'email' | 'number' | 'password' = 'text';
 </script>
 
-<input
-	class="{cn(
-		'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
-		className
-	)}"
-	bind:value
-	{...$$restProps}
-/>
+<div>
+	<label for={id} class="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+	<input
+		{id}
+		{type}
+		{...$$restProps}
+		bind:value
+		class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+	/>
+</div>
