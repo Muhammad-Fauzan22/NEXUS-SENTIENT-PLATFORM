@@ -1,32 +1,62 @@
-import pino from 'pino';
-import { config } from '$lib/server/config';
 
-// Opsi konfigurasi untuk pino logger
-const pinoOptions: pino.LoggerOptions = {
-	level: config.NODE_ENV === 'development' ? 'debug' : 'info',
-};
-
-// Di lingkungan pengembangan, gunakan 'pino-pretty' untuk log yang indah dan mudah dibaca.
-// Di lingkungan produksi, gunakan format JSON standar untuk efisiensi dan integrasi
-// dengan layanan log management (misalnya, Datadog, Logtail).
-if (config.NODE_ENV === 'development') {
-	pinoOptions.transport = {
-		target: 'pino-pretty',
-		options: {
-			colorize: true,
-			translateTime: 'SYS:yyyy-mm-dd HH:MM:ss',
-			ignore: 'pid,hostname'
-		}
+/**
+ * The core logging function. Avoid using this directly.
+ * @param level The severity level of the log.
+ * @param message The main log message.
+ * @param context Optional additional data to include in the log.
+ */
+function log(level: LogLevel, message: string, context: LogContext = {}): void {
+	const logObject = {
+		timestamp: new Date().toISOString(),
+		level,
+		message,
+		...context
 	};
+
+	const logString = JSON.stringify(logObject);
+
+	switch (level) {
+		case 'INFO':
+			console.info(logString);
+			break;
+		case 'WARN':
+			console.warn(logString);
+			break;
+		case 'ERROR':
+			console.error(logString);
+			break;
+	}
 }
 
 /**
- * Instance logger terpusat untuk digunakan di seluruh backend.
- *
- * @example
- * import { logger } from '$lib/server/utils/logger';
- * logger.info('User %s logged in.', userId);
- * logger.warn({ orderId: '123' }, 'Order processing failed.');
- * logger.error(new Error('Database connection lost'), 'Fatal error.');
+ * Logs an informational message. Use for general application flow events.
+ * @param message The main log message.
+ * @param context Optional additional data.
  */
-export const logger = pino(pinoOptions);
+export function info(message: string, context?: LogContext): void {
+	log('INFO', message, context);
+}
+
+/**
+ * Logs a warning message. Use for non-critical issues that should be investigated.
+ * @param message The main log message.
+ * @param context Optional additional data.
+ */
+export function warn(message: string, context?: LogContext): void {
+	log('WARN', message, context);
+}
+
+/**
+ * Logs an error message. Use for critical failures, exceptions, and unexpected states.
+ * @param message The main log message.
+ * @param context Optional additional data, often including an error object.
+ */
+export function error(message: string, context?: LogContext): void {
+	log('ERROR', message, context);
+}
+
+export const logger = {
+	info,
+	warn,
+	error
+};
