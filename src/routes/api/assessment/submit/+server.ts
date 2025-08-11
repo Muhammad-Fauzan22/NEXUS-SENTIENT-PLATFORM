@@ -1,61 +1,56 @@
 import type { RequestHandler } from '@sveltejs/kit';
 import { json } from '@sveltejs/kit';
-import { supabase } from '$lib/db/supabase'; // Assuming supabase client is in lib/db
-import { pwbAnalyzer } from '$lib/server/ai/analyzers/pwbAnalyzer';
-import { riasecAnalyzer } from '$lib/server/ai/analyzers/riasecAnalyzer';
-import { idpGenerator } from '$lib/server/ai/generators/idpGenerator';
+import { aiService } from '$lib/server/ai/aiService';
+import { dbService, type AssessmentSubmissionPayload } from '$lib/server/services/dbService';
 import { logger } from '$lib/server/utils/logger';
-import { BadRequestError, InternalServerError } from '$lib/server/utils/errors';
+import { BadRequestError, ApiError } from '$lib/server/utils/errors';
 
 /**
  * API Endpoint to submit assessment data, generate analysis, and create an IDP.
+ * This endpoint now uses dedicated services for AI and Database operations.
  */
 export const POST: RequestHandler = async ({ request }) => {
 	try {
 		const assessmentData = await request.json();
 
-		// Basic validation
-		if (!assessmentData || !assessmentData.user_data || !assessmentData.riasec_answers || !assessmentData.pwb_answers) {
-			throw new BadRequestError('Invalid assessment data payload.');
+		// Step 1: Validate incoming data payload
+		if (!assessmentData?.user_data || !assessmentData?.riasec_answers || !assessmentData?.pwb_answers) {
+			throw new BadRequestError('Invalid or incomplete assessment data payload.');
 		}
 
-		// 1. Analyze RIASEC and PWB in parallel
-		const [riasecResult, pwbResult] = await Promise.all([
-			riasecAnalyzer.analyze(assessmentData.riasec_answers),
-			pwbAnalyzer.analyze(assessmentData.pwb_answers)
-		]);
+		// Step 2: Orchestrate calls to the AI service for analysis (in parallel)
+		// NOTE: For now, we assume analyzers exist. We will build these next.
+		// const [riasecResult, pwbResult] = await Promise.all([
+		// 	aiService.analyzeRIASEC(assessmentData.riasec_answers),
+		// 	aiService.analyzePWB(assessmentData.pwb_answers)
+		// ]);
+		// Placeholder results until analyzers are built:
+		const riasecResult = { code: 'TBD', analysis: 'Analysis pending.' };
+		const pwbResult = { score: 0, analysis: 'Analysis pending.' };
 
-		// 2. Generate the Individual Development Plan (IDP)
-		const idpResult = await idpGenerator.generate({
-			userData: assessmentData.user_data,
-			riasecAnalysis: riasecResult,
-			pwbAnalysis: pwbResult
-		});
 
-		// 3. Store everything in Supabase
-		const { data: submissionData, error: submissionError } = await supabase
-			.from('assessment_submissions')
-			.insert([
-				{
-					user_info: assessmentData.user_data,
-					riasec_answers: assessmentData.riasec_answers,
-					pwb_answers: assessmentData.pwb_answers,
-					riasec_result: riasecResult,
-					pwb_result: pwbResult,
-					generated_idp: idpResult,
-					// TODO: Link to a user ID if you have authentication
-					// user_id: '...'
-				}
-			])
-			.select()
-			.single();
+		// Step 3: Orchestrate call to the AI service to generate the IDP
+		// const idpResult = await aiService.generateIDP({ ... });
+		// Placeholder result:
+		const idpResult = { plan: 'IDP generation pending.' };
 
-		if (submissionError) {
-			throw new InternalServerError('Failed to store assessment results.', { dbError: submissionError });
-		}
+
+		// Step 4: Assemble the payload for the database service
+		const submissionPayload: AssessmentSubmissionPayload = {
+			user_info: assessmentData.user_data,
+			riasec_answers: assessmentData.riasec_answers,
+			pwb_answers: assessmentData.pwb_answers,
+			riasec_result: riasecResult,
+			pwb_result: pwbResult,
+			generated_idp: idpResult
+		};
+
+		// Step 5: Call the database service to store the results
+		const submissionData = await dbService.createAssessmentSubmission(submissionPayload);
 
 		logger.info('Successfully processed and stored new assessment.', { submissionId: submissionData.id });
 
+		// Step 6: Return the successful response
 		return json({
 			success: true,
 			submissionId: submissionData.id,
@@ -63,12 +58,14 @@ export const POST: RequestHandler = async ({ request }) => {
 		}, { status: 201 });
 
 	} catch (err) {
+		// Centralized error handling
 		if (err instanceof ApiError) {
 			logger.warn(`API Error: ${err.message}`, { status: err.status, context: err.context });
 			return json({ message: err.message }, { status: err.status });
 		}
 
+		// Catch-all for unexpected errors
 		logger.error('An unexpected error occurred in the submission endpoint.', { error: err });
-		return json({ message: 'An unexpected error occurred.' }, { status: 500 });
+		return json({ message: 'An unexpected server error occurred.' }, { status: 500 });
 	}
 };
