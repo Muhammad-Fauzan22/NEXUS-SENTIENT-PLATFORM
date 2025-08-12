@@ -1,14 +1,7 @@
-import { sveltekit } from '@sveltejs/kit/vite';
-import { defineConfig } from 'vitest/config';
+// File ini berfungsi sebagai titik masuk konfigurasi untuk lingkungan pengujian Vitest.
 
-export default defineConfig({
-	plugins: [sveltekit()],
-	test: {
-		// Tell Vitest to use a browser-like environment (jsdom)
-		environment: 'jsdom',
-		// Include all test files
-		include: ['src/**/*.{test,spec}.{js,ts}'],
-		// Explicitly load our setup file before running tests
-		setupFiles: ['./vitest-setup.ts']
-	}
-});
+// Mengimpor '@testing-library/jest-dom/vitest' akan memperluas objek `expect`
+// dari Vitest dengan matchers yang lebih deskriptif dan berorientasi DOM.
+// Ini memungkinkan kita untuk menulis asserstion yang lebih mudah dibaca dan lebih kuat
+// untuk komponen UI, seperti `expect(element).toBeInTheDocument()`.
+import '@testing-library/jest-dom/vitest';
