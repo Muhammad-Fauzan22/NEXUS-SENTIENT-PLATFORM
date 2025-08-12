@@ -12,19 +12,21 @@ export interface PWBAnalysisResult {
 
 /**
  * Calculates the total score from an array of PWB answers.
+ * This function is exported for testability.
  * @param answers The array of PWB answers.
  * @returns The total calculated score.
  */
-function calculatePWBScore(answers: PWBAnswer[]): number {
+export function calculatePWBScore(answers: PWBAnswer[]): number {
 	return answers.reduce((sum, answer) => sum + answer.score, 0);
 }
 
 /**
  * Builds a detailed prompt for the AI to analyze PWB results based on scientific standards.
+ * This function is exported for testability.
  * @param totalScore The total calculated PWB score.
  * @returns A string containing the full prompt for the AI.
  */
-function buildPWBPrompt(totalScore: number): string {
+export function buildPWBPrompt(totalScore: number): string {
 	return `
     Analyze the following Psychological Well-Being (PWB) score based on Ryff's six-factor model of psychological well-being.
 
@@ -51,9 +53,6 @@ function buildPWBPrompt(totalScore: number): string {
       ]
     }
 
-    **Example for a score of 50:**
-    {"totalScore":50,"level":"Moderate","interpretation":"A moderate level of psychological well-being suggests a solid foundation across Ryff's six dimensions, but with clear areas for potential growth. The individual likely experiences a decent sense of purpose and self-acceptance, but may face challenges in certain aspects of life, such as fully mastering their environment or maintaining deep, positive relationships.","recommendations":["Practice daily affirmations to strengthen self-acceptance.","Identify one new skill to learn this month to foster personal growth.","Schedule a meaningful conversation with a close friend to nurture positive relations."]}
-
     **Your JSON Response:**
   `;
 }
@@ -70,10 +69,9 @@ async function analyze(answers: PWBAnswer[]): Promise<PWBAnalysisResult> {
 	const prompt = buildPWBPrompt(totalScore);
 
 	try {
-		const rawResponse = await aiService.callClaude(prompt); // Claude is suitable for structured JSON generation
+		const rawResponse = await aiService.callClaude(prompt);
 		const parsedResponse: PWBAnalysisResult = JSON.parse(rawResponse);
 
-		// Rigorous validation against the expected schema
 		if (
 			parsedResponse.totalScore !== totalScore ||
 			!['Low', 'Moderate', 'High'].includes(parsedResponse.level) ||
