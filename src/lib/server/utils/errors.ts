@@ -1,98 +1,60 @@
-import { json } from '@sveltejs/kit';
-import { ZodError } from 'zod';
-import { logger } from './logger';
-import { dev } from '$app/environment';
-
-// --- Kelas Error Terstruktur ---
-
 /**
- * Kelas dasar untuk semua error API yang terstandarisasi.
+ * Base class for custom API errors.
+ * Contains an HTTP status code and optional context for logging.
  */
 export class ApiError extends Error {
-	public readonly statusCode: number;
-	public readonly errorCode: string;
+	public readonly status: number;
+	public readonly context?: Record<string, unknown>;
 
-	constructor(statusCode: number, errorCode: string, message: string) {
+	constructor(status: number, message: string, context?: Record<string, unknown>) {
 		super(message);
-		this.statusCode = statusCode;
-		this.errorCode = errorCode;
-		Object.setPrototypeOf(this, new.target.prototype);
+		this.status = status;
+		this.context = context;
+		this.name = this.constructor.name;
 	}
 }
-
-export class BadRequestError extends ApiError {
-	constructor(errorCode: string, message: string) {
-		super(400, errorCode, message);
-	}
-}
-
-export class UnauthorizedError extends ApiError {
-	constructor(errorCode: string, message: string) {
-		super(401, errorCode, message);
-	}
-}
-
-export class ForbiddenError extends ApiError {
-	constructor(errorCode: string, message: string) {
-		super(403, errorCode, message);
-	}
-}
-
-export class NotFoundError extends ApiError {
-	constructor(errorCode: string, message: string) {
-		super(404, errorCode, message);
-	}
-}
-
-export class InternalServerError extends ApiError {
-	constructor(message: string = 'Terjadi kesalahan internal pada server.') {
-		super(500, 'INTERNAL_SERVER_ERROR', message);
-	}
-}
-
-
-// --- Penangan Error Terpusat ---
 
 /**
- * Penangan error API terpusat. Mencatat error dan mengembalikan respons JSON yang terstandardisasi.
- * @param error - Objek error yang ditangkap.
- * @param transactionId - ID unik untuk permintaan, digunakan untuk pelacakan.
- * @returns Objek Response SvelteKit.
+ * Represents a 400 Bad Request error.
  */
-export function handleApiError(error: unknown, transactionId: string): Response {
-	if (error instanceof ApiError) {
-		logger.warn({ transactionId, err: { code: error.errorCode, status: error.statusCode } }, `ApiError: ${error.message}`);
-		return json(
-			{
-				success: false,
-				message: error.message,
-				errorCode: error.errorCode,
-			},
-			{ status: error.statusCode }
-		);
+export class BadRequestError extends ApiError {
+	constructor(message = 'Bad Request', context?: Record<string, unknown>) {
+		super(400, message, context);
 	}
+}
 
-	if (error instanceof ZodError) {
-		const validationErrors = error.flatten().fieldErrors;
-		logger.warn({ transactionId, errors: validationErrors }, `Zod Validation Error`);
-		return json(
-			{
-				success: false,
-				message: 'Input tidak valid.',
-				details: validationErrors,
-			},
-			{ status: 400 }
-		);
+/**
+ * Represents a 401 Unauthorized error.
+ */
+export class UnauthorizedError extends ApiError {
+	constructor(message = 'Unauthorized', context?: Record<string, unknown>) {
+		super(401, message, context);
 	}
+}
 
-	const e = error as Error;
-	logger.error({ transactionId, err: e }, `Unhandled Internal Server Error: ${e.message}`);
+/**
+ * Represents a 403 Forbidden error.
+ */
+export class ForbiddenError extends ApiError {
+	constructor(message = 'Forbidden', context?: Record<string, unknown>) {
+		super(403, message, context);
+	}
+}
 
-	const responseBody = {
-		success: false,
-		message: 'Terjadi kesalahan internal pada server.',
-		details: dev ? { error: e.message, stack: e.stack } : undefined,
-	};
+/**
+ * Represents a 404 Not Found error.
+ */
+export class NotFoundError extends ApiError {
+	constructor(message = 'Not Found', context?: Record<string, unknown>) {
+		super(404, message, context);
+	}
+}
 
-	return json(responseBody, { status: 500 });
+/**
+ * Represents a 500 Internal Server Error.
+ */
+export class InternalServerError extends ApiError {
+	constructor(message = 'Internal Server Error', context?: Record<string, unknown>) {
+		super(500, message, context);
+	}
 }
