@@ -7853,3 +7853,9 @@
 2025-08-12 10:41:24,495 - INFO - Changes pushed to GitHub
 2025-08-12 10:41:27,785 - INFO - Detected file changes...
 2025-08-12 10:41:28,296 - INFO - Committed: Auto-sync: EXUS-SENTIENT-PLATFORM, auto_git_sync.log - 2025-08-12 10:41:28
+2025-08-12 10:41:48,701 - ERROR - Git command failed: fatal: unable to access 'https://github.com/Muhammad-Fauzan22/NEXUS-SENTIENT-PLATFORM.git/': Recv failure: Connection was reset
+
+2025-08-12 10:41:51,911 - INFO - Detected file changes...
+2025-08-12 10:41:52,453 - INFO - Committed: Auto-sync: EXUS-SENTIENT-PLATFORM, auto_git_sync.log - 2025-08-12 10:41:52
+2025-08-12 10:41:52,654 - ERROR - Git command failed: fatal: unable to access 'https://github.com/Muhammad-Fauzan22/NEXUS-SENTIENT-PLATFORM.git/': Could not resolve host: github.com
+
