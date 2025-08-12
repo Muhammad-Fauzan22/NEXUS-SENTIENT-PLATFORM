@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import type { PWBAnswer } from '$lib/types/schemas/assessment';
-// CORRECTED: Only import the specific function we are testing from the analyzer.
+// CORRECTED: Only import the specific function being tested.
 import { calculatePWBScore } from './pwbAnalyzer';
 
 describe('pwbAnalyzer Logic', () => {
@@ -11,8 +11,7 @@ describe('pwbAnalyzer Logic', () => {
 			{ question_id: 3, score: 4 },
 			{ question_id: 4, score: 1 }
 		];
-
-		const expectedScore = 16; // 5 + 6 + 4 + 1
+		const expectedScore = 16;
 		const result = calculatePWBScore(answers);
 		expect(result).toBe(expectedScore);
 	});
