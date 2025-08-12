@@ -1,11 +1,24 @@
 ﻿{
 	"extends": "./.svelte-kit/tsconfig.json",
 	"compilerOptions": {
-		"allowJs": true, "checkJs": true, "esModuleInterop": true,
-		"forceConsistentCasingInFileNames": true, "resolveJsonModule": true,
-		"skipLibCheck": true, "sourceMap": true, "strict": true,
-		"noUnusedLocals": true, "noUnusedParameters": true,
-		"noFallthroughCasesInSwitch": true, "noImplicitReturns": true,
-		"useUnknownInCatchVariables": true, "verbatimModuleSyntax": true
+		"allowJs": true,
+		"checkJs": true,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"resolveJsonModule": true,
+		"skipLibCheck": true,
+		"sourceMap": true,
+
+		// --- PROTOKOL KETEGASAN ABSOLUT ---
+		// Mengaktifkan semua pemeriksaan tipe yang ketat untuk keamanan maksimum.
+		"strict": true,
+
+		// Aturan tambahan untuk kebersihan dan keamanan kode.
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"noFallthroughCasesInSwitch": true,
+		"noImplicitReturns": true,
+		"useUnknownInCatchVariables": true,
+		"verbatimModuleSyntax": true
 	}
 }
