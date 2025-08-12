@@ -1,52 +1,36 @@
-# NEXUS: The Sentient Development Platform (KNOWS-Pro)
+# NEXUS: The Sentient Development Platform
 
-Platform Generasi Individual Development Plan (IDP) Berbasis AI untuk Pola Pengembangan Sumber Daya Mahasiswa (PPSDM) HMM ITS.
+**NEXUS** adalah sistem pengembangan sumber daya mahasiswa berbasis bukti yang mengintegrasikan metodologi psikometri, pedagogi modern, dan AI untuk menciptakan roadmap kompetensi personal yang valid, reliabel, dan terukur.
 
-## Deskripsi
+[![NEXUS CI - Test & Validation](https://github.com/Muhammad-Fauzan22/NEXUS-SENTIENT-PLATFORM/actions/workflows/ci.yml/badge.svg)](https://github.com/Muhammad-Fauzan22/NEXUS-SENTIENT-PLATFORM/actions/workflows/ci.yml)
 
-NEXUS adalah sistem cerdas yang dirancang untuk menganalisis potensi mahasiswa dan menghasilkan rencana pengembangan pribadi (IDP) yang sangat personal dan sistematis selama 8 semester. Platform ini dibangun berdasarkan blueprint arsitektur sistem canggih yang dirancang untuk skalabilitas, adaptabilitas, dan integrasi AI yang mendalam.
+---
 
-## Arsitektur & Prinsip Desain (Terinspirasi dari Blueprint NEXUS)
+## Core Features
 
-Arsitektur NEXUS dirancang untuk menjadi sistem yang "bernapas" dan terus berkembang. Meskipun implementasi awal menggunakan sumber daya yang tersedia (Python, API AI gratis, Supabase, GDrive), fondasinya dibangun untuk menyesuaikan diri dengan prinsip-prinsip berikut:
+-   **Analisis Psikometri Multi-Dimensi:** Menggunakan model RIASEC dan PWB yang divalidasi secara ilmiah.
+-   **Individual Development Plan (IDP) Berbasis AI:** Menghasilkan rencana aksi 8 semester yang personal dan dapat ditindaklanjuti.
+-   **Arsitektur Modular:** Provider AI yang dapat ditukar (Claude, Gemini, Perplexity) dan service layer yang terabstraksi.
+-   **Jaminan Kualitas Otomatis:** Alur kerja CI/CD dengan pengujian unit dan end-to-end untuk memastikan keandalan.
 
-*   **Data Obsession:** Setiap aspek sistem didasarkan pada data yang dikumpulkan dan dianalisis secara menyeluruh.
-*   **Continuous Evolution:** Sistem dirancang untuk mudah diperbarui dan disesuaikan dengan perubahan konteks (kebijakan kampus, program baru).
-*   **AI-Augmented Processing:** Menggunakan kekuatan berbagai API AI untuk tugas analisis dan generasi yang kompleks.
-*   **Modular & Extensible:** Komponen-komponen sistem (Data Pipeline, AI Agents, Storage) dibangun secara modular untuk memudahkan pengembangan dan pemeliharaan.
-*   **Blueprint Alignment:** Implementasi awal ini sudah mulai menyesuaikan diri dengan komponen blueprint seperti:
-    *   **Data Lake:** Direktori `data/lakehouse/` digunakan untuk menyimpan data mentah dan hasil pemrosesan terstruktur.
-    *   **Processing Engine:** Script seperti `src/data_pipeline/dataset_loader.py` berperan sebagai bagian awal dari mesin pemrosesan data.
-    *   **AI Core:** Integrasi dengan berbagai API AI (Gemini, DeepSeek, dll.) akan menjadi inti dari komponen analisis dan generasi.
+## Tech Stack Architecture
 
-Struktur awal sistem ini mencerminkan adaptasi prinsip-prinsip tersebut dalam lingkungan dengan sumber daya terbatas namun dengan ambisi tinggi untuk mencapai output yang setara dengan sistem kelas dunia.
+```mermaid
+graph TD
+    A[Frontend: SvelteKit] --> B[Backend API: SvelteKit Endpoints]
+    B --> C[Orchestrator: aiService]
+    B --> D[Database Service: dbService]
+    C --> E[AI Providers: Claude, Gemini, etc.]
+    D --> F[Database: Supabase]
 
-## Fitur Utama (Rencana)
+    subgraph A [Frontend]
+        A1[Svelte 5]
+        A2[Tailwind CSS]
+        A3[TypeScript]
+    end
 
-*   Analisis ARM (Analisis Raw Material) otomatis.
-*   Profil multidimensi berbasis AI (RIASEC, Big Five, Gaya Belajar, dll).
-*   Sintesis dataset eksternal untuk enriching.
-*   Sistem multi-agent AI untuk pemrosesan.
-*   Generasi IDP berbasis RAG (Retrieval-Augmented Generation).
-*   UI Web dan Telegram Bot.
-*   Penyimpanan di Google Drive dan MongoDB/Supabase.
-
-## Teknologi
-
-*   Python (FastAPI, PyMongo, Requests)
-*   AI: Gemini Pro, DeepSeek, Cohere, Perplexity, Hugging Face
-*   Database: MongoDB Atlas (Free Tier), Google Drive, Supabase
-*   Hosting: Vercel/Netlify (Frontend), Azure Functions/Heroku (Backend)
-*   UI: SvelteKit (opsional), Telegram Bot API
-
-## Cara Menjalankan
-
-(Akan diisi saat proyek berkembang)
-
-## Kontributor
-
-*   [MUHAMMAD FAUZAN]
-
-## Lisensi
-
-MIT License
+    subgraph B [Backend API]
+        B1[Node.js Runtime]
+        B2[Vitest for Unit Tests]
+        B3[Playwright for E2E Tests]
+    end
