@@ -5,13 +5,11 @@ import { dbService, type AssessmentSubmissionPayload } from '$lib/server/service
 import { logger } from '$lib/server/utils/logger';
 import { ApiError, BadRequestError } from '$lib/server/utils/errors';
 import type { AssessmentData } from '$lib/types/schemas/assessment';
-import { pwbAnalyzer } from '$lib/server/ai/analyzers/pwbAnalyzer';
-import { riasecAnalyzer } from '$lib/server/ai/analyzers/riasecAnalyzer';
-import { idpGenerator } from '$lib/server/ai/generators/idpGenerator';
 
 /**
- * API Endpoint to submit assessment data, generate analysis, and create an IDP.
- * This endpoint orchestrates calls to dedicated AI and Database services.
+ * API Endpoint to submit assessment data.
+ * This endpoint now acts as a thin controller, delegating all complex logic
+ * to the aiService and dbService.
  */
 export const POST: RequestHandler = async ({ request }) => {
 	try {
@@ -22,22 +20,12 @@ export const POST: RequestHandler = async ({ request }) => {
 			throw new BadRequestError('Invalid or incomplete assessment data payload.');
 		}
 
-		// Step 2: Run analyzers in parallel for efficiency
-		logger.info('Starting parallel analysis for RIASEC and PWB.', { email: assessmentData.user_data.email });
-		const [riasecResult, pwbResult] = await Promise.all([
-			riasecAnalyzer.analyze(assessmentData.riasec_answers),
-			pwbAnalyzer.analyze(assessmentData.pwb_answers)
-		]);
+		// Step 2: Execute the entire AI pipeline with a single call
+		const { riasecResult, pwbResult, idpResult } = await aiService.runFullAssessmentPipeline(
+			assessmentData
+		);
 
-		// Step 3: Generate the Individual Development Plan (IDP) using the analysis results
-		logger.info('Starting IDP generation.', { email: assessmentData.user_data.email });
-		const idpResult = await idpGenerator.generate({
-			userData: assessmentData.user_data,
-			riasecAnalysis: riasecResult,
-			pwbAnalysis: pwbResult
-		});
-
-		// Step 4: Assemble the final payload for the database
+		// Step 3: Assemble the final payload for the database
 		const submissionPayload: AssessmentSubmissionPayload = {
 			user_info: assessmentData.user_data,
 			riasec_answers: assessmentData.riasec_answers,
@@ -47,12 +35,15 @@ export const POST: RequestHandler = async ({ request }) => {
 			generated_idp: idpResult
 		};
 
-		// Step 5: Store the complete record in the database
+		// Step 4: Store the complete record in the database
 		const submissionData = await dbService.createAssessmentSubmission(submissionPayload);
 
-		logger.info('Successfully processed and stored new assessment.', { submissionId: submissionData.id });
+		logger.info('Successfully processed and stored new assessment.', {
+			submissionId: submissionData.id,
+			user: assessmentData.user_data.email
+		});
 
-		// Step 6: Return the successful response to the client
+		// Step 5: Return the successful response to the client
 		return json(
 			{
 				success: true,
@@ -61,7 +52,6 @@ export const POST: RequestHandler = async ({ request }) => {
 			},
 			{ status: 201 }
 		);
-
 	} catch (err: unknown) {
 		// Centralized error handling
 		if (err instanceof ApiError) {
