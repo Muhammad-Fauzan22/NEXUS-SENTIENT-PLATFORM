@@ -1,18 +1,20 @@
 /**
- * A standardized error structure for API responses.
+ * Struktur error standar yang diharapkan dari endpoint API backend.
  */
 interface ApiErrorResponse {
 	message: string;
-	[key: string]: unknown;
+	[key: string]: unknown; // Memungkinkan properti tambahan untuk konteks error.
 }
 
 /**
- * The core request function for client-side API calls.
- * @param method The HTTP method (GET, POST, PUT, DELETE).
- * @param path The API endpoint path (e.g., '/api/assessment').
- * @param data Optional data to send in the request body.
- * @returns The JSON response from the API.
- * @throws An error with the message from the API if the request fails.
+ * Fungsi inti untuk semua permintaan API dari sisi klien.
+ * Mengenkapsulasi logika fetch, pengaturan header, penanganan body, dan standardisasi error.
+ *
+ * @param method Metode HTTP yang akan digunakan.
+ * @param path Endpoint API yang dituju (misalnya, '/api/assessment/submit').
+ * @param data Data opsional untuk dikirim dalam body permintaan.
+ * @returns Promise yang me-resolve dengan data JSON dari respons.
+ * @throws Error dengan pesan dari server jika permintaan gagal.
  */
 async function request<T>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', path: string, data?: unknown): Promise<T> {
 	const opts: RequestInit = {
@@ -28,67 +30,30 @@ async function request<T>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', path: strin
 	const response = await fetch(path, opts);
 
 	if (response.ok) {
-		// Handle cases with no content in the response body (e.g., 204 No Content)
+		// Menangani respons tanpa konten (misalnya, status 204 No Content)
+		// dengan mengembalikan null, yang merupakan perilaku yang valid.
 		const text = await response.text();
-		if (!text) {
-			return null as T;
-		}
-		return JSON.parse(text) as T;
+		return text ? (JSON.parse(text) as T) : (null as T);
 	}
 
-	// Handle error responses
+	// Menangani respons error.
 	let errorPayload: ApiErrorResponse | null = null;
 	try {
 		errorPayload = await response.json();
 	} catch (e) {
-		// The error response was not valid JSON
+		// Jika body error bukan JSON, lemparkan error HTTP standar.
 		throw new Error(`HTTP ${response.status}: ${response.statusText}`);
 	}
 
+	// Lemparkan error dengan pesan yang informatif dari backend.
 	throw new Error(errorPayload?.message || `HTTP ${response.status}: An unknown error occurred.`);
 }
 
-/**
- * Performs a GET request.
- * @param path The API endpoint path.
- * @returns The JSON response from the API.
- */
-export function get<T>(path: string): Promise<T> {
-	return request<T>('GET', path);
-}
-
-/**
- * Performs a POST request.
- * @param path The API endpoint path.
- * @param data The data to send in the request body.
- * @returns The JSON response from the API.
- */
-export function post<T>(path: string, data: unknown): Promise<T> {
-	return request<T>('POST', path, data);
-}
-
-/**
- * Performs a PUT request.
- * @param path The API endpoint path.
- * @param data The data to send in the request body.
- * @returns The JSON response from the API.
- */
-export function put<T>(path: string, data: unknown): Promise<T> {
-	return request<T>('PUT', path, data);
-}
-
-/**
- * Performs a DELETE request.
- * @param path The API endpoint path.
- * @returns The JSON response from the API.
- */
-export function del<T>(path: string): Promise<T> {
-	return request<T>('DELETE', path);
-}
+// --- Metode Helper yang Diekspor ---
 
 export const apiClient = {
-	get,
-	post,
-	put,
-	del
+	get: <T>(path: string): Promise<T> => request<T>('GET', path),
+	post: <T>(path: string, data: unknown): Promise<T> => request<T>('POST', path, data),
+	put: <T>(path: string, data: unknown): Promise<T> => request<T>('PUT', path, data),
+	del: <T>(path: string): Promise<T> => request<T>('DELETE', path)
 };
