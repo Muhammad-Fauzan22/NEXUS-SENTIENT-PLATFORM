@@ -2,99 +2,92 @@ import { claudeProvider } from './providers/claude';
 import { geminiProvider } from './providers/gemini';
 import { perplexityProvider } from './providers/perplexity';
 import { logger } from '$lib/server/utils/logger';
-import { env } from '$lib/server/config';
 import { InternalServerError } from '$lib/server/utils/errors';
-
-// --- Key Pooling Utilities ---
-// A simple in-memory counter for round-robin key selection.
-const keyCounters: { [key: string]: number } = {
-	deepseek: 0,
-	cohere: 0
-};
+import type { AssessmentData } from '$lib/types/schemas/assessment';
+import { pwbAnalyzer } from './analyzers/pwbAnalyzer';
+import { riasecAnalyzer } from './analyzers/riasecAnalyzer';
+import { idpGenerator } from './generators/idpGenerator';
 
 /**
- * Retrieves the next key from a comma-separated string of keys in a round-robin fashion.
- * @param keyPool The comma-separated string of API keys from the environment.
- * @param poolName The name of the pool to track the counter.
- * @returns The next API key to use.
- * @throws {Error} If the key pool is empty.
- */
-function getKeyFromPool(keyPool: string, poolName: 'deepseek' | 'cohere'): string {
-	const keys = keyPool.split(',').map(k => k.trim()).filter(Boolean);
-	if (keys.length === 0) {
-		const errorMessage = `No keys available in the ${poolName} API key pool.`;
-		logger.error(errorMessage);
-		throw new InternalServerError(errorMessage);
-	}
-	const index = keyCounters[poolName] % keys.length;
-	keyCounters[poolName]++;
-	return keys[index];
-}
-
-// --- AI Service ---
-
-/**
- * A centralized service for interacting with various AI models.
- * It abstracts away the specific provider logic and handles errors consistently.
+ * A centralized service for orchestrating complex AI workflows.
+ * It selects the best provider for a given task and manages the analysis pipeline.
  */
 export const aiService = {
 	/**
-	 * Calls the Claude model.
+	 * Executes the full end-to-end assessment pipeline.
+	 * This function embodies the core logic of the PPSDM-AI system.
+	 *
+	 * @param assessmentData The complete raw data from the user submission.
+	 * @returns A promise that resolves to the final, generated Individual Development Plan.
+	 */
+	async runFullAssessmentPipeline(assessmentData: AssessmentData) {
+		try {
+			// --- PHASE 1: PARALLEL ANALYSIS ---
+			// Run independent analyses concurrently for maximum efficiency.
+			logger.info('Starting parallel analysis phase.', { email: assessmentData.user_data.email });
+			const [riasecResult, pwbResult] = await Promise.all([
+				riasecAnalyzer.analyze(assessmentData.riasec_answers),
+				pwbAnalyzer.analyze(assessmentData.pwb_answers)
+			]);
+			logger.info('Completed parallel analysis phase.', {
+				riasecCode: riasecResult.topCode,
+				pwbLevel: pwbResult.level
+			});
+
+			// --- PHASE 2: SYNTHESIS & GENERATION ---
+			// Use the results of the analysis to generate the final report.
+			// This is a complex, creative task, best suited for a powerful model like Claude.
+			logger.info('Starting synthesis phase (IDP Generation).', { email: assessmentData.user_data.email });
+			const idpResult = await idpGenerator.generate({
+				userData: assessmentData.user_data,
+				riasecAnalysis: riasecResult,
+				pwbAnalysis: pwbResult
+			});
+			logger.info('Completed synthesis phase.', { userName: assessmentData.user_data.name });
+
+			// --- PHASE 3: RETURN FINAL ARTIFACT ---
+			return {
+				riasecResult,
+				pwbResult,
+				idpResult
+			};
+		} catch (error) {
+			logger.error('A critical error occurred during the AI assessment pipeline.', { error });
+			// The underlying services (analyzers, generators) are expected to throw ApiError.
+			// If not, wrap it in a generic InternalServerError.
+			if (error instanceof InternalServerError) {
+				throw error;
+			}
+			throw new InternalServerError('An unexpected failure occurred in the AI pipeline.');
+		}
+	},
+
+	// --- Direct Provider Access (for specific, non-pipeline tasks) ---
+
+	/**
+	 * Directly calls the Claude model for general-purpose tasks.
 	 * @param prompt The prompt to send.
 	 * @returns The generated text.
 	 */
 	async callClaude(prompt: string): Promise<string> {
-		try {
-			logger.info('Calling Claude provider');
-			return await claudeProvider.generate(prompt);
-		} catch (error) {
-			logger.error('Claude provider failed', { originalError: error });
-			throw error; // Propagate the standardized error
-		}
+		return claudeProvider.generate(prompt);
 	},
 
 	/**
-	 * Calls the Gemini model.
+	 * Directly calls the Gemini model, often best for quick data extraction or simple generation.
 	 * @param prompt The prompt to send.
 	 * @returns The generated text.
 	 */
 	async callGemini(prompt: string): Promise<string> {
-		try {
-			logger.info('Calling Gemini provider');
-			return await geminiProvider.generate(prompt);
-		} catch (error) {
-			logger.error('Gemini provider failed', { originalError: error });
-			throw error;
-		}
+		return geminiProvider.generate(prompt);
 	},
 
 	/**
-	 * Calls the Perplexity model.
+	 * Directly calls the Perplexity model, best for tasks requiring real-time web information.
 	 * @param prompt The prompt to send.
 	 * @returns The generated text.
 	 */
 	async callPerplexity(prompt: string): Promise<string> {
-		try {
-			logger.info('Calling Perplexity provider');
-			return await perplexityProvider.generate(prompt);
-		} catch (error) {
-			logger.error('Perplexity provider failed', { originalError: error });
-			throw error;
-		}
-	},
-
-	// NOTE: DeepSeek and Cohere providers are not yet implemented.
-	// The key pooling logic is ready for when we create them.
-
-	/**
-	 * Gets the next available DeepSeek API key from the pool.
-	 * @returns A DeepSeek API key.
-	 */
-	getDeepSeekKey: (): string => getKeyFromPool(env.DEEPSEEK_API_KEYS, 'deepseek'),
-
-	/**
-	 * Gets the next available Cohere API key from the pool.
-	 * @returns A Cohere API key.
-	 */
-	getCohereKey: (): string => getKeyFromPool(env.COHERE_API_KEYS, 'cohere')
+		return perplexityProvider.generate(prompt);
+	}
 };
