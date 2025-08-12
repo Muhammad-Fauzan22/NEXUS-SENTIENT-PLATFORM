@@ -1,15 +1,19 @@
 import { createClient } from '@supabase/supabase-js';
 import { env } from '$lib/server/config';
 
-// Note: We are using the server-side config module here, but only accessing the
-// VITE_PUBLIC_ keys which are safe to expose to the browser.
-// This maintains a single source of truth for configuration.
+// Menggunakan modul konfigurasi server-side untuk menjaga satu sumber kebenaran,
+// namun hanya mengakses kunci VITE_PUBLIC_* yang aman untuk diekspos ke browser.
 
-const supabaseUrl = env.VITE_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = env.VITE_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseUrl = env.VITE_PUBLIC_SUPABASE_URL as string;
+const supabaseAnonKey = env.VITE_PUBLIC_SUPABASE_ANON_KEY as string;
 
 /**
- * The singleton, typed Supabase client instance.
- * This is safe to use in both server-side and client-side code.
+ * Instance singleton dari Supabase client yang telah diketik.
+ *
+ * Client ini menggunakan kunci 'anon' yang aman dan mematuhi kebijakan
+ * Row Level Security (RLS) yang telah Anda definisikan.
+ *
+ * Aman untuk digunakan di kode sisi server (server-side rendering) maupun
+ * di kode sisi klien (browser).
  */
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
