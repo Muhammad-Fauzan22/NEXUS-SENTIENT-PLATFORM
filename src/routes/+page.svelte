@@ -7,9 +7,16 @@
 	import Card from '$lib/components/ui/Card.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
 
+	// Menggunakan auto-subscription ($) untuk secara reaktif mendengarkan perubahan state.
 	const state = assessmentStore;
 </script>
 
+<!-- 
+  Komponen ini bertindak sebagai "State Machine Renderer" atau "Orchestrator UI".
+  Tanggung jawab utamanya adalah membaca state dari `assessmentStore` dan
+  menampilkan UI yang sesuai. Logika alur tidak ada di sini, melainkan
+  terenkapsulasi di dalam store.
+-->
 <div class="max-w-4xl mx-auto">
 	{#if $state.submission.state === 'loading'}
 		<Card>
@@ -20,6 +27,7 @@
 					take a moment.
 				</p>
 				<div class="mt-6">
+					<!-- Placeholder for a more sophisticated loading animation -->
 					<span class="loading loading-spinner loading-lg text-primary"></span>
 				</div>
 			</div>
@@ -40,6 +48,7 @@
 			</div>
 		</Card>
 	{:else}
+		<!-- State-driven step rendering -->
 		{#if $state.currentStep === 1}
 			<Step_1_UserData />
 		{:else if $state.currentStep === 2}
@@ -48,4 +57,4 @@
 			<Step_3_PWB />
 		{/if}
 	{/if}
-</div>
+</div>```
