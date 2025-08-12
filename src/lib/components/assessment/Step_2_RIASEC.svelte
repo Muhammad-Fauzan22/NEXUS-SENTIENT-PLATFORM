@@ -5,24 +5,24 @@
 	import Button from '$lib/components/ui/Button.svelte';
 	import Card from '$lib/components/ui/Card.svelte';
 
+	// Menggunakan objek untuk state jawaban memberikan performa yang lebih baik
+	// untuk pencarian dan pembaruan dibandingkan dengan array, terutama untuk daftar yang panjang.
 	let answers: { [key: number]: 'yes' | 'no' } = {};
 
 	function handleSubmit() {
+		// Validasi untuk memastikan semua pertanyaan telah dijawab.
 		if (Object.keys(answers).length !== riasecQuestions.length) {
 			alert('Please answer all questions before continuing.');
 			return;
 		}
 
+		// Mengubah format state lokal menjadi format yang diharapkan oleh store dan API.
 		const formattedAnswers: RIASECAnswer[] = Object.entries(answers).map(([id, answer]) => ({
 			question_id: parseInt(id, 10),
 			answer: answer
 		}));
 
 		assessmentStore.setRiasecAnswers(formattedAnswers);
-	}
-
-	function goBack() {
-		assessmentStore.goToStep(1);
 	}
 </script>
 
@@ -34,6 +34,7 @@
 	</p>
 
 	<form on:submit|preventDefault={handleSubmit} class="space-y-6">
+		<!-- Container yang dapat di-scroll untuk daftar pertanyaan yang panjang -->
 		<div class="space-y-4 max-h-[50vh] overflow-y-auto pr-4">
 			{#each riasecQuestions as question (question.id)}
 				<fieldset class="border-t border-gray-200 pt-4">
@@ -67,7 +68,7 @@
 		</div>
 
 		<div class="flex justify-between pt-4">
-			<Button on:click={goBack} variant="secondary">Back</Button>
+			<Button on:click={() => assessmentStore.goToStep(1)} variant="secondary">Back</Button>
 			<Button type="submit" variant="primary">Continue to PWB Assessment</Button>
 		</div>
 	</form>
