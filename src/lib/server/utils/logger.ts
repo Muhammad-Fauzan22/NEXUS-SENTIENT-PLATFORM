@@ -1,11 +1,20 @@
+type LogLevel = 'DEBUG' | 'INFO' | 'WARN' | 'ERROR';
+type LogContext = Record<string, unknown>;
 
 /**
- * The core logging function. Avoid using this directly.
+ * The core logging function.
  * @param level The severity level of the log.
  * @param message The main log message.
  * @param context Optional additional data to include in the log.
  */
 function log(level: LogLevel, message: string, context: LogContext = {}): void {
+	// If an error object is passed in the context, extract its message and stack for better logging
+	if (context.error && context.error instanceof Error) {
+		context.errorMessage = context.error.message;
+		context.errorStack = context.error.stack;
+		delete context.error; // Avoid redundant logging of the full object
+	}
+
 	const logObject = {
 		timestamp: new Date().toISOString(),
 		level,
@@ -16,6 +25,12 @@ function log(level: LogLevel, message: string, context: LogContext = {}): void {
 	const logString = JSON.stringify(logObject);
 
 	switch (level) {
+		case 'DEBUG':
+			// Debug logs are only shown if a specific environment variable is set
+			if (process.env.NODE_ENV === 'development') {
+				console.debug(logString);
+			}
+			break;
 		case 'INFO':
 			console.info(logString);
 			break;
@@ -28,35 +43,9 @@ function log(level: LogLevel, message: string, context: LogContext = {}): void {
 	}
 }
 
-/**
- * Logs an informational message. Use for general application flow events.
- * @param message The main log message.
- * @param context Optional additional data.
- */
-export function info(message: string, context?: LogContext): void {
-	log('INFO', message, context);
-}
-
-/**
- * Logs a warning message. Use for non-critical issues that should be investigated.
- * @param message The main log message.
- * @param context Optional additional data.
- */
-export function warn(message: string, context?: LogContext): void {
-	log('WARN', message, context);
-}
-
-/**
- * Logs an error message. Use for critical failures, exceptions, and unexpected states.
- * @param message The main log message.
- * @param context Optional additional data, often including an error object.
- */
-export function error(message: string, context?: LogContext): void {
-	log('ERROR', message, context);
-}
-
 export const logger = {
-	info,
-	warn,
-	error
+	debug: (message: string, context?: LogContext) => log('DEBUG', message, context),
+	info: (message: string, context?: LogContext) => log('INFO', message, context),
+	warn: (message: string, context?: LogContext) => log('WARN', message, context),
+	error: (message: string, context?: LogContext) => log('ERROR', message, context)
 };
