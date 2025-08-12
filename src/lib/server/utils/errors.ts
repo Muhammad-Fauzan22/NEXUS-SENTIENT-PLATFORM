@@ -1,6 +1,8 @@
+import { ZodError } from 'zod';
+import { logger } from './logger';
+
 /**
  * Base class for custom API errors.
- * Contains an HTTP status code and optional context for logging.
  */
 export class ApiError extends Error {
 	public readonly status: number;
@@ -24,29 +26,14 @@ export class BadRequestError extends ApiError {
 }
 
 /**
- * Represents a 401 Unauthorized error.
+ * Handles Zod validation errors, converting them into a 400 Bad Request.
  */
-export class UnauthorizedError extends ApiError {
-	constructor(message = 'Unauthorized', context?: Record<string, unknown>) {
-		super(401, message, context);
-	}
-}
-
-/**
- * Represents a 403 Forbidden error.
- */
-export class ForbiddenError extends ApiError {
-	constructor(message = 'Forbidden', context?: Record<string, unknown>) {
-		super(403, message, context);
-	}
-}
-
-/**
- * Represents a 404 Not Found error.
- */
-export class NotFoundError extends ApiError {
-	constructor(message = 'Not Found', context?: Record<string, unknown>) {
-		super(404, message, context);
+export class ZodValidationError extends ApiError {
+	constructor(error: ZodError, transactionId: string) {
+		const errors = error.flatten().fieldErrors;
+		const message = 'Input validation failed.';
+		logger.warn(message, { transactionId, errors });
+		super(400, message, { errors });
 	}
 }
 
