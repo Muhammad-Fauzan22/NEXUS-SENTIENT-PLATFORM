@@ -1,81 +1,28 @@
-# .github/workflows/deploy.yml
-# Workflow CI/CD untuk NEXUS-SENTIENT-PLATFORM.
-# Secara otomatis membangun dan mendeploy ke Netlify saat push ke main/develop.
-
-name: Deploy to Netlify
+# This is a placeholder for a real deployment workflow.
+# For now, it only validates that the project can be built.
+name: NEXUS Deploy - Build Verification
 
 on:
-  # Picu workflow saat push ke branch main atau develop
   push:
-    branches:
-      - main
-      - develop
-  # Picu workflow saat pull request dibuka/updated ke main atau develop
-  pull_request:
-    branches:
-      - main
-      - develop
-  # Picu workflow secara manual dari tab Actions di GitHub
+    branches: [ "main" ]
   workflow_dispatch:
 
 jobs:
-  build_and_deploy:
-    # Jalankan job ini di runner Ubuntu terbaru
+  build:
     runs-on: ubuntu-latest
 
-    # Definisikan environment berdasarkan branch
-    environment:
-      name: ${{ github.ref_name == 'main' && 'Production' || 'Development' }}
-      url: ${{ steps.netlify_deploy.outputs.deploy-url }}
-
     steps:
-      # --- 1. Checkout kode dari repositori ---
-      - name: Checkout repository
+      - name: Check out repository
         uses: actions/checkout@v4
 
-      # --- 2. Setup Node.js environment ---
-      - name: Setup Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20.x' # Gunakan versi Node.js LTS yang direkomendasikan untuk SvelteKit
-          cache: 'npm' # Gunakan caching untuk node_modules untuk mempercepat build
+          node-version: '20'
+          cache: 'npm'
 
-      # --- 3. Instal dependensi proyek ---
       - name: Install dependencies
-        run: npm ci # Gunakan npm ci untuk instalasi yang lebih cepat dan deterministik di lingkungan CI
+        run: npm install --legacy-peer-deps
 
-      # --- 4. (Opsional) Jalankan linter ---
-      # - name: Run linter
-      #   run: npm run lint
-
-      # --- 5. (Opsional) Jalankan test ---
-      # - name: Run tests
-      #   run: npm run test
-
-      # --- 6. Bangun proyek SvelteKit untuk produksi ---
-      - name: Build for production
+      - name: Build project
         run: npm run build
-        env:
-          # Pastikan environment variables untuk produksi tersedia saat build
-          # Misalnya, jika Anda menggunakan adapter-static dan perlu mengetahui origin
-          # PUBLIC_BASE_URL: ${{ secrets.NETLIFY_SITE_URL }}
-
-      # --- 7. Deploy ke Netlify menggunakan Netlify CLI Action ---
-      - name: Deploy to Netlify
-        id: netlify_deploy
-        uses: netlify/actions/cli@master
-        with:
-          args: deploy --dir=build --prod-if-branch=main
-          # --dir=build: Folder output build SvelteKit (disesuaikan jika beda)
-          # --prod-if-branch=main: Deploy ke produksi hanya jika branch adalah 'main'
-          # Jika branch 'develop', deploy ke URL preview/branch
-        env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-          # NETLIFY_SITE_URL: ${{ secrets.NETLIFY_SITE_URL }} # Jika diperlukan saat build
-
-      # --- 8. (Opsional) Tampilkan URL deploy di log ---
-      - name: Show deploy URL
-        run: |
-          echo "Deploy URL: ${{ steps.netlify_deploy.outputs.deploy-url }}"
-          echo "Logs URL: ${{ steps.netlify_deploy.outputs.logs-url }}"
