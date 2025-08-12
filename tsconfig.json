@@ -1,20 +1,11 @@
 ﻿{
 	"extends": "./.svelte-kit/tsconfig.json",
 	"compilerOptions": {
-		"allowJs": true,
-		"checkJs": true,
-		"esModuleInterop": true,
-		"forceConsistentCasingInFileNames": true,
-		"resolveJsonModule": true,
-		"skipLibCheck": true,
-		"sourceMap": true,
-		// --- ABSOLUTE STRICTNESS PROTOCOL ---
-		"strict": true,
-		"noUnusedLocals": true,
-		"noUnusedParameters": true,
-		"noFallthroughCasesInSwitch": true,
-		"noImplicitReturns": true,
-		"useUnknownInCatchVariables": true,
-		"verbatimModuleSyntax": true
+		"allowJs": true, "checkJs": true, "esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true, "resolveJsonModule": true,
+		"skipLibCheck": true, "sourceMap": true, "strict": true,
+		"noUnusedLocals": true, "noUnusedParameters": true,
+		"noFallthroughCasesInSwitch": true, "noImplicitReturns": true,
+		"useUnknownInCatchVariables": true, "verbatimModuleSyntax": true
 	}
 }
