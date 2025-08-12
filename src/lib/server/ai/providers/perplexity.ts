@@ -5,11 +5,13 @@ import { logger } from '$lib/server/utils/logger';
 const PERPLEXITY_API_URL = 'https://api.perplexity.ai/chat/completions';
 
 /**
- * Generates text using the Perplexity API.
+ * Menghasilkan teks menggunakan Perplexity API.
+ * Provider ini dioptimalkan untuk tugas-tugas yang memerlukan informasi
+ * real-time dari internet.
  *
- * @param prompt The user prompt to send to the model.
- * @returns A promise that resolves to the generated text content.
- * @throws {InternalServerError} If the API call fails.
+ * @param prompt Prompt pengguna untuk dikirim ke model.
+ * @returns Promise yang me-resolve dengan konten teks yang dihasilkan.
+ * @throws {InternalServerError} Jika panggilan API gagal atau respons tidak valid.
  */
 async function generate(prompt: string): Promise<string> {
 	try {
@@ -21,7 +23,7 @@ async function generate(prompt: string): Promise<string> {
 				authorization: `Bearer ${env.PERPLEXITY_API_KEY}`
 			},
 			body: JSON.stringify({
-				model: 'pplx-7b-online', // Model with internet access
+				model: 'pplx-7b-online', // Model dengan akses internet
 				messages: [{ role: 'user', content: prompt }]
 			})
 		});
@@ -36,7 +38,13 @@ async function generate(prompt: string): Promise<string> {
 		}
 
 		const data = await response.json();
-		const content = data.choices[0]?.message?.content || '';
+		// Ekstraksi konten yang aman dengan optional chaining
+		const content = data.choices?.[0]?.message?.content || '';
+
+		if (!content) {
+			logger.warn('Perplexity API returned a successful response but with empty content.', { responseData: data });
+		}
+
 		return content.trim();
 	} catch (error) {
 		logger.error('An unexpected error occurred while calling Perplexity API', { error });
