@@ -1,5 +1,4 @@
 <script lang="ts">
-	// CORRECTED: Use $lib alias for robust imports
 	import { assessmentStore } from '$lib/stores/assessmentStore';
 	import type { UserData } from '$lib/types/schemas/assessment';
 	import Button from '$lib/components/ui/Button.svelte';
