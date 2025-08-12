@@ -7192,3 +7192,9 @@
 
 2025-08-12 10:15:02,414 - INFO - Detected file changes...
 2025-08-12 10:15:03,331 - INFO - Committed: Auto-sync: auto_git_sync.log - 2025-08-12 10:15:03
+2025-08-12 10:15:14,710 - ERROR - Git command failed: fatal: unable to access 'https://github.com/Muhammad-Fauzan22/NEXUS-SENTIENT-PLATFORM.git/': Could not resolve host: github.com
+
+2025-08-12 10:15:17,974 - INFO - Detected file changes...
+2025-08-12 10:15:18,495 - INFO - Committed: Auto-sync: auto_git_sync.log - 2025-08-12 10:15:18
+2025-08-12 10:15:22,028 - INFO - Changes pushed to GitHub
+2025-08-12 10:15:25,233 - INFO - Detected file changes...
