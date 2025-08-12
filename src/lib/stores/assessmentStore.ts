@@ -1,7 +1,6 @@
 import { writable } from 'svelte/store';
-import type { UserData, RIASECAnswer, PWBAnswer } from '$lib/types/schemas/assessment';
+import type { UserData, RIASECAnswer, PWBAnswer, IDPResult } from '$lib/types/schemas/assessment';
 import { apiClient } from '$lib/utils/apiClient';
-import type { IDPResult } from '$lib/server/ai/generators/idpGenerator';
 
 // --- State Definition ---
 
