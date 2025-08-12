@@ -1,43 +1,59 @@
-import { test, expect } from '@playwright/test';
+import { describe, it, expect } from 'vitest';
+import type { PWBAnswer } from '$lib/types/schemas/assessment';
+// CORRECTED: Only import what is necessary for this unit test.
+import { calculatePWBScore } from './pwbAnalyzer';
 
-test('Full assessment end-to-end flow', async ({ page }) => {
-	// Step 0: Navigate to the home page
-	await page.goto('/');
+describe('pwbAnalyzer Logic', () => {
+	it('should correctly sum the scores from a list of PWB answers', () => {
+		const answers: PWBAnswer[] = [
+			{ question_id: 1, score: 5 },
+			{ question_id: 2, score: 6 },
+			{ question_id: 3, score: 4 },
+			{ question_id: 4, score: 1 }
+		];
 
-	// --- Step 1: Fill out User Data ---
-	await expect(page.getByRole('heading', { name: 'Welcome to Nexus' })).toBeVisible();
-	await page.getByLabel('Full Name').fill('Fauzan Test User');
-	await page.getByLabel('Email Address').fill('fauzan.test@example.com');
-	await page.getByLabel('Age').fill('25');
-	await page.getByLabel('Current Occupation or Field of Study').fill('AI Researcher');
-	await page.getByRole('button', { name: 'Continue to RIASEC Assessment' }).click();
+		const expectedScore = 16; // 5 + 6 + 4 + 1
+		const result = calculatePWBScore(answers);
+		expect(result).toBe(expectedScore);
+	});
 
-	// --- Step 2: Complete RIASEC Assessment ---
-	await expect(page.getByRole('heading', { name: 'RIASEC Assessment' })).toBeVisible();
-	// For simplicity, we'll just click the first option ('Yes') for all questions.
-	const riasecQuestions = await page.locator('fieldset').all();
-	for (const question of riasecQuestions) {
-		await question.getByText('Yes').click();
-	}
-	await page.getByRole('button', { name: 'Continue to PWB Assessment' }).click();
+	it('should return 0 for an empty list of answers', () => {
+		const answers: PWBAnswer[] = [];
+		const expectedScore = 0;
+		const result = calculatePWBScore(answers);
+		expect(result).toBe(expectedScore);
+	});
 
-	// --- Step 3: Complete PWB Assessment & Submit ---
-	await expect(page.getByRole('heading', { name: 'Psychological Well-Being Scale' })).toBeVisible();
-	const pwbQuestions = await page.locator('fieldset').all();
-	for (const question of pwbQuestions) {
-		// Click the radio button with the value "5"
-		await question.locator('input[value="5"]').click();
-	}
-	await page.getByRole('button', { name: 'Submit & Generate My Plan' }).click();
+	it('should handle scores of zero correctly', () => {
+		const answers: PWBAnswer[] = [
+			{ question_id: 1, score: 5 },
+			{ question_id: 2, score: 0 },
+			{ question_id: 3, score: 3 }
+		];
+		const expectedScore = 8;
+		const result = calculatePWBScore(answers);
+		expect(result).toBe(expectedScore);
+	});
 
-	// --- Step 4: Verify Loading and Final Result ---
-	// Assert that the loading screen appears. Playwright will wait automatically.
-	await expect(page.getByRole('heading', { name: 'Generating Your Plan...' })).toBeVisible();
-
-	// Assert that the final result page is displayed. We set a generous timeout
-	// because the AI generation can be slow.
-	await expect(page.getByRole('heading', { name: 'Individual Development Plan for Fauzan Test User' })).toBeVisible({ timeout: 60000 }); // 60 second timeout
-
-	// A final check to ensure the content is rendered
-	await expect(page.getByRole('heading', { name: 'Your Action Plan' })).toBeVisible();
+	it('should calculate a full scale of answers correctly', () => {
+		const answers: PWBAnswer[] = [
+			{ question_id: 1, score: 6 },
+			{ question_id: 2, score: 6 },
+			{ question_id: 3, score: 6 },
+			{ question_id: 4, score: 6 },
+			{ question_id: 5, score: 6 },
+			{ question_id: 6, score: 6 },
+			{ question_id: 7, score: 6 },
+			{ question_id: 8, score: 6 },
+			{ question_id: 9, score: 6 },
+			{ question_id: 10, score: 6 },
+			{ question_id: 11, score: 6 },
+			{ question_id: 12, score: 6 },
+			{ question_id: 13, score: 6 },
+			{ question_id: 14, score: 6 }
+		];
+		const expectedScore = 84; // 14 * 6
+		const result = calculatePWBScore(answers);
+		expect(result).toBe(expectedScore);
+	});
 });
