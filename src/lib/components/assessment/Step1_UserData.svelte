@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { assessmentStore } from '../../../stores/assessmentStore';
+	// CORRECTED: Use $lib alias for robust imports
+	import { assessmentStore } from '$lib/stores/assessmentStore';
 	import type { UserData } from '$lib/types/schemas/assessment';
 	import Button from '$lib/components/ui/Button.svelte';
 	import Card from '$lib/components/ui/Card.svelte';
@@ -13,8 +14,6 @@
 	};
 
 	function handleSubmit(): void {
-		// Basic validation can happen here if needed, but for now we trust the user
-		// and let the store handle the logic.
 		if (userData.name && userData.email && userData.age > 0 && userData.occupation) {
 			assessmentStore.setUserData(userData);
 		} else {
@@ -39,7 +38,6 @@
 			required
 			bind:value={userData.name}
 		/>
-
 		<Input
 			id="email"
 			label="Email Address"
@@ -48,7 +46,6 @@
 			required
 			bind:value={userData.email}
 		/>
-
 		<Input
 			id="age"
 			label="Age"
@@ -58,7 +55,6 @@
 			min="1"
 			bind:value={userData.age}
 		/>
-
 		<Input
 			id="occupation"
 			label="Current Occupation or Field of Study"
@@ -67,7 +63,6 @@
 			required
 			bind:value={userData.occupation}
 		/>
-
 		<div class="pt-4">
 			<Button type="submit" variant="primary" class="w-full">
 				Continue to RIASEC Assessment
