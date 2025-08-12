@@ -1,4 +1,5 @@
-// --- Input & Raw Data Schemas ---
+// --- Skema Input & Data Mentah ---
+// Mendefinisikan bentuk data yang dikumpulkan dari pengguna.
 
 export interface PWBAnswer {
 	question_id: number;
@@ -17,13 +18,16 @@ export interface UserData {
 	occupation: string;
 }
 
+// Agregasi dari semua data input yang dikirim ke API.
 export interface AssessmentData {
 	user_data: UserData;
 	riasec_answers: RIASECAnswer[];
 	pwb_answers: PWBAnswer[];
 }
 
-// --- AI Analysis & Output Schemas ---
+
+// --- Skema Output & Hasil Analisis AI ---
+// Mendefinisikan bentuk data terstruktur yang dihasilkan oleh layanan AI.
 
 export interface PWBAnalysisResult {
 	totalScore: number;
@@ -45,6 +49,7 @@ export interface ActionItem {
 	rationale: string;
 }
 
+// Skema final untuk Individual Development Plan (IDP) yang dihasilkan.
 export interface IDPResult {
 	title: string;
 	introduction: string;
