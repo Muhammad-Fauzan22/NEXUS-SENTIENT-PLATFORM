@@ -1,11 +1,10 @@
 <script lang="ts">
-	import { assessmentStore } from '../../../stores/assessmentStore';
+	import { assessmentStore } from '$lib/stores/assessmentStore';
 	import type { PWBAnswer } from '$lib/types/schemas/assessment';
 	import { pwbQuestions } from '$lib/data/raw/pwbQuestions';
 	import Button from '$lib/components/ui/Button.svelte';
 	import Card from '$lib/components/ui/Card.svelte';
 
-	// Use a map to store raw selections from radio buttons (as strings)
 	let selections: Map<number, string> = new Map();
 
 	function handleSubmit() {
@@ -48,7 +47,8 @@
 				<fieldset class="border-t border-gray-200 pt-4">
 					<legend class="text-md font-medium text-gray-700">{question.id}. {question.text}</legend>
 					<div class="flex justify-around items-center mt-3">
-						{#each { 1, 2, 3, 4, 5, 6 } as score}
+						<!-- CORRECTED: Use square brackets for array iteration -->
+						{#each [1, 2, 3, 4, 5, 6] as score}
 							<label class="flex flex-col items-center cursor-pointer">
 								<input
 									type="radio"
@@ -71,4 +71,4 @@
 			<Button type="submit" variant="primary">Submit & Generate My Plan</Button>
 		</div>
 	</form>
-</Card>
+</Card>```
