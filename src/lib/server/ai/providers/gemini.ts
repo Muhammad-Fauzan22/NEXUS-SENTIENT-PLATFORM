@@ -3,29 +3,36 @@ import { env } from '$lib/server/config';
 import { InternalServerError } from '$lib/server/utils/errors';
 import { logger } from '$lib/server/utils/logger';
 
-// Initialize the Google Generative AI client
-const genAI = new GoogleGenerativeAI(env.GEMINI_API_KEY);
+// Inisialisasi Google Generative AI client.
+// Dilakukan sekali saat modul dimuat untuk efisiensi (pola singleton).
+const genAI = new GoogleGenerativeAI(env.GEMINI_API_KEY as string);
 const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
 
 /**
- * Generates text using the Google Gemini API.
+ * Menghasilkan teks menggunakan Google Gemini API.
+ * Provider ini dioptimalkan untuk kecepatan dan tugas-tugas generasi teks umum.
  *
- * @param prompt The user prompt to send to the model.
- * @returns A promise that resolves to the generated text content.
- * @throws {InternalServerError} If the API call fails.
+ * @param prompt Prompt pengguna untuk dikirim ke model.
+ * @returns Promise yang me-resolve dengan konten teks yang dihasilkan.
+ * @throws {InternalServerError} Jika panggilan API gagal.
  */
 async function generate(prompt: string): Promise<string> {
 	try {
 		const result = await model.generateContent(prompt);
 		const response = result.response;
 		const text = response.text();
+		
+		if (!text) {
+			logger.warn('Gemini API returned a successful response but with empty content.', { responseData: response });
+		}
+
 		return text.trim();
 	} catch (error) {
-		logger.error('An unexpected error occurred while calling Gemini API', {
-			// Ensure we log the actual error object from the SDK
-			sdkError: error instanceof Error ? { message: error.message, stack: error.stack } : error
-		});
-		// Throw a standardized error for consistent handling upstream
+		// Menangani error spesifik dari SDK dan mencatatnya dengan benar
+		const sdkError = error instanceof Error ? { message: error.message, stack: error.stack } : error;
+		logger.error('An unexpected error occurred while calling Gemini API', { sdkError });
+		
+		// Melemparkan error terstandarisasi untuk konsistensi di seluruh aplikasi.
 		throw new InternalServerError('Failed to communicate with Gemini API.');
 	}
 }
