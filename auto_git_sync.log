@@ -5655,3 +5655,6 @@
 2025-08-12 09:10:33,472 - INFO - Changes pushed to GitHub
 2025-08-12 09:10:36,631 - INFO - Detected file changes...
 2025-08-12 09:10:37,093 - INFO - Committed: Auto-sync: EXUS-SENTIENT-PLATFORM, auto_git_sync.log - 2025-08-12 09:10:36
+2025-08-12 09:10:41,448 - INFO - Changes pushed to GitHub
+2025-08-12 09:10:44,647 - INFO - Detected file changes...
+2025-08-12 09:10:45,338 - INFO - Committed: Auto-sync: EXUS-SENTIENT-PLATFORM, auto_git_sync.log, src/lib/server/services/dbService.ts - 2025-08-12 09:10:45
