@@ -5886,3 +5886,6 @@
 2025-08-12 09:21:35,704 - INFO - Changes pushed to GitHub
 2025-08-12 09:21:38,963 - INFO - Detected file changes...
 2025-08-12 09:21:39,350 - INFO - Committed: Auto-sync: EXUS-SENTIENT-PLATFORM, auto_git_sync.log - 2025-08-12 09:21:39
+2025-08-12 09:21:45,715 - INFO - Changes pushed to GitHub
+2025-08-12 09:21:48,937 - INFO - Detected file changes...
+2025-08-12 09:21:49,468 - INFO - Committed: Auto-sync: EXUS-SENTIENT-PLATFORM, auto_git_sync.log, scripts/etl.ts - 2025-08-12 09:21:49
