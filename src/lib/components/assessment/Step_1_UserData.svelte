@@ -5,6 +5,9 @@
 	import Card from '$lib/components/ui/Card.svelte';
 	import Input from '$lib/components/ui/Input.svelte';
 
+	// Menginisialisasi state lokal untuk form.
+	// Ini adalah praktik yang baik untuk menjaga data form terisolasi
+	// sampai siap untuk disubmit ke store global.
 	let userData: UserData = {
 		name: '',
 		email: '',
@@ -13,7 +16,10 @@
 	};
 
 	function handleSubmit(): void {
+		// Validasi sederhana di sisi klien sebelum mengirim ke store.
 		if (userData.name && userData.email && userData.age > 0 && userData.occupation) {
+			// Mendelegasikan pembaruan state dan logika navigasi ke store,
+			// menjaga komponen ini tetap fokus pada presentasi.
 			assessmentStore.setUserData(userData);
 		} else {
 			alert('Please fill in all fields before continuing.');
