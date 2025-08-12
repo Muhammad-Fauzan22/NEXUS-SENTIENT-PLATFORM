@@ -1,8 +1,7 @@
 import { env } from '$env/dynamic/private';
-import { callClaude } from './providers/claude.js';
-import { callGemini } from './providers/gemini.js';
-import { callPerplexity } from './providers/perplexity.js';
-// Tambahkan impor untuk provider lain jika sudah Anda buat
+import { callClaude } from '../ai/providers/claude.js';
+import { callGemini } from '../ai/providers/gemini.js';
+// import { callPerplexity } from '../ai/providers/perplexity.js'; // Unused import commented out
 
 // Mengelola pool API key
 const deepseekKeys = JSON.parse(env.DEEPSEEK_API_KEYS || '[]');
@@ -10,6 +9,11 @@ const cohereKeys = JSON.parse(env.COHERE_API_KEYS || '[]');
 let deepseekIndex = 0;
 let cohereIndex = 0;
 
+/**
+ * @param {string[]} pool
+ * @param {number} index
+ * @returns {string|null}
+ */
 function getNextKey(pool, index) {
 	if (pool.length === 0) return null;
 	const key = pool[index];
