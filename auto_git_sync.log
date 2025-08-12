@@ -17907,3 +17907,7 @@ Everything up-to-date
 2025-08-12 22:25:23,551 - INFO - Committed: Auto-sync: auto_git_sync.log - 2025-08-12 22:25:23
 2025-08-12 22:25:26,606 - INFO - Changes pushed to GitHub
 2025-08-12 22:25:29,889 - INFO - Detected file changes...
+2025-08-12 22:25:30,766 - INFO - Committed: Auto-sync: auto_git_sync.log, src/lib/server/ai/providers/perplexity.ts - 2025-08-12 22:25:30
+2025-08-12 22:25:35,458 - INFO - Changes pushed to GitHub
+2025-08-12 22:25:38,892 - INFO - Detected file changes...
+2025-08-12 22:25:39,841 - INFO - Committed: Auto-sync: auto_git_sync.log - 2025-08-12 22:25:39
