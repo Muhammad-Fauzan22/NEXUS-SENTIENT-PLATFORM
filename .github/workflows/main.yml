@@ -1,0 +1,41 @@
+name: NEXUS CI/CD - Validate, Test & Build
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  validate-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js v20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies reliably
+        # Use 'npm ci' for faster, more reliable installs in CI environments
+        run: npm ci --legacy-peer-deps
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: Run Linting
+        run: npm run lint
+
+      - name: Run Unit Tests
+        run: npm test
+
+      - name: Run End-to-End Tests
+        run: npx playwright test
+
+      - name: Build for Production
+        # This step will only run if all previous steps (lint, tests) succeed
+        run: npm run build
