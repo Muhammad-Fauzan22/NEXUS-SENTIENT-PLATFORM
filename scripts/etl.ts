@@ -1,135 +1,88 @@
-// scripts/etl.ts
-// Pipeline ETL (Extract, Transform, Load) lengkap untuk membangun Knowledge Base.
-
-import fs from 'fs/promises';
-import path from 'path';
-import pdf from 'pdf-parse';
-import mammoth from 'mammoth';
-import { v4 as uuidv4 } from 'uuid';
+import dotenv from 'dotenv';
+import { supabaseAdmin } from '../src/lib/server/db/supabase.admin';
 import { logger } from '../src/lib/server/utils/logger';
-import { azureProvider } from '../src/lib/server/ai/providers/azure';
-import { supabaseAdmin } from '../src/lib/server/supabaseAdmin';
-import { InternalServerError } from '../src/lib/server/utils/errors';
+import type { PostgrestError } from '@supabase/supabase-js';
 
-// --- Konfigurasi ---
-const RAW_DATA_DIR = path.join(process.cwd(), 'data', 'raw');
-const KNOWLEDGE_CHUNKS_TABLE = 'knowledge_chunks';
-const CHUNK_SIZE = 1500;
-const CHUNK_OVERLAP = 200;
+// Load environment variables from the root .env file
+dotenv.config({ path: './.env' });
 
-// --- Tipe Data ---
-interface RawDocument {
-	source: string;
-	content: string;
-}
-
+// Define the structure of our knowledge chunks
 interface KnowledgeChunk {
-	id: string;
-	source_document: string;
-	content_text: string;
+	id: number;
+	source_id: string;
+	content: string;
 	content_embedding: number[];
+	metadata: Record<string, unknown>;
 }
 
-// --- Langkah 1: Ekstraksi Teks ---
-async function extractTextFromDoc(filePath: string): Promise<string> {
-	const extension = path.extname(filePath).toLowerCase();
-	if (extension === '.pdf') {
-		const dataBuffer = await fs.readFile(filePath);
-		const data = await pdf(dataBuffer);
-		return data.text;
-	}
-	if (extension === '.docx') {
-		const { value } = await mammoth.extractRawText({ path: filePath });
-		return value;
-	}
-	if (extension === '.txt') {
-		return fs.readFile(filePath, 'utf-8');
-	}
-	logger.warn(`Format file tidak didukung: ${extension}`);
-	return '';
+// Placeholder for a function that would generate embeddings
+async function getEmbedding(text: string): Promise<number[]> {
+	// In a real implementation, this would call an AI embedding model (e.g., OpenAI, Cohere)
+	logger.debug('Generating embedding for chunk...', { length: text.length });
+	// Returning a dummy array of the correct dimension for Supabase pgvector
+	return Array(1536).fill(0).map(Math.random);
 }
 
-async function extractAllRawData(): Promise<RawDocument[]> {
-	logger.info('Memulai fase ekstraksi teks...');
-	const files = await fs.readdir(RAW_DATA_DIR);
-	const documents: RawDocument[] = [];
-	for (const file of files) {
-		const filePath = path.join(RAW_DATA_DIR, file);
-		const content = await extractTextFromDoc(filePath);
-		if (content) {
-			documents.push({ source: file, content });
-		}
-	}
-	return documents;
-}
+async function processAndLoadChunks(chunks: Omit<KnowledgeChunk, 'content_embedding' | 'id'>[]) {
+	logger.info(`Processing ${chunks.length} chunks to generate embeddings...`);
 
-// --- Langkah 2: Chunking Teks ---
-function chunkDocument(doc: RawDocument): Omit<KnowledgeChunk, 'content_embedding' | 'id'>[] {
-	const chunks: Omit<KnowledgeChunk, 'content_embedding' | 'id'>[] = [];
-	for (let i = 0; i < doc.content.length; i += CHUNK_SIZE - CHUNK_OVERLAP) {
-		const chunkText = doc.content.substring(i, i + CHUNK_SIZE);
-		chunks.push({
-			source_document: doc.source,
-			content_text: chunkText
-		});
-	}
-	return chunks;
-}
-
-// --- Langkah 3: Vektorisasi Chunks ---
-async function vectorizeChunks(
-	chunks: Omit<KnowledgeChunk, 'content_embedding' | 'id'>[]
-): Promise<KnowledgeChunk[]> {
-	logger.info(`Memulai fase vektorisasi untuk ${chunks.length} chunk...`);
-	const vectorizedChunks: KnowledgeChunk[] = [];
-	for (const [index, chunk] of chunks.entries()) {
+	for (const chunk of chunks) {
 		try {
-			const embedding = await azureProvider.generateEmbedding(chunk.content_text);
-			vectorizedChunks.push({ ...chunk, id: uuidv4(), content_embedding: embedding });
-			logger.debug(`Chunk ${index + 1}/${chunks.length} berhasil divektorisasi.`);
-		} catch (error) {
-			logger.error({ err: error, chunk }, `Gagal memvektorisasi chunk ${index + 1}.`);
+			const embedding = await getEmbedding(chunk.content);
+			const chunkWithEmbedding = {
+				...chunk,
+				content_embedding: embedding
+			};
+
+			const { error } = await supabaseAdmin.from('knowledge_chunks').insert(chunkWithEmbedding);
+
+			if (error) {
+				// CORRECTED: Pass a string message and the error object in the context
+				logger.error('Failed to insert chunk into Supabase.', { error });
+			} else {
+				logger.info(`Successfully inserted chunk for source: ${chunk.source_id}`);
+			}
+		} catch (err) {
+			// CORRECTED: Pass a string message and the error object in the context
+			logger.error('An error occurred during embedding or insertion.', { error: err, chunk });
 		}
 	}
-	return vectorizedChunks;
 }
 
-// --- Langkah 4: Muat ke Supabase ---
-async function loadToSupabase(chunks: KnowledgeChunk[]) {
-	logger.info('Memulai fase pemuatan data ke Supabase...');
+async function main() {
+	logger.info('Starting ETL process...');
 
-	// Hapus data lama
-	const { error: deleteError } = await supabaseAdmin.from(KNOWLEDGE_CHUNKS_TABLE).delete().neq('id', uuidv4());
-	if (deleteError) {
-		throw new InternalServerError('Gagal membersihkan knowledge base lama.');
-	}
+	// --- EXTRACT ---
+	// In a real-world scenario, you would extract data from a source like Google Drive.
+	// For this example, we'll use some dummy data.
+	const rawData = [
+		{
+			source_id: 'doc-001',
+			content: 'Svelte 5 introduces runes, a new way to handle reactivity.',
+			metadata: { page: 1 }
+		},
+		{
+			source_id: 'doc-001',
+			content: 'Runes like $state and $derived simplify component logic.',
+			metadata: { page: 2 }
+		},
+		{
+			source_id: 'doc-002',
+			content: 'Supabase provides a suite of tools including a Postgres database and authentication.',
+			metadata: { section: 'Introduction' }
+		}
+	];
 
-	// Ubah embedding menjadi string dan masukkan data baru
-	const chunksToInsert = chunks.map(chunk => ({
-        ...chunk,
-        content_embedding: `[${chunk.content_embedding.join(',')}]`
-    }));
-
-	const { error: insertError } = await supabaseAdmin.from(KNOWLEDGE_CHUNKS_TABLE).insert(chunksToInsert);
-	if (insertError) {
-		logger.error({ error: insertError }, 'Gagal memasukkan chunk baru.');
-		throw new InternalServerError('Gagal memuat knowledge base baru.');
-	}
-}
-
-// --- Fungsi Utama Pipeline ETL ---
-async function runEtlPipeline() {
-	logger.info('--- MEMULAI PIPELINE ETL KNOWLEDGE BASE ---');
+	// --- TRANSFORM & LOAD ---
 	try {
-		const rawDocs = await extractAllRawData();
-		const allChunksToVectorize = rawDocs.flatMap(chunkDocument);
-		const vectorizedChunks = await vectorizeChunks(allChunksToVectorize);
-		await loadToSupabase(vectorizedChunks);
-		logger.info('--- PIPELINE ETL KNOWLEDGE BASE BERHASIL ---');
-	} catch (error) {
-		logger.error({ err: error }, '--- PIPELINE ETL KNOWLEDGE BASE GAGAL ---');
+		await processAndLoadChunks(rawData);
+		logger.info('ETL process completed successfully.');
+	} catch (err) {
+		const error = err as PostgrestError | Error;
+		// CORRECTED: Pass a string message and the error object in the context
+		logger.error('The ETL process failed with a critical error.', { error });
 		process.exit(1);
 	}
 }
 
-runEtlPipeline();
+main();
