@@ -1,6 +1,7 @@
-import { supabaseAdmin } from '$lib/server/db/supabase.admin';
-import { logger } from '$lib/server/utils/logger';
-import { InternalServerError } from '$lib/server/utils/errors';
+// CORRECTED: Using relative path for robust server-side imports.
+import { supabaseAdmin } from '../db/supabase.admin';
+import { logger } from '../utils/logger';
+import { InternalServerError } from '../utils/errors';
 
 /**
  * Defines the structure of the data for a new assessment submission.
@@ -12,13 +13,13 @@ export interface AssessmentSubmissionPayload {
 	riasec_result: unknown;
 	pwb_result: unknown;
 	generated_idp: unknown;
-	user_id?: string; // Optional: if you have user authentication
+	user_id?: string;
 }
 
 /**
  * Inserts a complete assessment submission into the database.
- * @param submission The assessment data to insert, conforming to the payload structure.
- * @returns The newly created submission record from the database.
+ * @param submission The assessment data to insert.
+ * @returns The newly created submission record.
  * @throws {InternalServerError} if the database operation fails.
  */
 async function createAssessmentSubmission(submission: AssessmentSubmissionPayload) {
