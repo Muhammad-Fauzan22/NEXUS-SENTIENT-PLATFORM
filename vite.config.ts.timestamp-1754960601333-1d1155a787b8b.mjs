@@ -1,0 +1,18 @@
+// vite.config.ts
+import { sveltekit } from "file:///C:/Users/fauzan/Documents/Projects/NEXUS-SENTIENT-PLATFORM/node_modules/@sveltejs/kit/src/exports/vite/index.js";
+import { defineConfig } from "file:///C:/Users/fauzan/Documents/Projects/NEXUS-SENTIENT-PLATFORM/node_modules/vitest/dist/config.js";
+var vite_config_default = defineConfig({
+  plugins: [sveltekit()],
+  test: {
+    // Tell Vitest to use a browser-like environment (jsdom)
+    environment: "jsdom",
+    // Include all test files
+    include: ["src/**/*.{test,spec}.{js,ts}"],
+    // Explicitly load our setup file before running tests
+    setupFiles: ["./vitest-setup.ts"]
+  }
+});
+export {
+  vite_config_default as default
+};
+//# sourceMappingURL=data:application/json;base64,ewogICJ2ZXJzaW9uIjogMywKICAic291cmNlcyI6IFsidml0ZS5jb25maWcudHMiXSwKICAic291cmNlc0NvbnRlbnQiOiBbImNvbnN0IF9fdml0ZV9pbmplY3RlZF9vcmlnaW5hbF9kaXJuYW1lID0gXCJDOlxcXFxVc2Vyc1xcXFxmYXV6YW5cXFxcRG9jdW1lbnRzXFxcXFByb2plY3RzXFxcXE5FWFVTLVNFTlRJRU5ULVBMQVRGT1JNXCI7Y29uc3QgX192aXRlX2luamVjdGVkX29yaWdpbmFsX2ZpbGVuYW1lID0gXCJDOlxcXFxVc2Vyc1xcXFxmYXV6YW5cXFxcRG9jdW1lbnRzXFxcXFByb2plY3RzXFxcXE5FWFVTLVNFTlRJRU5ULVBMQVRGT1JNXFxcXHZpdGUuY29uZmlnLnRzXCI7Y29uc3QgX192aXRlX2luamVjdGVkX29yaWdpbmFsX2ltcG9ydF9tZXRhX3VybCA9IFwiZmlsZTovLy9DOi9Vc2Vycy9mYXV6YW4vRG9jdW1lbnRzL1Byb2plY3RzL05FWFVTLVNFTlRJRU5ULVBMQVRGT1JNL3ZpdGUuY29uZmlnLnRzXCI7aW1wb3J0IHsgc3ZlbHRla2l0IH0gZnJvbSAnQHN2ZWx0ZWpzL2tpdC92aXRlJztcbmltcG9ydCB7IGRlZmluZUNvbmZpZyB9IGZyb20gJ3ZpdGVzdC9jb25maWcnO1xuXG5leHBvcnQgZGVmYXVsdCBkZWZpbmVDb25maWcoe1xuXHRwbHVnaW5zOiBbc3ZlbHRla2l0KCldLFxuXHR0ZXN0OiB7XG5cdFx0Ly8gVGVsbCBWaXRlc3QgdG8gdXNlIGEgYnJvd3Nlci1saWtlIGVudmlyb25tZW50IChqc2RvbSlcblx0XHRlbnZpcm9ubWVudDogJ2pzZG9tJyxcblx0XHQvLyBJbmNsdWRlIGFsbCB0ZXN0IGZpbGVzXG5cdFx0aW5jbHVkZTogWydzcmMvKiovKi57dGVzdCxzcGVjfS57anMsdHN9J10sXG5cdFx0Ly8gRXhwbGljaXRseSBsb2FkIG91ciBzZXR1cCBmaWxlIGJlZm9yZSBydW5uaW5nIHRlc3RzXG5cdFx0c2V0dXBGaWxlczogWycuL3ZpdGVzdC1zZXR1cC50cyddXG5cdH1cbn0pOyJdLAogICJtYXBwaW5ncyI6ICI7QUFBNFcsU0FBUyxpQkFBaUI7QUFDdFksU0FBUyxvQkFBb0I7QUFFN0IsSUFBTyxzQkFBUSxhQUFhO0FBQUEsRUFDM0IsU0FBUyxDQUFDLFVBQVUsQ0FBQztBQUFBLEVBQ3JCLE1BQU07QUFBQTtBQUFBLElBRUwsYUFBYTtBQUFBO0FBQUEsSUFFYixTQUFTLENBQUMsOEJBQThCO0FBQUE7QUFBQSxJQUV4QyxZQUFZLENBQUMsbUJBQW1CO0FBQUEsRUFDakM7QUFDRCxDQUFDOyIsCiAgIm5hbWVzIjogW10KfQo=
