@@ -1,10 +1,13 @@
-// CORRECTED: Using relative path for robust server-side imports.
 import { supabaseAdmin } from '../db/supabase.admin';
 import { logger } from '../utils/logger';
 import { InternalServerError } from '../utils/errors';
+import type { PostgrestError } from '@supabase/supabase-js';
+
+// --- Definisi Tipe Data Transfer Object (DTO) ---
 
 /**
- * Defines the structure of the data for a new assessment submission.
+ * Mendefinisikan "kontrak" data yang ketat untuk setiap submisi asesmen baru.
+ * Ini memastikan bahwa hanya data dengan bentuk yang benar yang dapat disimpan.
  */
 export interface AssessmentSubmissionPayload {
 	user_info: unknown;
@@ -13,25 +16,28 @@ export interface AssessmentSubmissionPayload {
 	riasec_result: unknown;
 	pwb_result: unknown;
 	generated_idp: unknown;
-	user_id?: string;
+	user_id?: string; // Opsional, untuk integrasi otentikasi di masa depan
 }
 
+// --- Logika Layanan Database ---
+
 /**
- * Inserts a complete assessment submission into the database.
- * @param submission The assessment data to insert.
- * @returns The newly created submission record.
- * @throws {InternalServerError} if the database operation fails.
+ * Menyisipkan catatan submisi asesmen yang lengkap ke dalam database.
+ *
+ * @param submission Objek data asesmen yang sesuai dengan payload.
+ * @returns Catatan yang baru saja dibuat dari database.
+ * @throws {InternalServerError} jika operasi database gagal.
  */
 async function createAssessmentSubmission(submission: AssessmentSubmissionPayload) {
-	const { data, error: dbError } = await supabaseAdmin
+	const { data, error } = await supabaseAdmin
 		.from('assessment_submissions')
 		.insert(submission)
 		.select()
-		.single();
+		.single(); // Menggunakan .single() untuk memastikan hanya satu baris yang dikembalikan atau error.
 
-	if (dbError) {
-		logger.error('Failed to insert assessment submission into database', {
-			dbError: { message: dbError.message, details: dbError.details, code: dbError.code }
+	if (error) {
+		logger.error('Failed to insert assessment submission into Supabase.', {
+			dbError: { message: error.message, details: error.details, code: error.code }
 		});
 		throw new InternalServerError('Database operation failed to store assessment.');
 	}
@@ -40,7 +46,8 @@ async function createAssessmentSubmission(submission: AssessmentSubmissionPayloa
 }
 
 /**
- * A centralized service for all database operations.
+ * Layanan terpusat (Repository Pattern) untuk semua operasi database.
+ * Ini mengabstraksi logika query Supabase dari logika bisnis aplikasi.
  */
 export const dbService = {
 	createAssessmentSubmission
