@@ -1,5 +1,5 @@
 import { env } from '$env/dynamic/private';
-import { callclaude } from '../ai/providers/claude.js';
+import { callClaude } from '../ai/providers/claude.js';
 import { callGemini } from '../ai/providers/gemini.js';
 // import { callPerplexity } from '../ai/providers/perplexity.js'; // Unused import commented out
 
