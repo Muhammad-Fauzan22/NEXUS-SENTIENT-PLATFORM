@@ -70,5 +70,3 @@ for (const key of requiredKeys) {
 
 // --- Freeze to prevent runtime mutations and assert type ---
 export const env = Object.freeze(config as EnvironmentVariables);
-type LogLevel = 'INFO' | 'WARN' | 'ERROR';
-type LogContext = Record<string, unknown>;
