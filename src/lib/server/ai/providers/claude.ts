@@ -5,18 +5,20 @@ import { logger } from '$lib/server/utils/logger';
 const CLAUDE_API_URL = 'https://api.anthropic.com/v1/messages';
 
 /**
- * Generates text using the Anthropic Claude API.
+ * Menghasilkan teks menggunakan Anthropic Claude API.
+ * Provider ini dioptimalkan untuk tugas-tugas yang memerlukan penalaran kompleks
+ * dan kepatuhan ketat terhadap skema JSON.
  *
- * @param prompt The user prompt to send to the model.
- * @returns A promise that resolves to the generated text content.
- * @throws {InternalServerError} If the API call fails.
+ * @param prompt Prompt pengguna untuk dikirim ke model.
+ * @returns Promise yang me-resolve dengan konten teks yang dihasilkan.
+ * @throws {InternalServerError} Jika panggilan API gagal atau respons tidak valid.
  */
 async function generate(prompt: string): Promise<string> {
 	try {
 		const response = await fetch(CLAUDE_API_URL, {
 			method: 'POST',
 			headers: {
-				'x-api-key': env.CLAUDE_API_KEY,
+				'x-api-key': env.CLAUDE_API_KEY as string,
 				'anthropic-version': '2023-06-01',
 				'content-type': 'application/json'
 			},
@@ -37,11 +39,16 @@ async function generate(prompt: string): Promise<string> {
 		}
 
 		const data = await response.json();
-		const content = data.content[0]?.text || '';
+		// Ekstraksi konten yang aman dengan optional chaining
+		const content = data.content?.[0]?.text || '';
+		
+		if (!content) {
+			logger.warn('Claude API returned a successful response but with empty content.', { responseData: data });
+		}
+
 		return content.trim();
 	} catch (error) {
 		logger.error('An unexpected error occurred while calling Claude API', { error });
-		// Re-throw as a standardized error
 		if (error instanceof InternalServerError) {
 			throw error;
 		}
