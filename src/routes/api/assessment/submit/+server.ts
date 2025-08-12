@@ -7,24 +7,25 @@ import { ApiError, BadRequestError } from '$lib/server/utils/errors';
 import type { AssessmentData } from '$lib/types/schemas/assessment';
 
 /**
- * API Endpoint to submit assessment data.
- * This endpoint orchestrates calls to dedicated AI and Database services.
+ * Endpoint API untuk menerima, memproses, dan menyimpan submisi asesmen.
+ * Bertindak sebagai "Controller" tipis yang mengorkestrasi panggilan ke layanan-layanan
+ * yang lebih dalam (AI dan Database).
  */
 export const POST: RequestHandler = async ({ request }) => {
 	try {
 		const assessmentData: AssessmentData = await request.json();
 
-		// Step 1: Validate incoming data payload
+		// Langkah 1: Validasi Input (Fail-Fast)
 		if (!assessmentData?.user_data || !assessmentData?.riasec_answers || !assessmentData?.pwb_answers) {
 			throw new BadRequestError('Invalid or incomplete assessment data payload.');
 		}
 
-		// Step 2: Execute the entire AI pipeline with a single call
+		// Langkah 2: Delegasikan seluruh proses AI ke aiService
 		const { riasecResult, pwbResult, idpResult } = await aiService.runFullAssessmentPipeline(
 			assessmentData
 		);
 
-		// Step 3: Assemble the final payload for the database
+		// Langkah 3: Siapkan payload untuk penyimpanan
 		const submissionPayload: AssessmentSubmissionPayload = {
 			user_info: assessmentData.user_data,
 			riasec_answers: assessmentData.riasec_answers,
@@ -34,7 +35,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			generated_idp: idpResult
 		};
 
-		// Step 4: Store the complete record in the database
+		// Langkah 4: Delegasikan penyimpanan ke dbService
 		const submissionData = await dbService.createAssessmentSubmission(submissionPayload);
 
 		logger.info('Successfully processed and stored new assessment.', {
@@ -42,23 +43,23 @@ export const POST: RequestHandler = async ({ request }) => {
 			user: assessmentData.user_data.email
 		});
 
-		// Step 5: Return the successful response to the client
+		// Langkah 5: Kembalikan respons sukses ke klien
 		return json(
 			{
 				success: true,
 				submissionId: submissionData.id,
 				idp: idpResult
 			},
-			{ status: 201 }
+			{ status: 201 } // 201 Created
 		);
+
 	} catch (err: unknown) {
-		// Centralized error handling with type guard
+		// Penanganan error terpusat dan aman-tipe
 		if (err instanceof ApiError) {
 			logger.warn(`API Error: ${err.message}`, { status: err.status, context: err.context });
 			return json({ message: err.message }, { status: err.status });
 		}
 
-		// Catch-all for unexpected errors
 		const error = err instanceof Error ? err : new Error(String(err));
 		logger.error('An unexpected error occurred in the submission endpoint.', {
 			errorMessage: error.message,
