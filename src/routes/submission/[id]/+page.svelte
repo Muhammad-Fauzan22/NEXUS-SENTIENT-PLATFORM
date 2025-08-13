@@ -11,6 +11,8 @@
 	// Fungsi untuk menghasilkan IDP dengan AI
 	async function handleGenerateIdp() {
 		isLoading = true;
+		idpResult = ''; // Reset hasil sebelumnya
+		
 		try {
 			const response = await fetch('/api/generate-idp', {
 				method: 'POST',
@@ -23,12 +25,31 @@
 			});
 			
 			if (!response.ok) {
-				const errorData = await response.json();
-				throw new Error(errorData.message || 'Failed to generate IDP');
+				const errorText = await response.text();
+				throw new Error(errorText || 'Failed to generate IDP');
 			}
 			
-			const result = await response.json();
-			idpResult = result.idp;
+			// Proses streaming response
+			const reader = response.body?.getReader();
+			const decoder = new TextDecoder();
+			
+			if (!reader) {
+				throw new Error('Failed to get response reader');
+			}
+			
+			// Baca stream secara progresif
+			while (true) {
+				const { done, value } = await reader.read();
+				
+				if (done) {
+					break;
+				}
+				
+				// Decode chunk dan tambahkan ke hasil
+				const chunk = decoder.decode(value, { stream: true });
+				idpResult += chunk;
+			}
+			
 		} catch (error: any) {
 			alert(`Error: ${error.message || 'Terjadi kesalahan saat menghasilkan IDP. Silakan coba lagi.'}`);
 		} finally {
@@ -107,6 +128,11 @@
 		{#if isLoading}
 			<div class="mt-6 text-center text-foreground/70">
 				<p>AI sedang menganalisis data Anda untuk menghasilkan rencana pengembangan individu yang personal...</p>
+				{#if idpResult}
+					<div class="prose dark:prose-invert max-w-none mt-4 p-4 bg-secondary/30 rounded-lg text-left">
+						{@html idpResult}
+					</div>
+				{/if}
 			</div>
 		{:else if idpResult}
 			<div class="prose dark:prose-invert max-w-none mt-6 p-4 bg-secondary/30 rounded-lg text-left">
