@@ -1,6 +1,8 @@
 <!-- src/routes/submission/[id]/+page.svelte -->
 <script lang="ts">
 	import type { PageData } from './$types';
+	import { toast } from 'svelte-sonner';
+	import MarkdownRenderer from '$lib/components/ui/MarkdownRenderer.svelte';
 	
 	const { data } = $props<PageData>();
 	
@@ -51,7 +53,7 @@
 			}
 			
 		} catch (error: any) {
-			alert(`Error: ${error.message || 'Terjadi kesalahan saat menghasilkan IDP. Silakan coba lagi.'}`);
+			toast.error(`Error: ${error.message || 'Terjadi kesalahan saat menghasilkan IDP. Silakan coba lagi.'}`);
 		} finally {
 			isLoading = false;
 		}
@@ -130,13 +132,13 @@
 				<p>AI sedang menganalisis data Anda untuk menghasilkan rencana pengembangan individu yang personal...</p>
 				{#if idpResult}
 					<div class="prose dark:prose-invert max-w-none mt-4 p-4 bg-secondary/30 rounded-lg text-left">
-						{@html idpResult}
+						<MarkdownRenderer content={idpResult} />
 					</div>
 				{/if}
 			</div>
 		{:else if idpResult}
-			<div class="prose dark:prose-invert max-w-none mt-6 p-4 bg-secondary/30 rounded-lg text-left">
-				{@html idpResult}
+			<div class="mt-6 p-4 bg-secondary/30 rounded-lg text-left">
+				<MarkdownRenderer content={idpResult} />
 			</div>
 		{/if}
 	</div>
