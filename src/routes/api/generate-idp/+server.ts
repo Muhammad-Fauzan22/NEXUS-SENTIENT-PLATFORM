@@ -44,6 +44,17 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			throw error(403, 'Forbidden');
 		}
 		
+		// Setelah verifikasi kepemilikan, perbarui status menjadi 'Analyzing'
+		const { error: updateError } = await supabase
+			.from('submissions')
+			.update({ status: 'Analyzing' })
+			.eq('id', submissionId);
+		
+		// Penanganan error dasar untuk update status
+		if (updateError) {
+			console.error('Error updating status to Analyzing:', updateError);
+		}
+		
 		// Rancang prompt dengan prompt engineering yang canggih
 		const prompt = `
 Anda adalah seorang konselor karir dan akademik ahli dari Departemen Teknik Mesin ITS. Tugas Anda adalah menganalisis profil mahasiswa dan menghasilkan Rencana Pengembangan Individu (IDP) yang personal dan ilmiah.
@@ -122,6 +133,17 @@ Untuk setiap semester:
 					for await (const chunk of result.stream) {
 						const chunkText = chunk.text();
 						controller.enqueue(encoder.encode(chunkText));
+					}
+					
+					// Setelah proses AI streaming selesai, perbarui status menjadi 'Complete'
+					const { error: completeUpdateError } = await supabase
+						.from('submissions')
+						.update({ status: 'Complete' })
+						.eq('id', submissionId);
+					
+					// Penanganan error dasar untuk update status complete
+					if (completeUpdateError) {
+						console.error('Error updating status to Complete:', completeUpdateError);
 					}
 					
 					// Tutup stream setelah selesai
