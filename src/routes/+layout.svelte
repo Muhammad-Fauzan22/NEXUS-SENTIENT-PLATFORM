@@ -1,7 +1,9 @@
+<!-- src/routes/+layout.svelte -->
 <script lang="ts">
 	import '../app.css';
 	import { goto } from '$app/navigation';
 	import type { PageData } from './$types';
+	import { Toaster } from 'svelte-sonner';
 	
 	const { data } = $props<PageData>();
 	
@@ -53,4 +55,7 @@
 			© 2024 NEXUS - The Sentient Development Platform
 		</div>
 	</footer>
+	
+	<!-- Provider Toast -->
+	<Toaster />
 </div>
