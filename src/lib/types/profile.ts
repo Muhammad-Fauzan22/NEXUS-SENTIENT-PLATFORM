@@ -1,4 +1,39 @@
 /**
+ * Interface untuk skor asesmen RIASEC (Holland Code)
+ */
+export interface IRiasecScores {
+	/**
+	 * Skor untuk tipe Realistic (R)
+	 */
+	realistic: number | null;
+	
+	/**
+	 * Skor untuk tipe Investigative (I)
+	 */
+	investigative: number | null;
+	
+	/**
+	 * Skor untuk tipe Artistic (A)
+	 */
+	artistic: number | null;
+	
+	/**
+	 * Skor untuk tipe Social (S)
+	 */
+	social: number | null;
+	
+	/**
+	 * Skor untuk tipe Enterprising (E)
+	 */
+	enterprising: number | null;
+	
+	/**
+	 * Skor untuk tipe Conventional (C)
+	 */
+	conventional: number | null;
+}
+
+/**
  * Interface untuk struktur data profil mahasiswa
  */
 export interface IStudentProfile {
@@ -39,7 +74,7 @@ export interface IStudentProfile {
 		/**
 		 * Hasil asesmen RIASEC (Holland Code)
 		 */
-		riasec: any;
+		riasec: Partial<IRiasecScores>;
 		
 		/**
 		 * Hasil asesmen Big Five Personality Traits
