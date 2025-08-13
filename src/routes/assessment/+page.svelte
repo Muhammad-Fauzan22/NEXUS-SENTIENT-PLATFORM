@@ -16,7 +16,7 @@
 		submissionStatus = null;
 
 		try {
-			const response = await fetch('/api/ingest', {
+			const response = await fetch('/api/assessment/submit', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
@@ -81,13 +81,13 @@
 		<h2 class="text-2xl font-bold mb-8">Assessment: Step {currentStep} of 4</h2>
 
 		{#if currentStep === 1}
-			<Step1_PersonalInfo formData={formData} />
+			<Step1_PersonalInfo bind:formData={formData} />
 		{:else if currentStep === 2}
-			<Step2_Riasec formData={formData} />
+			<Step2_Riasec bind:formData={formData} />
 		{:else if currentStep === 3}
-			<Step3_BigFive formData={formData} />
+			<Step3_BigFive bind:formData={formData} />
 		{:else if currentStep === 4}
-			<Step4_Review formData={formData} />
+			<Step4_Review {formData} />
 		{/if}
 
 		<div class="mt-8 flex justify-between">
