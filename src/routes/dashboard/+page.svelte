@@ -1,6 +1,7 @@
 <!-- src/routes/dashboard/+page.svelte -->
 <script lang="ts">
 	import type { PageData } from './$types';
+	import Button from '$lib/components/ui/Button.svelte';
 	
 	const { data } = $props<PageData>();
 	
@@ -45,10 +46,7 @@
 		{/if}
 	</div>
 	
-	<a 
-		href="/" 
-		class="mt-8 inline-block bg-primary hover:bg-primary/90 text-foreground font-bold py-2 px-4 rounded-lg transition-colors"
-	>
+	<Button href="/" variant="primary">
 		Create New IDP Submission
-	</a>
+	</Button>
 </div>
