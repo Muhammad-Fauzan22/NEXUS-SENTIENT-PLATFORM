@@ -1,21 +1,16 @@
-<script lang="ts">
-	import '../app.css';
-</script>
-
-<div class="min-h-screen bg-background text-foreground flex flex-col">
-	<header class="border-b border-secondary">
-		<nav class="container mx-auto p-4 flex justify-between items-center">
-			<h1 class="text-xl font-bold text-primary">NEXUS</h1>
-		</nav>
-	</header>
-
-	<main class="container mx-auto p-4 flex-grow">
-		<slot />
-	</main>
-
-	<footer class="border-t border-secondary">
-		<div class="container mx-auto p-4 text-center text-secondary text-sm">
-			© 2024 NEXUS - The Sentient Development Platform
-		</div>
-	</footer>
-</div>
+<section class="flex items-center justify-center min-h-screen">
+	<div class="max-w-3xl text-center">
+		<h1 class="text-7xl font-bold bg-gradient-to-r from-accent to-primary text-transparent bg-clip-text">
+			NEXUS
+		</h1>
+		<p class="text-foreground/80 mt-4">
+			The Sentient Development Platform for Personalized Academic & Career Growth
+		</p>
+		<a 
+			href="/assessment" 
+			class="bg-primary text-foreground px-8 py-3 rounded-md hover:bg-primary/90 transition-colors mt-8 inline-block"
+		>
+			Begin Assessment
+		</a>
+	</div>
+</section>
