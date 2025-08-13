@@ -12,8 +12,16 @@ const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY);
  * @param request - HTTP request yang berisi data form IDP
  * @returns Respons JSON yang menunjukkan status penerimaan data
  */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
 	try {
+		// Dapatkan sesi pengguna
+		const session = await locals.getSession();
+		
+		// Tambahkan Perlindungan Rute: Periksa apakah pengguna sudah login
+		if (!session) {
+			throw error(401, 'Unauthorized: You must be logged in to submit data.');
+		}
+		
 		// Ekstrak data dari body request
 		const formData = await request.json();
 
@@ -33,7 +41,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			.from('submissions') // Nama tabel di Supabase
 			.insert([
 				{
-					// Petakan formData ke kolom tabel
+					user_id: session.user.id, // DATA PENTING YANG BARU
 					full_name: formData.personal?.fullName,
 					email: formData.personal?.email,
 					whatsapp_number: formData.personal?.whatsapp,
