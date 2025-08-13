@@ -1,0 +1,64 @@
+/**
+ * Interface untuk struktur data profil mahasiswa
+ */
+export interface IStudentProfile {
+	/**
+	 * UUID unik dari Supabase
+	 * @example "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+	 */
+	id: string;
+	
+	/**
+	 * Timestamp kapan profil dibuat dalam format ISO 8601
+	 * @example "2023-12-01T10:30:00Z"
+	 */
+	createdAt: string;
+	
+	/**
+	 * Nama lengkap mahasiswa
+	 * @example "Budi Santoso"
+	 */
+	fullName: string;
+	
+	/**
+	 * Alamat email mahasiswa
+	 * @example "budi.santoso@student.its.ac.id"
+	 */
+	email: string;
+	
+	/**
+	 * Nomor Pokok Mahasiswa (NRP)
+	 * @example "5123123456"
+	 */
+	studentId: string;
+	
+	/**
+	 * Objek yang berisi semua hasil asesmen mentah dari mahasiswa
+	 */
+	assessmentData: {
+		/**
+		 * Hasil asesmen RIASEC (Holland Code)
+		 */
+		riasec: any;
+		
+		/**
+		 * Hasil asesmen Big Five Personality Traits
+		 */
+		bigFive: any;
+		
+		/**
+		 * Hasil asesmen VARK Learning Styles
+		 */
+		vark: any;
+		
+		/**
+		 * Hasil asesmen Psychological Well-Being (PWB)
+		 */
+		pwb: any;
+		
+		/**
+		 * Data portofolio mahasiswa
+		 */
+		portfolio: any;
+	};
+}
