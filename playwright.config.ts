@@ -59,13 +59,6 @@ export default defineConfig({
 		timeout: 120 * 1000,
 	},
 
-	// --- SINKRONISASI DENGAN SVELTEKIT ---
-	// Blok ini krusial untuk mengajarkan Playwright cara me-resolusi
-	// alias path SvelteKit (seperti `$lib`), memungkinkan tes E2E untuk
-	// mengimpor modul jika diperlukan (meskipun praktik terbaiknya adalah menghindarinya).
-	resolve: {
-		alias: {
-			$lib: path.resolve('./src/lib')
-		}
-	}
+	// Note: Path aliases for $lib are handled by SvelteKit's build system
+	// and will work correctly when tests run against the web server
 });
