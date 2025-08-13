@@ -1,9 +1,17 @@
+/**
+ * Mendefinisikan kontrak tipe untuk setiap pertanyaan PWB.
+ * Properti `reversed` adalah kunci untuk skoring psikometri yang akurat.
+ */
 export interface PWBQuestion {
 	id: number;
 	text: string;
-	reversed: boolean; // True if a lower score is better
+	reversed: boolean; // True jika skor yang lebih rendah menunjukkan atribut positif.
 }
 
+/**
+ * Sumber kebenaran (Single Source of Truth) untuk semua pertanyaan asesmen PWB.
+ * Memisahkan data dari logika memastikan pemeliharaan yang mudah dan skoring yang konsisten.
+ */
 export const pwbQuestions: PWBQuestion[] = [
     { id: 1, text: 'Saya cenderung merasa bangga dengan diri saya.', reversed: false },
     { id: 2, text: 'Saya sering merasa kecewa dengan pencapaian saya.', reversed: true },
