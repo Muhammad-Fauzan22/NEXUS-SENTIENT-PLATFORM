@@ -2,6 +2,8 @@
 	import type { IStudentProfile } from '$lib/types/profile.ts';
 	import Step1_PersonalInfo from '$lib/components/assessment/Step1_PersonalInfo.svelte';
 	import Step2_Riasec from '$lib/components/assessment/Step2_Riasec.svelte';
+	import Step3_BigFive from '$lib/components/assessment/Step3_BigFive.svelte';
+	import Step4_Review from '$lib/components/assessment/Step4_Review.svelte';
 
 	let currentStep = $state(1);
 	let formData = $state<Partial<IStudentProfile>>({});
@@ -27,9 +29,9 @@
 	{:else if currentStep === 2}
 		<Step2_Riasec formData={formData} />
 	{:else if currentStep === 3}
-		<div>Placeholder for Big Five Assessment</div>
+		<Step3_BigFive formData={formData} />
 	{:else if currentStep === 4}
-		<div>Placeholder for Submission Review</div>
+		<Step4_Review formData={formData} />
 	{/if}
 
 	<div class="mt-8 flex justify-between">
