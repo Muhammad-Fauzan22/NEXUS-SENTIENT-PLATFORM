@@ -1,7 +1,8 @@
+<!-- src/lib/components/assessment/Step3_BigFive.svelte -->
 <script lang="ts">
 	import type { IStudentProfile } from '$lib/types/profile.ts';
 
-	let { formData } = $props<{ formData: Partial<IStudentProfile> }>();
+	let { formData = $bindable() } = $props<{ formData: Partial<IStudentProfile> }>();
 
 	// Inisialisasi struktur assessmentData.bigFive jika belum ada
 	formData.assessmentData = formData.assessmentData ?? {};
