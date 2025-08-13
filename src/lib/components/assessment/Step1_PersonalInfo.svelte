@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { IStudentProfile } from '../../../types/profile.ts';
+	import type { IStudentProfile } from '$lib/types/profile.ts';
 
 	let { formData } = $props<{ formData: Partial<IStudentProfile> }>();
 </script>
