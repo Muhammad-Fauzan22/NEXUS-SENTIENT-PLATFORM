@@ -1,5 +1,7 @@
 <script lang="ts">
-	import type { IStudentProfile } from '../../lib/types/profile.ts';
+	import type { IStudentProfile } from '$lib/types/profile.ts';
+	import Step1_PersonalInfo from '$lib/components/assessment/Step1_PersonalInfo.svelte';
+	import Step2_Riasec from '$lib/components/assessment/Step2_Riasec.svelte';
 
 	let currentStep = $state(1);
 	let formData = $state<Partial<IStudentProfile>>({});
@@ -21,9 +23,9 @@
 	<h2 class="text-2xl font-bold mb-8">Assessment: Step {currentStep} of 4</h2>
 
 	{#if currentStep === 1}
-		<div>Placeholder for Personal Information Form</div>
+		<Step1_PersonalInfo formData={formData} />
 	{:else if currentStep === 2}
-		<div>Placeholder for RIASEC Assessment</div>
+		<Step2_Riasec formData={formData} />
 	{:else if currentStep === 3}
 		<div>Placeholder for Big Five Assessment</div>
 	{:else if currentStep === 4}
