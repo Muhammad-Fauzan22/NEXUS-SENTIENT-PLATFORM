@@ -1,6 +1,8 @@
+<!-- src/routes/+page.svelte -->
 <script lang="ts">
 	import { writable } from 'svelte/store';
 	import { goto } from '$app/navigation';
+	import { toast } from 'svelte-sonner';
 	import Step1_Personal from '$lib/components/idp-form/Step1_Personal.svelte';
 	import Step2_Academic from '$lib/components/idp-form/Step2_Academic.svelte';
 	import Step3_Psychometric from '$lib/components/idp-form/Step3_Psychometric.svelte';
@@ -38,7 +40,7 @@
 			// Ganti alert dengan navigasi ke halaman konfirmasi
 			await goto(`/submission/${result.submissionId}`);
 		} catch (error) {
-			alert('Terjadi kesalahan saat mengirim data. Silakan coba lagi.');
+			toast.error('Gagal mengirim data. Silakan periksa koneksi Anda dan coba lagi.');
 		} finally {
 			isLoading.set(false);
 		}
