@@ -23,7 +23,7 @@
 				{#each submissions as submission (submission.id)}
 					<a 
 						href="/submission/{submission.id}" 
-						class="block p-4 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-colors border border-secondary"
+						class="block p-4 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-colors border border-secondary relative"
 					>
 						<div class="flex justify-between items-center">
 							<div>
@@ -32,7 +32,19 @@
 									Submitted on: {new Date(submission.created_at).toLocaleDateString()}
 								</p>
 							</div>
-							<div class="text-right">
+							<div class="flex items-center gap-2">
+								<!-- Lencana status -->
+								<span 
+									class="px-2 py-0.5 text-xs font-semibold rounded-full"
+									class:bg-blue-500/20={submission.status === 'Submitted'}
+									class:bg-yellow-500/20={submission.status === 'Analyzing'}
+									class:bg-green-500/20={submission.status === 'Complete'}
+									class:text-blue-300={submission.status === 'Submitted'}
+									class:text-yellow-300={submission.status === 'Analyzing'}
+									class:text-green-300={submission.status === 'Complete'}
+								>
+									{submission.status}
+								</span>
 								<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
 									View Details
 								</span>
