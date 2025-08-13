@@ -1,3 +1,4 @@
+<!-- src/lib/components/assessment/Step4_Review.svelte -->
 <script lang="ts">
 	import type { IStudentProfile } from '$lib/types/profile.ts';
 
