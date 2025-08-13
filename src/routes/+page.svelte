@@ -6,8 +6,11 @@
 		<p class="text-foreground/80 mt-4">
 			The Sentient Development Platform for Personalized Academic & Career Growth
 		</p>
-		<button class="bg-primary text-foreground px-8 py-3 rounded-md hover:bg-primary/90 transition-colors mt-8">
+		<a 
+			href="/assessment" 
+			class="bg-primary text-foreground px-8 py-3 rounded-md hover:bg-primary/90 transition-colors mt-8 inline-block"
+		>
 			Begin Assessment
-		</button>
+		</a>
 	</div>
 </section>
