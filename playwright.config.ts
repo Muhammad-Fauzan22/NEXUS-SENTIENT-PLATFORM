@@ -40,10 +40,6 @@ export default defineConfig({
 		reuseExistingServer: !process.env.CI
 	},
 
-	// CORRECTED: Add a resolve block to teach Playwright about SvelteKit's path aliases.
-	resolve: {
-		alias: {
-			$lib: path.resolve('./src/lib')
-		}
-	}
+	// Note: Path aliases for $lib are handled by SvelteKit's build system
+	// and will work correctly when tests run against the web server
 });
