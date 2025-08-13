@@ -21,7 +21,8 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies reliably
-        # Use 'npm ci' for faster, more reliable installs in CI environments
+        # Menggunakan 'npm ci' lebih cepat dan lebih andal untuk lingkungan otomatis
+        # karena menginstal persis sesuai dengan package-lock.json.
         run: npm ci --legacy-peer-deps
 
       - name: Install Playwright Browsers
@@ -37,5 +38,5 @@ jobs:
         run: npx playwright test
 
       - name: Build for Production
-        # This step will only run if all previous steps (lint, tests) succeed
+        # Langkah ini hanya akan berjalan jika semua tes sebelumnya berhasil.
         run: npm run build
