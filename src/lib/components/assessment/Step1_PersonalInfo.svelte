@@ -1,50 +1,47 @@
+<!-- src/lib/components/assessment/Step1_PersonalInfo.svelte -->
 <script lang="ts">
 	import type { IStudentProfile } from '$lib/types/profile.ts';
-	import Step1_PersonalInfo from '$lib/components/assessment/Step1_PersonalInfo.svelte';
 
-	let currentStep = $state(1);
-	let formData = $state<Partial<IStudentProfile>>({});
-
-	function nextStep() {
-		if (currentStep < 4) {
-			currentStep++;
-		}
-	}
-
-	function prevStep() {
-		if (currentStep > 1) {
-			currentStep--;
-		}
-	}
+	let { formData = $bindable() } = $props<{ formData: Partial<IStudentProfile> }>();
 </script>
 
-<main class="container mx-auto px-4 py-12">
-	<h2 class="text-2xl font-bold mb-8">Assessment: Step {currentStep} of 4</h2>
-
-	{#if currentStep === 1}
-		<Step1_PersonalInfo formData={formData} />
-	{:else if currentStep === 2}
-		<div>Placeholder for RIASEC Assessment</div>
-	{:else if currentStep === 3}
-		<div>Placeholder for Big Five Assessment</div>
-	{:else if currentStep === 4}
-		<div>Placeholder for Submission Review</div>
-	{/if}
-
-	<div class="mt-8 flex justify-between">
-		<button 
-			class="bg-secondary text-foreground px-6 py-2 rounded-md disabled:opacity-50"
-			disabled={currentStep === 1}
-			onclick={prevStep}
-		>
-			Previous
-		</button>
-		<button 
-			class="bg-primary text-foreground px-6 py-2 rounded-md disabled:opacity-50"
-			disabled={currentStep === 4}
-			onclick={nextStep}
-		>
-			Next
-		</button>
+<div class="space-y-6">
+	<div>
+		<label for="fullName" class="block text-sm font-medium text-foreground/80">
+			Full Name
+		</label>
+		<input
+			id="fullName"
+			type="text"
+			bind:value={formData.fullName}
+			class="mt-1 block w-full rounded-md border-foreground/30 bg-secondary shadow-sm focus:border-accent focus:ring focus:ring-accent focus:ring-opacity-50"
+			placeholder="Enter your full name"
+		/>
 	</div>
-</main>
+
+	<div>
+		<label for="email" class="block text-sm font-medium text-foreground/80">
+			Email Address
+		</label>
+		<input
+			id="email"
+			type="email"
+			bind:value={formData.email}
+			class="mt-1 block w-full rounded-md border-foreground/30 bg-secondary shadow-sm focus:border-accent focus:ring focus:ring-accent focus:ring-opacity-50"
+			placeholder="Enter your email address"
+		/>
+	</div>
+
+	<div>
+		<label for="studentId" class="block text-sm font-medium text-foreground/80">
+			Student ID (NRP)
+		</label>
+		<input
+			id="studentId"
+			type="text"
+			bind:value={formData.studentId}
+			class="mt-1 block w-full rounded-md border-foreground/30 bg-secondary shadow-sm focus:border-accent focus:ring focus:ring-accent focus:ring-opacity-50"
+			placeholder="Enter your Student ID"
+		/>
+	</div>
+</div>
