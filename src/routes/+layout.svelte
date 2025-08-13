@@ -4,6 +4,7 @@
 	import { goto } from '$app/navigation';
 	import type { PageData } from './$types';
 	import { Toaster } from 'svelte-sonner';
+	import Button from '$lib/components/ui/Button.svelte';
 	
 	const { data } = $props<PageData>();
 	
@@ -27,21 +28,18 @@
 				<!-- Pengguna sudah login -->
 				<div class="flex items-center gap-4">
 					<span class="text-sm text-foreground/80">{session.user.email}</span>
-					<button
+					<Button
+						variant="secondary"
 						on:click={handleSignOut}
-						class="bg-destructive hover:bg-destructive-hover text-foreground px-3 py-1 rounded-md text-sm transition-colors"
 					>
 						Logout
-					</button>
+					</Button>
 				</div>
 			{:else}
 				<!-- Pengguna belum login -->
-				<a 
-					href="/login" 
-					class="bg-primary hover:bg-primary-hover text-foreground px-4 py-2 rounded-md text-sm transition-colors"
-				>
+				<Button href="/login" variant="primary">
 					Login
-				</a>
+				</Button>
 			{/if}
 		</nav>
 	</header>
