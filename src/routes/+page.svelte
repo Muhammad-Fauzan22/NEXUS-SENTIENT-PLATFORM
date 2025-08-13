@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { writable } from 'svelte/store';
+	import { goto } from '$app/navigation';
 	import Step1_Personal from '$lib/components/idp-form/Step1_Personal.svelte';
 	import Step2_Academic from '$lib/components/idp-form/Step2_Academic.svelte';
 	import Step3_Psychometric from '$lib/components/idp-form/Step3_Psychometric.svelte';
@@ -34,7 +35,8 @@
 			}
 
 			const result = await res.json();
-			alert(`Data berhasil dikirim! ID Pengajuan Anda: ${result.submissionId}`);
+			// Ganti alert dengan navigasi ke halaman konfirmasi
+			await goto(`/submission/${result.submissionId}`);
 		} catch (error) {
 			alert('Terjadi kesalahan saat mengirim data. Silakan coba lagi.');
 		} finally {
