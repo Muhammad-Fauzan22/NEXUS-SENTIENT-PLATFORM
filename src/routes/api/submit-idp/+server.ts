@@ -1,14 +1,8 @@
 import type { RequestHandler } from '@sveltejs/kit';
-import { json, error } from '@sveltejs/kit';
-import { createClient } from '@supabase/supabase-js';
-import { env } from '$env/dynamic/private';
-
-// Inisialisasi Supabase client
-const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY);
+import { json } from '@sveltejs/kit';
 
 /**
  * API endpoint untuk menerima data form Individual Development Plan (IDP)
- * dan menyimpannya ke database Supabase
  * @param request - HTTP request yang berisi data form IDP
  * @returns Respons JSON yang menunjukkan status penerimaan data
  */
@@ -28,51 +22,28 @@ export const POST: RequestHandler = async ({ request }) => {
 			);
 		}
 
-		// Penyimpanan ke Supabase
-		const { data, error: dbError } = await supabase
-			.from('submissions') // Nama tabel di Supabase
-			.insert([
-				{
-					// Petakan formData ke kolom tabel
-					full_name: formData.personal?.fullName,
-					email: formData.personal?.email,
-					whatsapp_number: formData.personal?.whatsapp,
-					region: formData.personal?.origin,
-					gpa: formData.academic?.gpa,
-					favorite_courses: formData.academic?.favoriteCourses,
-					research_interest: formData.academic?.researchInterest,
-					mastered_software: formData.academic?.tools,
-					psychometric_results: formData.psychometric // Simpan sebagai objek JSONB
-				}
-			])
-			.select() // Minta data yang baru saja dimasukkan untuk dikembalikan
-			.single(); // Karena kita hanya memasukkan satu baris
+		// Logika sukses (placeholder)
+		// Di masa depan, di sinilah logika untuk menyimpan ke Supabase akan ditempatkan
+		console.log('Menerima data IDP untuk diproses:', formData);
 
-		// Periksa jika ada error dari Supabase
-		if (dbError) {
-			console.error('Supabase insert error:', dbError);
-			throw error(500, 'Gagal menyimpan data ke database');
-		}
-
-		// Respons sukses
+		// Kembalikan respons sukses dengan submissionId tiruan
 		return json(
 			{ 
 				success: true, 
-				message: 'Data berhasil disimpan!', 
-				submissionId: data.id 
+				message: 'Data berhasil diterima!', 
+				submissionId: `NEXUS-${Date.now()}` 
 			}, 
 			{ status: 200 }
 		);
-	} catch (err) {
+	} catch (error) {
 		// Tangani error parsing JSON atau error lainnya
-		console.error('Error processing IDP submission:', err);
-		
-		// Jika ini adalah error SvelteKit yang sudah kita throw, lempar ulang
-		if (err instanceof Error && 'status' in err) {
-			throw err;
-		}
-		
-		// Untuk error lainnya, kembalikan error 500
-		throw error(500, 'Terjadi kesalahan saat memproses data');
+		console.error('Error processing IDP submission:', error);
+		return json(
+			{ 
+				success: false, 
+				message: 'Terjadi kesalahan saat memproses data.' 
+			}, 
+			{ status: 500 }
+		);
 	}
 };
