@@ -22,3 +22,28 @@ function getNextKey(pool, index) {
 
 export const aiManager = {
 	/**
+	 * @param {'ANALYZE' | 'GENERATE_DRAFT' | 'SUMMARIZE' | 'EMBEDDING'} taskType
+	 * @param {string} prompt
+	 * @param {object} [_options]
+	 */
+	async executeTask(taskType, prompt, _options = {}) {
+		console.log(`Executing AI task: ${taskType}`);
+
+		switch (taskType) {
+			case 'ANALYZE':
+				return geminiProvider.generate(prompt);
+
+			case 'GENERATE_DRAFT':
+				return claudeProvider.generate(prompt);
+
+			case 'SUMMARIZE':
+				return geminiProvider.generate(prompt);
+
+			case 'EMBEDDING':
+				throw new Error('Embedding provider not yet implemented.');
+
+			default:
+				throw new Error(`Unknown AI task type: ${taskType}`);
+		}
+	}
+};
