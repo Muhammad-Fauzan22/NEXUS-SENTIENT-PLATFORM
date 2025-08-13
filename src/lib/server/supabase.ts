@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { VITE_PUBLIC_SUPABASE_URLL } from '$env/static/public';
+import { PUBLIC_SUPABASE_URL } from '$env/static/public';
 import { SUPABASE_SERVICE_ROLE_KEY } from '$env/static/private';
 
 /**
