@@ -1,35 +1,34 @@
+<!-- src/lib/components/ui/Button.svelte -->
 <script lang="ts">
-	import clsx from 'clsx';
-
-	type Variant = 'primary' | 'secondary';
-
-	export let variant: Variant = 'primary';
-	export let disabled: boolean = false;
-
-	// --- Kelas Dasar & Varian ---
-	// Menggunakan pendekatan berbasis kelas untuk styling yang konsisten dan dapat dipelihara.
-	const baseClasses =
-		'px-4 py-2 rounded-md font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed';
-
-	const variantClasses: Record<Variant, string> = {
-		primary: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500',
-		secondary: 'bg-gray-200 text-gray-800 hover:bg-gray-300 focus:ring-gray-400'
-	};
+	// Gunakan sintaksis Svelte 5 Runes
+	let { href = undefined } = $props<{ href?: string }>();
+	let { variant = 'primary' } = $props<{ variant?: 'primary' | 'secondary' }>();
+	
+	// Terima semua sisa props menggunakan rest props
+	const { children, ...rest } = $props();
 </script>
 
-<!--
-  Tombol ini dirancang untuk fleksibilitas maksimum:
-  - {...$$restProps}: Meneruskan semua atribut HTML lainnya (misalnya, `type="submit"`)
-    langsung ke elemen tombol.
-  - on:click: Meneruskan event `click` ke komponen induk.
-  - clsx(...): Menggabungkan kelas-kelas secara dinamis untuk styling yang bersih.
-    `$$props.class` memungkinkan penambahan kelas kustom dari luar.
--->
-<button
-	{...$$restProps}
-	class={clsx(baseClasses, variantClasses[variant], $$props.class)}
-	{disabled}
-	on:click
->
-	<slot />
-</button>
+{#if href}
+	<!-- Render sebagai tautan <a> -->
+	<a
+		href={href}
+		class="inline-block font-bold py-2 px-4 rounded-lg transition-colors bg-primary text-primary-foreground hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50"
+		class:bg-secondary={variant === 'secondary'}
+		class:hover:bg-secondary/80={variant === 'secondary'}
+		class:focus:ring-secondary={variant === 'secondary'}
+		{...rest}
+	>
+		{children}
+	</a>
+{:else}
+	<!-- Render sebagai tombol <button> -->
+	<button
+		class="inline-block font-bold py-2 px-4 rounded-lg transition-colors bg-primary text-primary-foreground hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50"
+		class:bg-secondary={variant === 'secondary'}
+		class:hover:bg-secondary/80={variant === 'secondary'}
+		class:focus:ring-secondary={variant === 'secondary'}
+		{...rest}
+	>
+		{children}
+	</button>
+{/if}
