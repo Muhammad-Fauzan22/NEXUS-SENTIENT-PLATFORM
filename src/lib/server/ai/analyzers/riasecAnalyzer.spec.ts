@@ -54,7 +54,6 @@ describe('riasecAnalyzer Unit Tests', () => {
 
 		it('should return fewer than 3 codes if there are fewer than 3 scores greater than zero', () => {
 			const scores: Record<RIASECCode, number> = { R: 5, I: 8, A: 0, S: 0, E: 0, C: 0 };
-			const expectedTopCodes: RIASECCode[] = ['I', 'R'];
 			// Note: The original function slices to 3, so this tests that behavior.
 			// A more robust implementation might filter out zeros first.
 			const result = getTopRIASECCodes(scores);
