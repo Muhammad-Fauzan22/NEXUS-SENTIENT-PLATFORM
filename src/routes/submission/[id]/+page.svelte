@@ -3,6 +3,38 @@
 	import type { PageData } from './$types';
 	
 	const { data } = $props<PageData>();
+	
+	// State untuk mengelola loading dan hasil IDP
+	let isLoading = false;
+	let idpResult = '';
+	
+	// Fungsi untuk menghasilkan IDP dengan AI
+	async function handleGenerateIdp() {
+		isLoading = true;
+		try {
+			const response = await fetch('/api/generate-idp', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					submissionId: data.submission.id
+				})
+			});
+			
+			if (!response.ok) {
+				const errorData = await response.json();
+				throw new Error(errorData.message || 'Failed to generate IDP');
+			}
+			
+			const result = await response.json();
+			idpResult = result.idp;
+		} catch (error: any) {
+			alert(`Error: ${error.message || 'Terjadi kesalahan saat menghasilkan IDP. Silakan coba lagi.'}`);
+		} finally {
+			isLoading = false;
+		}
+	}
 </script>
 
 <div class="max-w-4xl mx-auto text-center">
@@ -51,6 +83,36 @@
 			<h3 class="font-medium text-foreground/80">Software/Tools yang Dikuasai</h3>
 			<p class="mt-1">{data.submission.mastered_software || 'Tidak ada data'}</p>
 		</div>
+	</div>
+	
+	<!-- Area aksi untuk menghasilkan IDP -->
+	<div class="mt-8">
+		<button
+			on:click={handleGenerateIdp}
+			disabled={isLoading}
+			class="bg-accent hover:bg-accent/90 text-foreground font-bold py-3 px-6 rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center mx-auto"
+		>
+			{#if isLoading}
+				<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+					<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+					<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+				</svg>
+				AI is analyzing... please wait.
+			{:else}
+				✨ Generate IDP with AI
+			{/if}
+		</button>
+		
+		<!-- Area untuk menampilkan hasil IDP -->
+		{#if isLoading}
+			<div class="mt-6 text-center text-foreground/70">
+				<p>AI sedang menganalisis data Anda untuk menghasilkan rencana pengembangan individu yang personal...</p>
+			</div>
+		{:else if idpResult}
+			<div class="prose dark:prose-invert max-w-none mt-6 p-4 bg-secondary/30 rounded-lg text-left">
+				{@html idpResult}
+			</div>
+		{/if}
 	</div>
 	
 	<!-- Pesan penutup -->
