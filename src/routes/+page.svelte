@@ -7,6 +7,7 @@
 
 	const currentStep = writable(1);
 	const formData = writable({});
+	const isLoading = writable(false);
 
 	function nextStep() {
 		currentStep.update(n => n + 1);
@@ -14,6 +15,31 @@
 
 	function prevStep() {
 		currentStep.update(n => n - 1);
+	}
+
+	async function handleSubmit() {
+		isLoading.set(true);
+		
+		try {
+			const res = await fetch('/api/submit-idp', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify($formData)
+			});
+
+			if (!res.ok) {
+				throw new Error();
+			}
+
+			const result = await res.json();
+			alert(`Data berhasil dikirim! ID Pengajuan Anda: ${result.submissionId}`);
+		} catch (error) {
+			alert('Terjadi kesalahan saat mengirim data. Silakan coba lagi.');
+		} finally {
+			isLoading.set(false);
+		}
 	}
 </script>
 
@@ -44,8 +70,16 @@
 			</button>
 			
 			{#if $currentStep === 4}
-				<button class="bg-accent text-foreground px-6 py-2 rounded-md">
-					Submit
+				<button 
+					class="bg-accent text-foreground px-6 py-2 rounded-md disabled:opacity-50"
+					disabled={$isLoading}
+					on:click={handleSubmit}
+				>
+					{#if $isLoading}
+						Submitting...
+					{:else}
+						Submit
+					{/if}
 				</button>
 			{:else}
 				<button 
