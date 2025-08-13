@@ -9,7 +9,7 @@
 
 	function nextStep() {
 		if (currentStep < 4) {
-			currentStep++;y
+			currentStep++;
 		}
 	}
 
