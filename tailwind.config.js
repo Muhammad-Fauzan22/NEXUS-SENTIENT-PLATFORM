@@ -1,21 +1,23 @@
-import { fontFamily } from 'tailwindcss/defaultTheme';
+// tailwind.config.js
+import { defineConfig } from 'tailwindcss';
 
-/** @type {import('tailwindcss').Config} */
-export default {
+export default defineConfig({
   content: ['./src/**/*.{html,js,svelte,ts}'],
   theme: {
     extend: {
       colors: {
-        background: 'var(--background)',
-        foreground: 'var(--foreground)',
-        primary: 'var(--primary)',
-        secondary: 'var(--secondary)',
-        accent: 'var(--accent)'
-      },
-      fontFamily: {
-        sans: ['Inter', ...fontFamily.sans]
+        background: 'hsl(var(--background))',
+        foreground: 'hsl(var(--foreground))',
+        primary: 'hsl(var(--primary))',
+        'primary-hover': 'hsl(var(--primary-hover))',
+        'primary-focus': 'hsl(var(--primary-focus))',
+        secondary: 'hsl(var(--secondary))',
+        'secondary-hover': 'hsl(var(--secondary-hover))',
+        destructive: 'hsl(var(--destructive))',
+        'destructive-hover': 'hsl(var(--destructive-hover))',
+        calm: 'hsl(var(--calm))'
       }
     }
   },
   plugins: []
-};
+});
