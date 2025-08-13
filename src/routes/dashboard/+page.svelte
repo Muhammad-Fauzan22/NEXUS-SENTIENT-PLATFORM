@@ -19,7 +19,7 @@
 	
 	<a 
 		href="/" 
-		class="mt-8 inline-block bg-primary text-foreground font-bold py-2 px-4 rounded-lg hover:bg-primary/90 transition-colors"
+		class="mt-8 inline-block bg-primary hover:bg-primary/90 text-foreground font-bold py-2 px-4 rounded-lg transition-colors"
 	>
 		Create New IDP Submission
 	</a>
