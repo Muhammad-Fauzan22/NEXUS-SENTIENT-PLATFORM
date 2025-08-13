@@ -1,7 +1,6 @@
 import { json } from '@sveltejs/kit';
 import { supabaseAdmin } from '$lib/server/supabase';
-import { INGEST_API_KEY } from '$env/static/private';
-import type { IStudentProfile } from '$lib/types/profile';
+import { INGEST_API_KEY } from '$env/static/public';
 
 /**
  * API endpoint untuk menerima data dari form assessment dan menyimpannya ke database
