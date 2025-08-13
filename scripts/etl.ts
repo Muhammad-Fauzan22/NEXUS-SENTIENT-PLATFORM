@@ -18,7 +18,7 @@ interface KnowledgeChunk {
 // Placeholder for a function that would generate embeddings
 async function getEmbedding(text: string): Promise<number[]> {
 	// In a real implementation, this would call an AI embedding model (e.g., OpenAI, Cohere)
-	logger.debug('Generating embedding for chunk...', { length: text.length });
+	logger.info(`Generating embedding for chunk... Length: ${text.length}`);
 	// Returning a dummy array of the correct dimension for Supabase pgvector
 	return Array(1536).fill(0).map(Math.random);
 }
