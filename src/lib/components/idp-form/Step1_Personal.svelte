@@ -1,5 +1,8 @@
+<!-- src/lib/components/idp-form/Step1_Personal.svelte -->
 <script lang="ts">
-	let { formData } = $props<{ formData: any }>();
+	import Input from '$lib/components/ui/Input.svelte';
+	
+	let { formData = $bindable() } = $props<{ formData: any }>();
 	
 	// Inisialisasi data personal jika belum ada
 	formData.personal ??= {};
@@ -13,10 +16,9 @@
 			<label class="block mb-2 text-sm font-medium text-foreground/80">
 				Nama Lengkap
 			</label>
-			<input 
+			<Input 
 				type="text"
 				bind:value={formData.personal.fullName}
-				class="bg-secondary/50 border border-secondary/80 text-foreground text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5"
 				placeholder="Masukkan nama lengkap Anda"
 			/>
 		</div>
@@ -25,10 +27,9 @@
 			<label class="block mb-2 text-sm font-medium text-foreground/80">
 				Email Pribadi
 			</label>
-			<input 
+			<Input 
 				type="email"
 				bind:value={formData.personal.email}
-				class="bg-secondary/50 border border-secondary/80 text-foreground text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5"
 				placeholder="Masukkan email Anda"
 			/>
 		</div>
@@ -37,10 +38,9 @@
 			<label class="block mb-2 text-sm font-medium text-foreground/80">
 				Nomor Whatsapp
 			</label>
-			<input 
+			<Input 
 				type="tel"
 				bind:value={formData.personal.whatsapp}
-				class="bg-secondary/50 border border-secondary/80 text-foreground text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5"
 				placeholder="Masukkan nomor WhatsApp"
 			/>
 		</div>
@@ -49,10 +49,9 @@
 			<label class="block mb-2 text-sm font-medium text-foreground/80">
 				Asal Daerah
 			</label>
-			<input 
+			<Input 
 				type="text"
 				bind:value={formData.personal.origin}
-				class="bg-secondary/50 border border-secondary/80 text-foreground text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5"
 				placeholder="Masukkan daerah asal Anda"
 			/>
 		</div>
