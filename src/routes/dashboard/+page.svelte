@@ -4,8 +4,8 @@
 	
 	const { data } = $props<PageData>();
 	
-	// Ekstrak sesi dari data
-	const { session } = data;
+	// Ekstrak sesi dan submissions dari data
+	const { session, submissions } = data;
 </script>
 
 <div class="p-8">
@@ -13,8 +13,36 @@
 	<p class="text-lg text-foreground/80 mt-1">Logged in as: {session.user.email}</p>
 	
 	<div class="mt-8">
-		<h2 class="text-xl font-semibold">My IDP Submissions</h2>
-		<p class="mt-2 text-foreground/70">Your past submissions will be displayed here.</p>
+		<div class="flex justify-between items-center">
+			<h2 class="text-xl font-semibold">My IDP Submissions</h2>
+		</div>
+		
+		{#if submissions && submissions.length > 0}
+			<div class="mt-4 space-y-4">
+				{#each submissions as submission (submission.id)}
+					<a 
+						href="/submission/{submission.id}" 
+						class="block p-4 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-colors border border-secondary"
+					>
+						<div class="flex justify-between items-center">
+							<div>
+								<h3 class="font-medium text-foreground">{submission.full_name}</h3>
+								<p class="text-sm text-foreground/70 mt-1">
+									Submitted on: {new Date(submission.created_at).toLocaleDateString()}
+								</p>
+							</div>
+							<div class="text-right">
+								<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
+									View Details
+								</span>
+							</div>
+						</div>
+					</a>
+				{/each}
+			</div>
+		{:else}
+			<p class="mt-4 text-foreground/70">Anda belum memiliki pengajuan. Mulai buat sekarang!</p>
+		{/if}
 	</div>
 	
 	<a 
