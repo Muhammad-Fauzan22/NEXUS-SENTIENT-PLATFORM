@@ -1,6 +1,8 @@
+<!-- src/routes/login/+page.svelte -->
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import type { PageData } from './$types';
+	import { toast } from 'svelte-sonner';
 	
 	const { data } = $props<PageData>();
 	
@@ -22,13 +24,13 @@
 			});
 			
 			if (error) {
-				alert(`Error: ${error.message}`);
+				toast.error(error.message || 'Terjadi kesalahan pada server.');
 				return;
 			}
 			
-			alert('Pendaftaran berhasil! Silakan cek email Anda untuk verifikasi.');
+			toast.success('Pendaftaran berhasil! Silakan cek email Anda untuk verifikasi.');
 		} catch (err) {
-			alert('Terjadi kesalahan saat pendaftaran.');
+			toast.error('Terjadi kesalahan saat pendaftaran.');
 		} finally {
 			loading = false;
 		}
@@ -44,14 +46,14 @@
 			});
 			
 			if (error) {
-				alert(`Error: ${error.message}`);
+				toast.error(error.message || 'Terjadi kesalahan pada server.');
 				return;
 			}
 			
 			// Jika berhasil, arahkan ke halaman dashboard
 			await goto('/dashboard');
 		} catch (err) {
-			alert('Terjadi kesalahan saat login.');
+			toast.error('Terjadi kesalahan saat login.');
 		} finally {
 			loading = false;
 		}
