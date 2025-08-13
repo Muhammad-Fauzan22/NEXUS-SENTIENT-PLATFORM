@@ -1,5 +1,5 @@
 // src/routes/api/generate-idp/+server.ts
-import { error, json, type RequestHandler } from '@sveltejs/kit';
+import { error, type RequestHandler } from '@sveltejs/kit';
 import { createClient } from '@supabase/supabase-js';
 import { env } from '$env/dynamic/private';
 import { GoogleGenerativeAI } from '@google/generative-ai';
@@ -12,7 +12,7 @@ const genAI = new GoogleGenerativeAI(env.GEMINI_API_KEY);
 
 /**
  * API endpoint untuk menghasilkan Individual Development Plan (IDP)
- * berdasarkan data pengajuan yang disimpan di database
+ * berdasarkan data pengajuan yang disimpan di database dengan streaming
  */
 export const POST: RequestHandler = async ({ request, locals }) => {
 	try {
@@ -108,32 +108,37 @@ Untuk setiap semester:
 - Format dalam Markdown dengan heading, bullet points, dan struktur yang jelas.
 `;
 
-		// Panggil Google Gemini API
+		// Panggil Google Gemini API dengan streaming
 		const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-		const result = await model.generateContent(prompt);
-		const response = await result.response;
-		const idpContent = response.text();
+		const result = await model.generateContentStream(prompt);
 		
-		// Simpan hasil IDP ke database
-		const { error: updateError } = await supabase
-			.from('submissions')
-			.update({ 
-				idp_result: idpContent,
-				idp_generated_at: new Date().toISOString()
-			})
-			.eq('id', submissionId);
+		// Buat stream respons
+		const stream = new ReadableStream({
+			async start(controller) {
+				const encoder = new TextEncoder();
+				
+				try {
+					// Loop melalui hasil streaming
+					for await (const chunk of result.stream) {
+						const chunkText = chunk.text();
+						controller.enqueue(encoder.encode(chunkText));
+					}
+					
+					// Tutup stream setelah selesai
+					controller.close();
+				} catch (err) {
+					controller.error(err);
+				}
+			}
+		});
 		
-		// Periksa jika ada error saat menyimpan
-		if (updateError) {
-			console.error('Error saving IDP to database:', updateError);
-			throw error(500, 'Failed to save IDP result');
-		}
-		
-		// Kembalikan hasil IDP
-		return json({ 
-			success: true, 
-			idp: idpContent,
-			message: 'IDP successfully generated and saved'
+		// Kembalikan stream respons
+		return new Response(stream, {
+			headers: {
+				'Content-Type': 'text/plain; charset=utf-8',
+				'Cache-Control': 'no-cache',
+				'Connection': 'keep-alive'
+			}
 		});
 		
 	} catch (err) {
