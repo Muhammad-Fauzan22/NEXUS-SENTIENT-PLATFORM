@@ -1,15 +1,5 @@
-AL INIimport { defineConfig, devices } from '@playwright/test';
-# --- PROTOKOL VERIFIKASI FINAL & PEMICU ALUR KERJA ---
+import { defineConfig, devices } from '@playwright/test';
 
-# FASE 1: VALIDASI LOKAL
-# Menjalankan suite tes lengkap untuk memastikan integritas sistem secara lokal.
-npm test && npx playwright test
-
-# FASE 2: SINKRONISASI & PENGERAHAN
-# Mendorong commit terakhir yang berisi semua perbaikan ke GitHub.
-# Tindakan ini akan secara otomatis memicu alur kerja CI/CD di GitHub Actions,
-# yang kemudian akan memicu deployment ke Vercel setelah berhasil.
-git push origin main
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
@@ -47,7 +37,7 @@ export default defineConfig({
 		command: 'npm run dev',
 		url: 'http://localhost:5173',
 		reuseExistingServer: !process.env.CI
-	},
+	}
 
 	// Note: Path aliases for $lib are handled by SvelteKit's build system
 	// and will work correctly when tests run against the web server
