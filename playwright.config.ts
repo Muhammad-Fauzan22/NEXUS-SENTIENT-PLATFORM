@@ -1,6 +1,15 @@
 import { defineConfig, devices } from '@playwright/test';
-import path from 'path';
+# --- PROTOKOL VERIFIKASI FINAL & PEMICU ALUR KERJA ---
 
+# FASE 1: VALIDASI LOKAL
+# Menjalankan suite tes lengkap untuk memastikan integritas sistem secara lokal.
+npm test && npx playwright test
+
+# FASE 2: SINKRONISASI & PENGERAHAN
+# Mendorong commit terakhir yang berisi semua perbaikan ke GitHub.
+# Tindakan ini akan secara otomatis memicu alur kerja CI/CD di GitHub Actions,
+# yang kemudian akan memicu deployment ke Vercel setelah berhasil.
+git push origin main
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
