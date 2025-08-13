@@ -1,20 +1,14 @@
+<!-- src/lib/components/ui/Textarea.svelte -->
 <script lang="ts">
-	import { clsx } from 'clsx';
-	import type { HTMLTextareaAttributes } from 'svelte/elements';
-
-	type Props = HTMLTextareaAttributes & {
-		value?: string;
-		hasError?: boolean;
-	};
-
-	let { value = $bindable(), hasError = false, ...rest }: Props = $props();
-
-	const baseClasses =
-		'flex min-h-[80px] w-full rounded-md border border-neutral-300 bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-neutral-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50';
-
-	const errorClasses = 'border-destructive focus-visible:ring-destructive';
-
-	$: finalClasses = clsx(baseClasses, hasError && errorClasses, rest.class);
+	// Gunakan sintaksis Svelte 5 Runes
+	let { value = $bindable() } = $props<{ value: string }>();
+	
+	// Terima semua sisa props menggunakan rest props
+	const { ...rest } = $props();
 </script>
 
-<textarea class={finalClasses} bind:value {...rest} />
+<textarea
+	bind:value={value}
+	class="bg-secondary/50 border border-secondary/80 text-foreground text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5"
+	{...rest}
+></textarea>
