@@ -1,10 +1,10 @@
-```typescript
 import { json } from '@sveltejs/kit';
 import { supabaseAdmin } from '$lib/server/supabase';
 import { INGEST_API_KEY } from '$env/static/private';
+import type { IStudentProfile } from '$lib/types/profile';
 
 /**
- * API endpoint untuk menerima data dari Google Form dan memulai pipeline pemrosesan
+ * API endpoint untuk menerima data dari form assessment dan menyimpannya ke database
  * @param request - HTTP request yang berisi data profil mahasiswa
  * @returns Respons JSON yang menunjukkan status pemrosesan
  */
@@ -24,10 +24,16 @@ export async function POST({ request }) {
 		// Parsing data dari request body
 		const data = await request.json();
 
+		// Tambahkan timestamp jika tidak ada
+		const profileData = {
+			...data,
+			createdAt: data.createdAt || new Date().toISOString()
+		};
+
 		// Simpan data ke tabel profiles di Supabase
 		const { data: newProfile, error } = await supabaseAdmin
 			.from('profiles')
-			.insert(data)
+			.insert(profileData)
 			.select()
 			.single();
 
@@ -48,7 +54,7 @@ export async function POST({ request }) {
 		// Respons sukses dengan data yang baru dibuat
 		return json(
 			{ 
-				message: 'Data ingested successfully', 
+				message: 'Data submitted successfully', 
 				profile: newProfile
 			},
 			{ status: 201 }
@@ -62,4 +68,3 @@ export async function POST({ request }) {
 		);
 	}
 }
-```
