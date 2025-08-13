@@ -34,6 +34,36 @@ export interface IRiasecScores {
 }
 
 /**
+ * Interface untuk skor asesmen Big Five (OCEAN)
+ */
+export interface IBigFiveScores {
+	/**
+	 * Skor untuk dimensi Openness to Experience
+	 */
+	openness: number | null;
+	
+	/**
+	 * Skor untuk dimensi Conscientiousness
+	 */
+	conscientiousness: number | null;
+	
+	/**
+	 * Skor untuk dimensi Extraversion
+	 */
+	extraversion: number | null;
+	
+	/**
+	 * Skor untuk dimensi Agreeableness
+	 */
+	agreeableness: number | null;
+	
+	/**
+	 * Skor untuk dimensi Neuroticism
+	 */
+	neuroticism: number | null;
+}
+
+/**
  * Interface untuk struktur data profil mahasiswa
  */
 export interface IStudentProfile {
@@ -79,7 +109,7 @@ export interface IStudentProfile {
 		/**
 		 * Hasil asesmen Big Five Personality Traits
 		 */
-		bigFive: any;
+		bigFive: Partial<IBigFiveScores>;
 		
 		/**
 		 * Hasil asesmen VARK Learning Styles
