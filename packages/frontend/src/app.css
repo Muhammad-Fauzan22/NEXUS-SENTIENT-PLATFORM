@@ -7,24 +7,36 @@
 /*    Ini memungkinkan kita untuk membuat tema yang dinamis dan konsisten. */
 @layer base {
 	:root {
-		--background: theme(colors.background);
-		--foreground: theme(colors.text);
+		--background: #0a0a0a;
+		--foreground: #f4f4f5;
 
-		--primary: theme(colors.primary.DEFAULT);
-		--primary-hover: theme(colors.primary.hover);
-		--primary-focus: theme(colors.primary.focus);
+		--primary: #3b82f6;
+		--primary-hover: #2563eb;
+		--primary-focus: #1d4ed8;
 
-		--secondary: theme(colors.secondary.DEFAULT);
-		--secondary-hover: theme(colors.secondary.hover);
+		--secondary: #1e293b;
+		--secondary-hover: #0f172a;
 
-		--destructive: theme(colors.destructive.DEFAULT);
-		--destructive-hover: theme(colors.destructive.hover);
+		--destructive: #ef4444;
+		--destructive-hover: #dc2626;
 		
-		--calm: theme(colors.calm);
+		--calm: #14b8a6;
 	}
 
 	/* Atur warna dasar untuk body */
 	body {
-		@apply bg-background text-foreground;
+		background-color: var(--background);
+		color: var(--foreground);
 	}
+}
+
+/* Tambahkan smooth scrolling */
+html {
+	scroll-behavior: smooth;
+}
+
+/* Tambahkan font smoothing untuk teks yang lebih halus */
+body {
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }
