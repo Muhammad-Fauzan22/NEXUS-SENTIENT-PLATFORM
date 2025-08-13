@@ -1,4 +1,4 @@
-import { supabaseAdmin } from '$lib/server/supabaseAdmin';
+import { supabaseAdmin } from '$lib/server/supabase';
 import { azureProvider } from './providers/azure'; // Menggunakan provider AI kita
 import { logger } from '../utils/logger';
 import { InternalServerError } from '../utils/errors';
@@ -28,11 +28,11 @@ export async function retrieveContext(queryText: string): Promise<KnowledgeChunk
 
 	try {
 		// Langkah 1: Ubah query teks menjadi embedding vektor menggunakan provider AI kita
-		logger.debug({ query: queryText.substring(0, 50) + '...' }, 'Membuat embedding untuk query RAG...');
+		logger.info(`Membuat embedding untuk query RAG: ${queryText.substring(0, 50)}...`);
 		const queryEmbedding = await azureProvider.generateEmbedding(queryText);
 
 		// Langkah 2: Panggil fungsi RPC di Supabase untuk melakukan pencarian kemiripan
-		logger.debug('Memanggil fungsi RPC match_knowledge_chunks di Supabase...');
+		logger.info('Memanggil fungsi RPC match_knowledge_chunks di Supabase...');
 		const { data, error } = await supabaseAdmin.rpc('match_knowledge_chunks', {
 			query_embedding: queryEmbedding,
 			match_threshold: MATCH_THRESHOLD,
@@ -40,19 +40,19 @@ export async function retrieveContext(queryText: string): Promise<KnowledgeChunk
 		});
 
 		if (error) {
-			logger.error({ error }, 'Gagal saat memanggil fungsi RPC Supabase.');
+			logger.error(`Gagal saat memanggil fungsi RPC Supabase: ${error.message}`);
 			throw new InternalServerError('Gagal melakukan pencarian konteks.');
 		}
 
 		if (!data || data.length === 0) {
-			logger.info({ query: queryText.substring(0, 50) + '...' }, 'Tidak ada konteks relevan yang ditemukan.');
+			logger.info(`Tidak ada konteks relevan yang ditemukan untuk query: ${queryText.substring(0, 50)}...`);
 			return [];
 		}
 
-		logger.info({ count: data.length }, 'Konteks relevan berhasil diambil.');
+		logger.info(`Konteks relevan berhasil diambil. Jumlah: ${data.length}`);
 		return data as KnowledgeChunk[];
-	} catch (e) {
-		logger.error({ error: e, query: queryText.substring(0, 50) + '...' }, 'Terjadi error tak terduga dalam pipeline RAG.');
+	} catch (e: any) {
+		logger.error(`Terjadi error tak terduga dalam pipeline RAG untuk query: ${queryText.substring(0, 50)}... Error: ${e.message}`);
 		// Mengembalikan array kosong untuk memastikan sistem tetap bisa berjalan
 		// meskipun RAG gagal.
 		return [];
