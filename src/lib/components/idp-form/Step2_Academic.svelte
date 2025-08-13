@@ -1,5 +1,9 @@
+<!-- src/lib/components/idp-form/Step2_Academic.svelte -->
 <script lang="ts">
-	let { formData } = $props<{ formData: any }>();
+	import Input from '$lib/components/ui/Input.svelte';
+	import Textarea from '$lib/components/ui/Textarea.svelte';
+	
+	let { formData = $bindable() } = $props<{ formData: any }>();
 	
 	// Inisialisasi data akademik jika belum ada
 	formData.academic ??= {};
@@ -13,11 +17,10 @@
 			<label class="block mb-2 text-sm font-medium text-foreground/80">
 				IPK Terakhir
 			</label>
-			<input 
+			<Input 
 				type="number"
 				step="0.01"
 				bind:value={formData.academic.gpa}
-				class="bg-secondary/50 border border-secondary/80 text-foreground text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5"
 				placeholder="Contoh: 3.85"
 			/>
 		</div>
@@ -26,10 +29,9 @@
 			<label class="block mb-2 text-sm font-medium text-foreground/80">
 				Mata Kuliah Favorit
 			</label>
-			<input 
+			<Input 
 				type="text"
 				bind:value={formData.academic.favoriteCourses}
-				class="bg-secondary/50 border border-secondary/80 text-foreground text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5"
 				placeholder="Contoh: Mekanika Fluida, Termodinamika"
 			/>
 		</div>
@@ -38,24 +40,22 @@
 			<label class="block mb-2 text-sm font-medium text-foreground/80">
 				Topik Riset/TA yang Diminati
 			</label>
-			<textarea 
+			<Textarea 
 				bind:value={formData.academic.researchInterest}
 				rows="4"
-				class="bg-secondary/50 border border-secondary/80 text-foreground text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5"
 				placeholder="Jelaskan topik spesifik yang menarik minat Anda untuk penelitian..."
-			></textarea>
+			/>
 		</div>
 		
 		<div class="md:col-span-2">
 			<label class="block mb-2 text-sm font-medium text-foreground/80">
 				Software/Tools yang Dikuasai
 			</label>
-			<textarea 
+			<Textarea 
 				bind:value={formData.academic.tools}
 				rows="4"
-				class="bg-secondary/50 border border-secondary/80 text-foreground text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5"
 				placeholder="Contoh: Ansys Fluent, SolidWorks, MATLAB, Python"
-			></textarea>
+			/>
 		</div>
 	</div>
 </div>
