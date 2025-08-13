@@ -39558,3 +39558,9 @@ Everything up-to-date
 2025-08-13 13:27:52,805 - INFO - Changes pushed to GitHub
 2025-08-13 13:27:56,051 - INFO - Detected file changes...
 2025-08-13 13:27:56,625 - INFO - Committed: Auto-sync: auto_git_sync.log, src/lib/components/idp-form/Step1_Personal.svelte - 2025-08-13 13:27:56
+2025-08-13 13:28:17,840 - ERROR - Git command failed: fatal: unable to access 'https://github.com/Muhammad-Fauzan22/NEXUS-SENTIENT-PLATFORM.git/': Failed to connect to github.com port 443 after 21061 ms: Could not connect to server
+
+2025-08-13 13:28:21,022 - INFO - Detected file changes...
+2025-08-13 13:28:21,539 - INFO - Committed: Auto-sync: auto_git_sync.log, src/lib/components/idp-form/Step1_Personal.svelte - 2025-08-13 13:28:21
+2025-08-13 13:28:24,675 - INFO - Changes pushed to GitHub
+2025-08-13 13:28:27,859 - INFO - Detected file changes...
