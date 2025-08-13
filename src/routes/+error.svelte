@@ -1,4 +1,3 @@
-```svelte
 <!-- src/routes/+error.svelte -->
 <script lang="ts">
 	import { page } from '$app/stores';
@@ -18,4 +17,3 @@
 		Kembali ke Beranda
 	</Button>
 </div>
-```
