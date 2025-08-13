@@ -1,3 +1,84 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  /* Color Palette - Dark Professional Theme */
+  --nexus-bg-primary: #0f172a;      /* Deep blue-gray background */
+  --nexus-bg-secondary: #1e293b;    /* Slightly lighter background */
+  --nexus-bg-tertiary: #334155;     /* Card/panel background */
+  
+  --nexus-text-primary: #f1f5f9;    /* Primary text color */
+  --nexus-text-secondary: #cbd5e1;  /* Secondary text color */
+  --nexus-text-tertiary: #94a3b8;   /* Muted text color */
+  
+  --nexus-primary: #3b82f6;         /* Electric blue - primary accent */
+  --nexus-primary-hover: #60a5fa;   /* Lighter blue for hover states */
+  --nexus-primary-active: #2563eb;  /* Darker blue for active states */
+  
+  --nexus-secondary: #8b5cf6;       /* Purple accent */
+  --nexus-secondary-hover: #a78bfa; /* Lighter purple for hover */
+  
+  --nexus-accent: #22d3ee;          /* Teal/Cyan accent */
+  --nexus-accent-hover: #67e8f9;    /* Lighter teal for hover */
+  
+  --nexus-success: #10b981;         /* Success green */
+  --nexus-warning: #f59e0b;         /* Warning amber */
+  --nexus-error: #ef4444;           /* Error red */
+  
+  /* Typography */
+  --nexus-font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --nexus-font-mono: 'Fira Code', 'JetBrains Mono', monospace;
+  
+  /* Spacing & Sizing */
+  --nexus-radius-sm: 0.25rem;
+  --nexus-radius-md: 0.5rem;
+  --nexus-radius-lg: 0.75rem;
+  --nexus-radius-xl: 1rem;
+  
+  /* Shadows */
+  --nexus-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+  --nexus-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.15);
+  --nexus-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+}
+
+/* Global body styles */
+body {
+  @apply bg-[--nexus-bg-primary] text-[--nexus-text-primary];
+  font-family: var(--nexus-font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
+/* Base styles for better UX */
+* {
+  @apply border-[--nexus-bg-tertiary];
+}
+
+/* Focus styles for accessibility */
+:focus-visible {
+  @apply outline outline-2 outline-offset-2 outline-[--nexus-primary];
+}
+
+/* Scrollbar styling for webkit browsers */
+::-webkit-scrollbar {
+  @apply w-2 h-2;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-[--nexus-bg-secondary];
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-[--nexus-bg-tertiary] rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-[--nexus-primary];
+}
+
+/* Selection highlight */
+::selection {
+  @apply bg-[--nexus-primary] text-white;
+}
