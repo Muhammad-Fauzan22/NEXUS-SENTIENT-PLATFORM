@@ -1,8 +1,16 @@
+/**
+ * Mendefinisikan kontrak tipe untuk setiap pertanyaan RIASEC.
+ * Ini memastikan konsistensi data di seluruh aplikasi.
+ */
 export interface RIASECQuestion {
 	id: number;
 	text: string;
 }
 
+/**
+ * Sumber kebenaran (Single Source of Truth) untuk semua pertanyaan asesmen RIASEC.
+ * Memisahkan data dari logika presentasi memungkinkan pemeliharaan yang lebih mudah.
+ */
 export const riasecQuestions: RIASECQuestion[] = [
     { id: 1, text: 'Saya suka bekerja dengan perkakas.' },
     { id: 2, text: 'Saya suka melakukan eksperimen ilmiah.' },
