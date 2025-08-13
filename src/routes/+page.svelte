@@ -3,6 +3,7 @@
 	import { writable } from 'svelte/store';
 	import { goto } from '$app/navigation';
 	import { toast } from 'svelte-sonner';
+	import Button from '$lib/components/ui/Button.svelte';
 	import Step1_Personal from '$lib/components/idp-form/Step1_Personal.svelte';
 	import Step2_Academic from '$lib/components/idp-form/Step2_Academic.svelte';
 	import Step3_Psychometric from '$lib/components/idp-form/Step3_Psychometric.svelte';
@@ -65,34 +66,39 @@
 		{/if}
 
 		<div class="mt-8 flex justify-between">
-			<button 
-				class="bg-secondary text-foreground px-6 py-2 rounded-md disabled:opacity-50"
+			<Button 
+				variant="secondary"
 				disabled={$currentStep === 1}
 				on:click={prevStep}
 			>
 				Previous
-			</button>
+			</Button>
 			
-			{#if $currentStep === 4}
-				<button 
-					class="bg-accent text-foreground px-6 py-2 rounded-md disabled:opacity-50"
-					disabled={$isLoading}
-					on:click={handleSubmit}
-				>
-					{#if $isLoading}
-						Submitting...
-					{:else}
-						Submit
-					{/if}
-				</button>
-			{:else}
-				<button 
-					class="bg-primary text-foreground px-6 py-2 rounded-md"
-					on:click={nextStep}
-				>
-					Next
-				</button>
-			{/if}
+			<div class="flex gap-2">
+				{#if $currentStep === 4}
+					<Button 
+						variant="primary"
+						disabled={$isLoading}
+						on:click={handleSubmit}
+					>
+						{#if $isLoading}
+							Submitting...
+						{:else}
+							Submit
+						{/if}
+					</Button>
+				{/if}
+				
+				{#if $currentStep < 4}
+					<Button 
+						variant="primary"
+						disabled={$currentStep === 4}
+						on:click={nextStep}
+					>
+						Next
+					</Button>
+				{/if}
+			</div>
 		</div>
 	</div>
 </div>
