@@ -81,11 +81,11 @@
 		<h2 class="text-2xl font-bold mb-8">Assessment: Step {currentStep} of 4</h2>
 
 		{#if currentStep === 1}
-			<Step1_PersonalInfo bind:formData={formData} />
+			<Step1_PersonalInfo {formData} />
 		{:else if currentStep === 2}
-			<Step2_Riasec bind:formData={formData} />
+			<Step2_Riasec {formData} />
 		{:else if currentStep === 3}
-			<Step3_BigFive bind:formData={formData} />
+			<Step3_BigFive {formData} />
 		{:else if currentStep === 4}
 			<Step4_Review {formData} />
 		{/if}
@@ -123,4 +123,3 @@
 		</div>
 	</main>
 {/if}
-
