@@ -1,0 +1,49 @@
+<script lang="ts">
+	import type { IStudentProfile } from '../../lib/types/profile.ts';
+
+	let currentStep = $state(1);
+	let formData = $state<Partial<IStudentProfile>>({});
+
+	function nextStep() {
+		if (currentStep < 4) {
+			currentStep++;
+		}
+	}
+
+	function prevStep() {
+		if (currentStep > 1) {
+			currentStep--;
+		}
+	}
+</script>
+
+<main class="container mx-auto px-4 py-12">
+	<h2 class="text-2xl font-bold mb-8">Assessment: Step {currentStep} of 4</h2>
+
+	{#if currentStep === 1}
+		<div>Placeholder for Personal Information Form</div>
+	{:else if currentStep === 2}
+		<div>Placeholder for RIASEC Assessment</div>
+	{:else if currentStep === 3}
+		<div>Placeholder for Big Five Assessment</div>
+	{:else if currentStep === 4}
+		<div>Placeholder for Submission Review</div>
+	{/if}
+
+	<div class="mt-8 flex justify-between">
+		<button 
+			class="bg-secondary text-foreground px-6 py-2 rounded-md disabled:opacity-50"
+			disabled={currentStep === 1}
+			onclick={prevStep}
+		>
+			Previous
+		</button>
+		<button 
+			class="bg-primary text-foreground px-6 py-2 rounded-md disabled:opacity-50"
+			disabled={currentStep === 4}
+			onclick={nextStep}
+		>
+			Next
+		</button>
+	</div>
+</main>
