@@ -5,6 +5,8 @@
 	import Button from '$lib/components/ui/Button.svelte';
 	import Card from '$lib/components/ui/Card.svelte';
 
+	// Menggunakan Map untuk menyimpan pilihan memberikan fleksibilitas dan performa
+	// yang baik untuk kunci numerik.
 	let selections: Map<number, string> = new Map();
 
 	function handleSubmit() {
@@ -16,18 +18,18 @@
 		const formattedAnswers: PWBAnswer[] = [];
 		for (const question of pwbQuestions) {
 			let score = parseInt(selections.get(question.id) || '0', 10);
+			// Menerapkan logika skoring terbalik untuk item yang relevan,
+			// sebuah langkah krusial dalam validasi psikometri.
 			if (question.reversed) {
-				score = 7 - score; // Reverse score (1->6, 2->5, ..., 6->1)
+				score = 7 - score;
 			}
 			formattedAnswers.push({ question_id: question.id, score });
 		}
 
+		// Memperbarui store dengan jawaban PWB, lalu segera memicu
+		// proses submisi akhir ke backend.
 		assessmentStore.setPwbAnswers(formattedAnswers);
-		assessmentStore.submitAssessment(); // Trigger the final submission
-	}
-
-	function goBack() {
-		assessmentStore.goToStep(2);
+		assessmentStore.submitAssessment();
 	}
 </script>
 
@@ -37,8 +39,7 @@
 		Rate each statement on a scale of 1 to 6 based on how much you agree.
 	</p>
 	<div class="text-sm text-center text-gray-500 mb-6 p-2 bg-gray-50 rounded-md">
-		1 = Strongly Disagree | 2 = Disagree | 3 = Slightly Disagree | 4 = Slightly Agree | 5 = Agree | 6
-		= Strongly Agree
+		1 = Strongly Disagree | 6 = Strongly Agree
 	</div>
 
 	<form on:submit|preventDefault={handleSubmit} class="space-y-6">
@@ -47,7 +48,6 @@
 				<fieldset class="border-t border-gray-200 pt-4">
 					<legend class="text-md font-medium text-gray-700">{question.id}. {question.text}</legend>
 					<div class="flex justify-around items-center mt-3">
-						<!-- CORRECTED: Use square brackets for array iteration -->
 						{#each [1, 2, 3, 4, 5, 6] as score}
 							<label class="flex flex-col items-center cursor-pointer">
 								<input
@@ -67,8 +67,8 @@
 		</div>
 
 		<div class="flex justify-between pt-4">
-			<Button on:click={goBack} variant="secondary">Back</Button>
+			<Button on:click={() => assessmentStore.goToStep(2)} variant="secondary">Back</Button>
 			<Button type="submit" variant="primary">Submit & Generate My Plan</Button>
 		</div>
 	</form>
-</Card>```
+</Card>
