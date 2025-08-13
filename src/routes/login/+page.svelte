@@ -3,6 +3,7 @@
 	import { goto } from '$app/navigation';
 	import type { PageData } from './$types';
 	import { toast } from 'svelte-sonner';
+	import Button from '$lib/components/ui/Button.svelte';
 	
 	const { data } = $props<PageData>();
 	
@@ -99,31 +100,29 @@
 			</div>
 			
 			<div class="flex flex-col sm:flex-row gap-4 pt-4">
-				<button
-					type="button"
+				<Button
 					on:click={handleSignUp}
 					disabled={loading}
-					class="flex-1 bg-accent text-foreground py-2 px-4 rounded-md hover:bg-accent/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent disabled:opacity-50 transition-colors"
+					variant="secondary"
 				>
 					{#if loading}
 						Loading...
 					{:else}
 						Sign Up
 					{/if}
-				</button>
+				</Button>
 				
-				<button
-					type="button"
+				<Button
 					on:click={handleSignIn}
 					disabled={loading}
-					class="flex-1 bg-primary text-foreground py-2 px-4 rounded-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 transition-colors"
+					variant="primary"
 				>
 					{#if loading}
 						Loading...
 					{:else}
 						Sign In
 					{/if}
-				</button>
+				</Button>
 			</div>
 		</form>
 	</div>
