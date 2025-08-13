@@ -36,8 +36,18 @@ export default defineConfig({
 	webServer: {
 		command: 'npm run dev',
 		url: 'http://localhost:5173',
+		{
+			name: 'chromium',
+			use: { ...devices['Desktop Chrome'] }
+		}
+	],
+
+	/* Run your local dev server before starting the tests */
+	webServer: {
+		command: 'npm run dev',
+		url: 'http://localhost:5173',
 		reuseExistingServer: !process.env.CI
-	}
+	},
 
 	// Note: Path aliases for $lib are handled by SvelteKit's build system
 	// and will work correctly when tests run against the web server
