@@ -39,10 +39,11 @@
 		</div>
 
 		<div class="md:col-span-2">
-			<label class="block mb-2 text-sm font-medium text-foreground/80">
+			<label for="researchInterest" class="block mb-2 text-sm font-medium text-foreground/80">
 				Topik Riset/TA yang Diminati
 			</label>
 			<Textarea
+				id="researchInterest"
 				bind:value={formData.academic.researchInterest}
 				rows="4"
 				placeholder="Jelaskan topik spesifik yang menarik minat Anda untuk penelitian..."
