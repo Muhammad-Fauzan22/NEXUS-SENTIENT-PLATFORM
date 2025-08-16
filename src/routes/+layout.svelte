@@ -6,16 +6,13 @@
 	import { Toaster } from 'svelte-sonner';
 	import Button from '$lib/components/ui/Button.svelte';
 	import Logo from '$lib/components/core/Logo.svelte';
-	
-	const { data } = $props<PageData>();
-	
-	// Buat variabel reaktif untuk session dan supabase
-	let { session, supabase } = $derived(data);
-	
-	// Fungsi untuk logout
+	import { supabase } from '$lib/client/supabase';
+
+	const { data, children } = $props<PageData & { children?: any }>();
+	let { session } = $derived(data);
+
 	async function handleSignOut() {
 		await supabase.auth.signOut();
-		// Arahkan ke halaman utama untuk me-refresh sesi
 		await goto('/');
 	}
 </script>
@@ -27,23 +24,16 @@
 			<a href="/" class="text-primary">
 				<Logo size={8} />
 			</a>
-			
+
 			{#if session}
 				<!-- Pengguna sudah login -->
 				<div class="flex items-center gap-4">
 					<span class="text-sm text-foreground/80">{session.user.email}</span>
-					<Button
-						variant="secondary"
-						on:click={handleSignOut}
-					>
-						Logout
-					</Button>
+					<Button variant="secondary" on:click={handleSignOut}>Logout</Button>
 				</div>
 			{:else}
 				<!-- Pengguna belum login -->
-				<Button href="/login" variant="primary">
-					Login
-				</Button>
+				<Button href="/login" variant="primary">Login</Button>
 			{/if}
 		</nav>
 	</header>
@@ -57,7 +47,7 @@
 			© 2024 NEXUS - The Sentient Development Platform
 		</div>
 	</footer>
-	
+
 	<!-- Provider Toast -->
 	<Toaster />
 </div>
