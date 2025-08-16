@@ -2,56 +2,55 @@
 <script lang="ts">
 	import Input from '$lib/components/ui/Input.svelte';
 	import Textarea from '$lib/components/ui/Textarea.svelte';
-	
+
 	let { formData = $bindable() } = $props<{ formData: any }>();
-	
+
 	// Inisialisasi data akademik jika belum ada
 	formData.academic ??= {};
 </script>
 
 <div>
 	<h3 class="text-xl font-semibold mb-6">Langkah 2: Riwayat & Minat Akademik</h3>
-	
+
 	<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 		<div>
-			<label class="block mb-2 text-sm font-medium text-foreground/80">
+			<label for="gpa" class="block mb-2 text-sm font-medium text-foreground/80">
 				IPK Terakhir
 			</label>
-			<Input 
+			<Input
+				id="gpa"
 				type="number"
 				step="0.01"
 				bind:value={formData.academic.gpa}
 				placeholder="Contoh: 3.85"
 			/>
 		</div>
-		
+
 		<div>
-			<label class="block mb-2 text-sm font-medium text-foreground/80">
-				Mata Kuliah Favorit
-			</label>
-			<Input 
+			<label class="block mb-2 text-sm font-medium text-foreground/80"> Mata Kuliah Favorit </label>
+			<Input
 				type="text"
 				bind:value={formData.academic.favoriteCourses}
 				placeholder="Contoh: Mekanika Fluida, Termodinamika"
 			/>
 		</div>
-		
+
 		<div class="md:col-span-2">
 			<label class="block mb-2 text-sm font-medium text-foreground/80">
 				Topik Riset/TA yang Diminati
 			</label>
-			<Textarea 
+			<Textarea
 				bind:value={formData.academic.researchInterest}
 				rows="4"
 				placeholder="Jelaskan topik spesifik yang menarik minat Anda untuk penelitian..."
 			/>
 		</div>
-		
+
 		<div class="md:col-span-2">
 			<label class="block mb-2 text-sm font-medium text-foreground/80">
 				Software/Tools yang Dikuasai
 			</label>
-			<Textarea 
+			<Textarea
 				bind:value={formData.academic.tools}
 				rows="4"
 				placeholder="Contoh: Ansys Fluent, SolidWorks, MATLAB, Python"
