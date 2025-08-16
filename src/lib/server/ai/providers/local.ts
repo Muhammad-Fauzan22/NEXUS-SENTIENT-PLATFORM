@@ -58,8 +58,10 @@ export async function generate(prompt: string): Promise<string> {
 			if (!res.ok) {
 				const text = await res.text();
 				logger.error('Local LLM (llama.cpp) call failed', { status: res.status, text });
+				llmBreaker.fail();
 				throw new InternalServerError('Local LLM (llama.cpp) request failed.');
 			}
+			llmBreaker.succeed();
 			const data = await res.json();
 			const out = (data?.content || data?.completion || '').toString().trim();
 			return out;
