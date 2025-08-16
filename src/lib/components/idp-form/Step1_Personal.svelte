@@ -25,8 +25,15 @@
 		</div>
 
 		<div>
-			<label class="block mb-2 text-sm font-medium text-foreground/80"> Email Pribadi </label>
-			<Input type="email" bind:value={formData.personal.email} placeholder="Masukkan email Anda" />
+			<label for="email" class="block mb-2 text-sm font-medium text-foreground/80">
+				Email Pribadi
+			</label>
+			<Input
+				id="email"
+				type="email"
+				bind:value={formData.personal.email}
+				placeholder="Masukkan email Anda"
+			/>
 		</div>
 
 		<div>
