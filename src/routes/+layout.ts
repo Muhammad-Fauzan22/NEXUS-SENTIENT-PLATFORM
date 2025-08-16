@@ -5,7 +5,8 @@ import { supabase } from '$lib/client/supabase';
 export const load: PageLoad = async ({ fetch, data, depends }) => {
 	depends('supabase:auth');
 
-	// supabase client is provided from server-side env via $lib/db/supabase
+	// client-only supabase; server load should not import this file during SSR
+
 
 
 	const {
