@@ -33,10 +33,35 @@ export const handle: Handle = async ({ event, resolve }) => {
 		return session;
 	};
 
-	// Resolve request dengan transformasi header yang direkomendasikan
-	return resolve(event, {
+	// Rate limit sederhana per IP
+	const ip = event.getClientAddress?.() || event.request.headers.get('x-forwarded-for') || undefined;
+	if (!checkRateLimit(ip)) {
+		return new Response('Too Many Requests', { status: 429 });
+	}
+
+	// Header keamanan dasar + CSP ketat
+	const response = await resolve(event, {
 		filterSerializedResponseHeaders(name) {
 			return name === 'content-range';
-		},
+		}
 	});
+
+	const csp = [
+		"default-src 'self'",
+		"script-src 'self' 'unsafe-inline'",
+		"style-src 'self' 'unsafe-inline'",
+		"img-src 'self' data:",
+		"connect-src 'self'",
+		"font-src 'self' data:",
+		"frame-ancestors 'none'"
+	].join('; ');
+
+	response.headers.set('Content-Security-Policy', csp);
+	response.headers.set('X-Content-Type-Options', 'nosniff');
+	response.headers.set('X-Frame-Options', 'DENY');
+	response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+	// HSTS hanya bila HTTPS; jika deploy di HTTPS, aktifkan:
+	// response.headers.set('Strict-Transport-Security', 'max-age=15552000; includeSubDomains');
+
+	return response;
 };
