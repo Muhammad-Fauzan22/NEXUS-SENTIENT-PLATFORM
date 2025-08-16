@@ -17,13 +17,25 @@ async function withRetry<T>(fn: () => Promise<T>, attempts = 3) {
 // Embedding provider that targets an OpenAI-compatible /v1/embeddings endpoint.
 // Works both in SvelteKit server and in Node scripts (uses process.env).
 const EMB_BASE = process.env.LOCAL_EMBEDDINGS_BASE_URL || process.env.LOCAL_LLM_BASE_URL; // allow reuse
-const EMB_MODEL = process.env.LOCAL_EMBEDDINGS_MODEL || 'text-embedding-3-small';
+const EMB_MODEL = process.env.LOCAL_EMBEDDINGS_MODEL || 'nomic-embed-text'; // better local default (768-d)
 const EMB_API_KEY = process.env.LOCAL_EMBEDDINGS_API_KEY || process.env.LOCAL_LLM_API_KEY;
+const TARGET_DIM = Number(process.env.EMBEDDINGS_TARGET_DIM || 1536); // DB pgvector dim
+
+function normalize(vec: number[], target = TARGET_DIM): number[] {
+	if (vec.length === target) return vec;
+	if (vec.length > target) return vec.slice(0, target);
+	// pad with zeros
+	return vec.concat(Array(target - vec.length).fill(0));
+}
+
+function randomVec(dim = TARGET_DIM) {
+	return Array(dim).fill(0).map(Math.random);
+}
 
 export async function generateEmbedding(text: string): Promise<number[]> {
 	if (!EMB_BASE) {
 		logger.warn('LOCAL_EMBEDDINGS_BASE_URL is not set. Falling back to random embedding.');
-		return Array(1536).fill(0).map(Math.random);
+		return randomVec();
 	}
 	try {
 		const res = await withRetry(() =>
@@ -39,18 +51,18 @@ export async function generateEmbedding(text: string): Promise<number[]> {
 		if (!res.ok) {
 			const body = await res.text();
 			logger.error('Embedding API call failed', { status: res.status, body });
-			return Array(1536).fill(0).map(Math.random);
+			return randomVec();
 		}
 		const data = await res.json();
 		const vec = data?.data?.[0]?.embedding;
 		if (!Array.isArray(vec)) {
 			logger.warn('Embedding API returned invalid format. Using random vector.');
-			return Array(1536).fill(0).map(Math.random);
+			return randomVec();
 		}
-		return vec as number[];
+		return normalize(vec as number[]);
 	} catch (error) {
 		logger.error('Embedding provider error. Using random vector.', { error });
-		return Array(1536).fill(0).map(Math.random);
+		return randomVec();
 	}
 }
 
