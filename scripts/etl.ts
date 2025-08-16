@@ -15,12 +15,11 @@ interface KnowledgeChunk {
 	metadata: Record<string, unknown>;
 }
 
-// Placeholder for a function that would generate embeddings
+// Embedding provider (OpenAI-compatible). When not configured, falls back to random vector.
+import { generateEmbedding as embed } from '../src/lib/server/ai/providers/embeddings';
 async function getEmbedding(text: string): Promise<number[]> {
-	// In a real implementation, this would call an AI embedding model (e.g., OpenAI, Cohere)
 	logger.info(`Generating embedding for chunk... Length: ${text.length}`);
-	// Returning a dummy array of the correct dimension for Supabase pgvector
-	return Array(1536).fill(0).map(Math.random);
+	return await embed(text);
 }
 
 async function processAndLoadChunks(chunks: Omit<KnowledgeChunk, 'content_embedding' | 'id'>[]) {
