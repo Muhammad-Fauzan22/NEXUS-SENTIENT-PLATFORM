@@ -85,3 +85,79 @@ body {
 .red-accent-pulse {
   animation: redPulse 3s ease-in-out infinite;
 }
+
+/* Advanced NEXUS quantum effects */
+@keyframes quantumFlicker {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
+}
+
+@keyframes neuralPulse {
+  0%, 100% { 
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  50% { 
+    transform: scale(1.05);
+    filter: brightness(1.2);
+  }
+}
+
+@keyframes xrScan {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes aiProcessing {
+  0%, 100% { 
+    background-position: 0% 50%;
+  }
+  50% { 
+    background-position: 100% 50%;
+  }
+}
+
+/* Quantum UI effects */
+.quantum-superposition {
+  animation: quantumFlicker 2s ease-in-out infinite;
+}
+
+.neural-activity {
+  animation: neuralPulse 1.5s ease-in-out infinite;
+}
+
+.xr-interface {
+  animation: xrScan 4s linear infinite;
+}
+
+.ai-processing {
+  background: linear-gradient(45deg, #FF0080, #FF44AA, #FF0080);
+  background-size: 200% 200%;
+  animation: aiProcessing 3s ease infinite;
+}
+
+/* Advanced interaction feedback */
+.gesture-detected {
+  box-shadow: 0 0 30px rgba(80, 200, 120, 0.8);
+  animation: neuralPulse 0.5s ease-out;
+}
+
+.voice-active {
+  box-shadow: 0 0 30px rgba(0, 212, 255, 0.8);
+  animation: quantumFlicker 1s ease-in-out;
+}
+
+.eye-tracking {
+  box-shadow: 0 0 30px rgba(255, 107, 0, 0.8);
+}
+
+/* Performance optimization classes */
+.quantum-accelerated {
+  transform: translateZ(0);
+  will-change: transform, opacity;
+}
+
+.neural-optimized {
+  backface-visibility: hidden;
+  perspective: 1000px;
+}

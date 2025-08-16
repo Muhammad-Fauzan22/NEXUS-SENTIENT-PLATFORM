@@ -3,6 +3,7 @@ import { error, type RequestHandler } from '@sveltejs/kit';
 import { createClient } from '@supabase/supabase-js';
 import { env } from '$env/dynamic/private';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { z } from 'zod';
 
 // Inisialisasi Supabase client
 const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY);
@@ -18,43 +19,43 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	try {
 		// Dapatkan submissionId dari request body
 		const { submissionId } = await request.json();
-		
+
 		// Dapatkan sesi pengguna
 		const session = await locals.getSession();
-		
+
 		// Verifikasi keamanan: Pengguna harus login
 		if (!session) {
 			throw error(401, 'Unauthorized');
 		}
-		
+
 		// Ambil data pengajuan dari Supabase berdasarkan ID
 		const { data: submission, error: dbError } = await supabase
 			.from('submissions')
 			.select('*')
 			.eq('id', submissionId)
 			.single();
-		
+
 		// Periksa jika ada error saat mengambil data
 		if (dbError || !submission) {
 			throw error(404, 'Submission not found');
 		}
-		
+
 		// Verifikasi kepemilikan: Pastikan pengguna adalah pemilik data
 		if (submission.user_id !== session.user.id) {
 			throw error(403, 'Forbidden');
 		}
-		
+
 		// Setelah verifikasi kepemilikan, perbarui status menjadi 'Analyzing'
 		const { error: updateError } = await supabase
 			.from('submissions')
 			.update({ status: 'Analyzing' })
 			.eq('id', submissionId);
-		
+
 		// Penanganan error dasar untuk update status
 		if (updateError) {
 			console.error('Error updating status to Analyzing:', updateError);
 		}
-		
+
 		// Rancang prompt dengan prompt engineering yang canggih
 		const prompt = `
 Anda adalah seorang konselor karir dan akademik ahli dari Departemen Teknik Mesin ITS. Tugas Anda adalah menganalisis profil mahasiswa dan menghasilkan Rencana Pengembangan Individu (IDP) yang personal dan ilmiah.
@@ -74,11 +75,11 @@ Anda adalah seorang konselor karir dan akademik ahli dari Departemen Teknik Mesi
    - Software/Tools yang Dikuasai: ${submission.mastered_software || 'Tidak disediakan'}
 
 3. **Hasil Asesmen Psikometri (RIASEC):**
-   ${submission.psychometric_results ? 
-     Object.entries(submission.psychometric_results as Record<string, unknown>)
-       .map(([key, value]) => `   - ${key}: ${value}`)
-       .join('\n') 
-     : '   Data tidak tersedia'}
+   ${submission.psychometric_results ?
+				Object.entries(submission.psychometric_results as Record<string, unknown>)
+					.map(([key, value]) => `   - ${key}: ${value}`)
+					.join('\n')
+				: '   Data tidak tersedia'}
 
 **TUGAS ANDA:**
 
@@ -122,30 +123,30 @@ Untuk setiap semester:
 		// Panggil Google Gemini API dengan streaming
 		const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 		const result = await model.generateContentStream(prompt);
-		
+
 		// Buat stream respons
 		const stream = new ReadableStream({
 			async start(controller) {
 				const encoder = new TextEncoder();
-				
+
 				try {
 					// Loop melalui hasil streaming
 					for await (const chunk of result.stream) {
 						const chunkText = chunk.text();
 						controller.enqueue(encoder.encode(chunkText));
 					}
-					
+
 					// Setelah proses AI streaming selesai, perbarui status menjadi 'Complete'
 					const { error: completeUpdateError } = await supabase
 						.from('submissions')
 						.update({ status: 'Complete' })
 						.eq('id', submissionId);
-					
+
 					// Penanganan error dasar untuk update status complete
 					if (completeUpdateError) {
 						console.error('Error updating status to Complete:', completeUpdateError);
 					}
-					
+
 					// Tutup stream setelah selesai
 					controller.close();
 				} catch (err) {
@@ -153,7 +154,7 @@ Untuk setiap semester:
 				}
 			}
 		});
-		
+
 		// Kembalikan stream respons
 		return new Response(stream, {
 			headers: {
@@ -162,15 +163,15 @@ Untuk setiap semester:
 				'Connection': 'keep-alive'
 			}
 		});
-		
+
 	} catch (err) {
 		console.error('Error in IDP generation:', err);
-		
+
 		// Tangani error berdasarkan tipe
 		if (err instanceof Error && 'status' in err) {
 			throw err;
 		}
-		
+
 		throw error(500, 'Internal server error during IDP generation');
 	}
 };

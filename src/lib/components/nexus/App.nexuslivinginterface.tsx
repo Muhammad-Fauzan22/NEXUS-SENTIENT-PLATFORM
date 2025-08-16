@@ -1,8 +1,10 @@
 import React from 'react';
-import { Box, Typography, Button, Stack } from '@mui/material';
+import { Box, Typography, Button, Stack, Switch, FormControlLabel } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { NexusApp } from './NexusApp';
+import { AdvancedNexusApp } from './AdvancedNexusApp';
 import { CompanyLogo } from './components/CompanyLogo';
+import { AICapability, InteractionMode } from './types/advanced';
 
 const PreviewContainer = styled(Box)(({ theme }) => ({
   width: '100vw',
@@ -24,7 +26,10 @@ const PreviewControls = styled(Box)(({ theme }) => ({
 }));
 
 export const App: React.FC = () => {
-  const [currentDemo, setCurrentDemo] = React.useState<'full' | 'oracle' | 'assessment' | 'constellation' | 'dashboard'>('full');
+  const [currentDemo, setCurrentDemo] = React.useState<'full' | 'advanced' | 'oracle' | 'assessment' | 'constellation' | 'dashboard'>('advanced');
+  const [quantumMode, setQuantumMode] = React.useState(true);
+  const [neuromorphicMode, setNeuromorphicMode] = React.useState(true);
+  const [xrMode, setXrMode] = React.useState(true);
 
   const handleAssessmentComplete = (results: any) => {
     console.log('Assessment completed:', results);
@@ -44,6 +49,22 @@ export const App: React.FC = () => {
 
   const renderDemo = () => {
     switch (currentDemo) {
+      case 'advanced':
+        return (
+          <AdvancedNexusApp
+            initialView="oracle-gate"
+            debugMode={true}
+            quantumMode={quantumMode}
+            neuromorphicProcessing={neuromorphicMode}
+            xrEnabled={xrMode}
+            aiCapabilities={[AICapability.EMOTION_DETECTION, AICapability.PREDICTIVE_ANALYTICS, AICapability.NATURAL_LANGUAGE]}
+            interactionModes={[InteractionMode.GESTURE, InteractionMode.VOICE, InteractionMode.EYE_TRACKING]}
+            onAssessmentComplete={handleAssessmentComplete}
+            onConstellationInteraction={handleConstellationInteraction}
+            onEmotionalStateChange={handleEmotionalStateChange}
+            onProgressUpdate={handleProgressUpdate}
+          />
+        );
       case 'oracle':
         return (
           <NexusApp
@@ -90,13 +111,14 @@ export const App: React.FC = () => {
         );
       default:
         return (
-          <NexusApp
+          <AdvancedNexusApp
             initialView="oracle-gate"
             debugMode={true}
-            enableAudio={true}
-            enableProactiveNotifications={true}
-            enableEmpatheticUI={true}
-            enable3DConstellation={true}
+            quantumMode={quantumMode}
+            neuromorphicProcessing={neuromorphicMode}
+            xrEnabled={xrMode}
+            aiCapabilities={[AICapability.EMOTION_DETECTION, AICapability.PREDICTIVE_ANALYTICS]}
+            interactionModes={[InteractionMode.GESTURE, InteractionMode.VOICE]}
             onAssessmentComplete={handleAssessmentComplete}
             onConstellationInteraction={handleConstellationInteraction}
             onEmotionalStateChange={handleEmotionalStateChange}
@@ -120,13 +142,22 @@ export const App: React.FC = () => {
             </Typography>
           </Box>
         </Stack>
+        
         <Stack direction="column" spacing={1}>
+          <Button 
+            size="small" 
+            variant={currentDemo === 'advanced' ? 'contained' : 'outlined'}
+            onClick={() => setCurrentDemo('advanced')}
+            sx={{ backgroundColor: currentDemo === 'advanced' ? 'error.main' : 'transparent' }}
+          >
+            ⚛️ Quantum NEXUS
+          </Button>
           <Button 
             size="small" 
             variant={currentDemo === 'full' ? 'contained' : 'outlined'}
             onClick={() => setCurrentDemo('full')}
           >
-            Full Experience
+            Classic Experience
           </Button>
           <Button 
             size="small" 
@@ -157,6 +188,27 @@ export const App: React.FC = () => {
             Dashboard
           </Button>
         </Stack>
+
+        {currentDemo === 'advanced' && (
+          <Stack direction="column" spacing={1} sx={{ mt: 2, pt: 2, borderTop: '1px solid', borderColor: 'grey.800' }}>
+            <Typography variant="caption" color="text.secondary">Advanced Features:</Typography>
+            <FormControlLabel
+              control={<Switch checked={quantumMode} onChange={(e) => setQuantumMode(e.target.checked)} size="small" />}
+              label="Quantum Mode"
+              sx={{ '& .MuiFormControlLabel-label': { fontSize: '0.75rem' } }}
+            />
+            <FormControlLabel
+              control={<Switch checked={neuromorphicMode} onChange={(e) => setNeuromorphicMode(e.target.checked)} size="small" />}
+              label="Neural Processing"
+              sx={{ '& .MuiFormControlLabel-label': { fontSize: '0.75rem' } }}
+            />
+            <FormControlLabel
+              control={<Switch checked={xrMode} onChange={(e) => setXrMode(e.target.checked)} size="small" />}
+              label="XR Interface"
+              sx={{ '& .MuiFormControlLabel-label': { fontSize: '0.75rem' } }}
+            />
+          </Stack>
+        )}
       </PreviewControls>
 
       {renderDemo()}
