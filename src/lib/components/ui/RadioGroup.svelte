@@ -1,10 +1,16 @@
 <!-- src/lib/components/ui/RadioGroup.svelte -->
 <script lang="ts">
-	// Gunakan sintaksis Svelte 5 Runes
-	let { group = $bindable() } = $props<{ group: string }>();
-	let { label } = $props<{ label: string }>();
-	let { options } = $props<{ options: string[] }>();
-	let { name } = $props<{ name: string }>();
+	let {
+		group = $bindable(),
+		label,
+		options,
+		name
+	} = $props<{
+		group: string;
+		label: string;
+		options: string[];
+		name: string;
+	}>();
 </script>
 
 <div class="mb-4">
@@ -14,9 +20,9 @@
 			<label class="flex items-center gap-2 cursor-pointer">
 				<input
 					type="radio"
-					name={name}
+					{name}
 					value={option}
-					bind:group={group}
+					bind:group
 					class="w-4 h-4 text-primary bg-secondary border-secondary focus:ring-primary focus:ring-2"
 				/>
 				<span class="text-foreground/90">{option}</span>
