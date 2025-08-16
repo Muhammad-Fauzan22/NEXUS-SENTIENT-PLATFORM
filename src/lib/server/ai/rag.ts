@@ -1,7 +1,7 @@
 import { supabaseAdmin } from '$lib/server/supabase';
-import { azureProvider } from './providers/azure'; // Menggunakan provider AI kita
 import { logger } from '../utils/logger';
 import { InternalServerError } from '../utils/errors';
+import { embeddingProvider } from './providers/embeddings';
 
 // Definisikan tipe untuk knowledge chunk yang diambil dari database
 interface KnowledgeChunk {
