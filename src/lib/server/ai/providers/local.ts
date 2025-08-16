@@ -1,4 +1,12 @@
 import { logger } from '$lib/server/utils/logger';
+// NOTE: add timeout & retry wrapper
+const withTimeout = async <T>(p: Promise<T>, ms = 20_000) => {
+	return await Promise.race([
+		p,
+		new Promise<T>((_, rej) => setTimeout(() => rej(new Error('AI request timeout')), ms))
+	]);
+};
+
 import { InternalServerError } from '$lib/server/utils/errors';
 import { env as dynamicEnv } from '$env/dynamic/private';
 
