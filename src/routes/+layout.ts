@@ -1,6 +1,6 @@
 // src/routes/+layout.ts
 import type { PageLoad } from './$types';
-import { supabase } from '$lib/db/supabase';
+import { supabase } from '$lib/client/supabase';
 
 export const load: PageLoad = async ({ fetch, data, depends }) => {
 	depends('supabase:auth');
