@@ -142,7 +142,7 @@
 	<!-- Area aksi untuk menghasilkan IDP -->
 	<div class="mt-8">
 		<button
-			on:click={handleGenerateIdp}
+			onclick={handleGenerateIdp}
 			disabled={isLoading}
 			class="bg-accent hover:bg-accent/90 text-foreground font-bold py-3 px-6 rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center mx-auto"
 		>
