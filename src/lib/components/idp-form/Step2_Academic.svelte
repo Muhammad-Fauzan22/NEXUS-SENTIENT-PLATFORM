@@ -51,10 +51,11 @@
 		</div>
 
 		<div class="md:col-span-2">
-			<label class="block mb-2 text-sm font-medium text-foreground/80">
+			<label for="tools" class="block mb-2 text-sm font-medium text-foreground/80">
 				Software/Tools yang Dikuasai
 			</label>
 			<Textarea
+				id="tools"
 				bind:value={formData.academic.tools}
 				rows="4"
 				placeholder="Contoh: Ansys Fluent, SolidWorks, MATLAB, Python"
