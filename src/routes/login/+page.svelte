@@ -100,7 +100,7 @@
 			</div>
 
 			<div class="flex flex-col sm:flex-row gap-4 pt-4">
-				<Button on:click={handleSignUp} disabled={loading} variant="secondary">
+				<Button onclick={handleSignUp} disabled={loading} variant="secondary">
 					{#if loading}
 						Loading...
 					{:else}
@@ -108,7 +108,7 @@
 					{/if}
 				</Button>
 
-				<Button on:click={handleSignIn} disabled={loading} variant="primary">
+				<Button onclick={handleSignIn} disabled={loading} variant="primary">
 					{#if loading}
 						Loading...
 					{:else}
