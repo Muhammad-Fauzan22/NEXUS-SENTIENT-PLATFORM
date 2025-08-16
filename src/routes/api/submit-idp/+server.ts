@@ -39,19 +39,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			throw error(401, 'Unauthorized: You must be logged in to submit data.');
 		}
 
-		// Ekstrak data dari body request
-		const formData = await request.json();
-
-		// Validasi sederhana untuk memastikan data utama ada
-		if (!formData || !formData.personal || !formData.academic) {
-			return json(
-				{
-					success: false,
-					message: 'Data yang dikirim tidak lengkap.'
-				},
-				{ status: 400 }
-			);
+		// Ekstrak data dari body request + validasi
+		const parsed = IdpFormSchema.safeParse(await request.json());
+		if (!parsed.success) {
+			return json({ success: false, message: 'Data tidak valid', issues: parsed.error.issues }, { status: 400 });
 		}
+		const formData = parsed.data;
 
 		// Penyimpanan ke Supabase
 		const { data, error: dbError } = await supabase
