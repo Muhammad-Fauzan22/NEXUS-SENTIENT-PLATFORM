@@ -23,17 +23,17 @@
 <div class="p-8">
 	<h1 class="text-3xl font-bold text-primary">Welcome to your Dashboard</h1>
 	<p class="text-lg text-foreground/80 mt-1">Logged in as: {session.user.email}</p>
-	
+
 	<div class="mt-8">
 		<div class="flex justify-between items-center">
 			<h2 class="text-xl font-semibold">My IDP Submissions</h2>
 		</div>
-		
+
 		{#if submissions && submissions.length > 0}
 			<div class="mt-4 space-y-4">
 				{#each submissions as submission (submission.id)}
-					<a 
-						href="/submission/{submission.id}" 
+					<a
+						href="/submission/{submission.id}"
 						class="block p-4 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-colors border border-secondary relative"
 					>
 						<div class="flex justify-between items-center">
@@ -45,18 +45,14 @@
 							</div>
 							<div class="flex items-center gap-2">
 								<!-- Lencana status -->
-								<span 
-									class="px-2 py-0.5 text-xs font-semibold rounded-full"
-									class:bg-blue-500/20={submission.status === 'Submitted'}
-									class:bg-yellow-500/20={submission.status === 'Analyzing'}
-									class:bg-green-500/20={submission.status === 'Complete'}
-									class:text-blue-300={submission.status === 'Submitted'}
-									class:text-yellow-300={submission.status === 'Analyzing'}
-									class:text-green-300={submission.status === 'Complete'}
+								<span
+									class={`px-2 py-0.5 text-xs font-semibold rounded-full ${statusBadgeClasses(submission.status)}`}
 								>
 									{submission.status}
 								</span>
-								<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
+								<span
+									class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary"
+								>
 									View Details
 								</span>
 							</div>
@@ -68,8 +64,6 @@
 			<p class="mt-4 text-foreground/70">Anda belum memiliki pengajuan. Mulai buat sekarang!</p>
 		{/if}
 	</div>
-	
-	<Button href="/" variant="primary">
-		Create New IDP Submission
-	</Button>
+
+	<Button href="/" variant="primary">Create New IDP Submission</Button>
 </div>
