@@ -8,6 +8,10 @@
   konten apa pun, menjadikannya sangat dapat digunakan kembali dan
   mematuhi prinsip komposisi.
 -->
+<script lang="ts">
+	const { children } = $props<{ children?: any }>();
+</script>
+
 <div class="bg-white shadow-md rounded-lg p-6 md:p-8">
-	<slot />
+	{@render children?.()}
 </div>
