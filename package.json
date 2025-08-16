@@ -15,6 +15,7 @@
 	"devDependencies": {
 		"@playwright/test": "^1.45.1",
 		"@sveltejs/adapter-auto": "^3.2.1",
+		"@sveltejs/adapter-node": "5.3.1",
 		"@sveltejs/kit": "^2.5.17",
 		"@sveltejs/vite-plugin-svelte": "4.0.4",
 		"@testing-library/jest-dom": "^6.4.6",
