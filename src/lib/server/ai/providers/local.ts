@@ -89,8 +89,10 @@ export async function generate(prompt: string): Promise<string> {
 		if (!res.ok) {
 			const text = await res.text();
 			logger.error('Local LLM (OpenAI-compatible) call failed', { status: res.status, text });
+			llmBreaker.fail();
 			throw new InternalServerError('Local LLM (OpenAI-compatible) request failed.');
 		}
+		llmBreaker.succeed();
 		const data = await res.json();
 		const out = (data?.choices?.[0]?.message?.content || data?.choices?.[0]?.text || '').toString().trim();
 		return out;

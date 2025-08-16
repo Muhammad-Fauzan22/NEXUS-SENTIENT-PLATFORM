@@ -13,6 +13,9 @@ async function withRetry<T>(fn: () => Promise<T>, attempts = 3) {
 	throw lastErr;
 }
 
+import { CircuitBreaker } from '$lib/server/utils/circuitBreaker';
+const embBreaker = new CircuitBreaker(5, 30_000, 10_000);
+
 
 // Embedding provider that targets an OpenAI-compatible /v1/embeddings endpoint.
 // Works both in SvelteKit server and in Node scripts (uses process.env).
