@@ -26,6 +26,13 @@ const MATCH_COUNT = 10; // Jumlah maksimum potongan konteks yang akan diambil
  * @returns Sebuah promise yang resolve menjadi array KnowledgeChunk.
  */
 export async function retrieveContext(queryText: string): Promise<KnowledgeChunk[]> {
+	const key = cacheKey((queryText || '').trim());
+	const cached = ragCache.get(key);
+	if (cached) {
+		logger.info('RAG cache hit.');
+		return cached;
+	}
+
 	if (!queryText) {
 		logger.warn('Query teks untuk retrieval kosong. Melewatkan pencarian konteks.');
 		return [];
