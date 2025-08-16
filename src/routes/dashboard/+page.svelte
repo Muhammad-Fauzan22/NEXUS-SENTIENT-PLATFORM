@@ -3,7 +3,7 @@
 	import type { PageData } from './$types';
 	import Button from '$lib/components/ui/Button.svelte';
 
-	const { data } = $props<PageData>();
+	const { data } = $props();
 	const { session, submissions } = data;
 
 	function statusBadgeClasses(status: string): string {
