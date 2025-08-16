@@ -1,6 +1,5 @@
 <!-- src/routes/submission/[id]/+page.svelte -->
 <script lang="ts">
-	import type { PageData } from './$types';
 	import { toast } from 'svelte-sonner';
 	import MarkdownRenderer from '$lib/components/ui/MarkdownRenderer.svelte';
 
