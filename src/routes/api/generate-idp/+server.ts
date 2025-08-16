@@ -15,6 +15,8 @@ const genAI = new GoogleGenerativeAI(env.GEMINI_API_KEY);
  * API endpoint untuk menghasilkan Individual Development Plan (IDP)
  * berdasarkan data pengajuan yang disimpan di database dengan streaming
  */
+
+const BodySchema = z.object({ submissionId: z.string().min(1) });
 export const POST: RequestHandler = async ({ request, locals }) => {
 	try {
 		// Dapatkan submissionId dari request body
