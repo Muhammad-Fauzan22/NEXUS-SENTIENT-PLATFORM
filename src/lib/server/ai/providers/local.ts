@@ -39,23 +39,15 @@ export async function generate(prompt: string): Promise<string> {
 		assertConfigured();
 
 		if (MODE === 'llamacpp') {
-			// llama.cpp server: POST /completion
-			const res = await fetch(`${BASE_URL.replace(/\/$/, '')}/completion`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-					prompt,
-					stream: false,
-					temperature: 0.7,
-					mirostat: 0,
-					stop: ['</s>']
-				})
-			});
-			const data = await res.json();
-			const out = (data?.content || data?.completion || '').toString().trim();
-			return out;
+			// llama.cpp server: POST /completion with timeout
+			const res = await withTimeout(
+				fetch(`${BASE_URL.replace(/\/$/, '')}/completion`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ prompt, stream: false, temperature: 0.7, mirostat: 0, stop: ['</s>'] })
+				}),
+				20_000
+			);
 			if (!res.ok) {
 				const text = await res.text();
 				logger.error('Local LLM (llama.cpp) call failed', { status: res.status, text });
