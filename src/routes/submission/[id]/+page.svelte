@@ -2,6 +2,7 @@
 <script lang="ts">
 	import { toast } from 'svelte-sonner';
 	import MarkdownRenderer from '$lib/components/ui/MarkdownRenderer.svelte';
+	import { supabase } from '$lib/client/supabase';
 
 	const { data } = $props();
 
