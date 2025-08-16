@@ -36,13 +36,17 @@ export async function POST({ request }) {
 	}
 
 	try {
-		// Parsing data dari request body
-		const data = await request.json();
+		// Parsing dan validasi data dari request body
+		const raw = await request.json();
+		const parsed = ProfileSchema.safeParse(raw);
+		if (!parsed.success) {
+			return json({ error: 'Validation failed', issues: parsed.error.issues }, { status: 400 });
+		}
 
 		// Tambahkan timestamp jika tidak ada
 		const profileData = {
-			...data,
-			createdAt: data.createdAt || new Date().toISOString()
+			...parsed.data,
+			createdAt: raw.createdAt || new Date().toISOString()
 		};
 
 		// Simpan data ke tabel profiles di Supabase
