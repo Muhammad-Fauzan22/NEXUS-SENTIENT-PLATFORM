@@ -10,6 +10,9 @@ const withTimeout = async <T>(p: Promise<T>, ms = 20_000) => {
 import { InternalServerError } from '$lib/server/utils/errors';
 import { env as dynamicEnv } from '$env/dynamic/private';
 
+import { CircuitBreaker } from '$lib/server/utils/circuitBreaker';
+const llmBreaker = new CircuitBreaker(4, 30_000, 10_000);
+
 /**
  * Local LLM provider (self-hosted) with flexible API compatibility.
  * Supported modes via env LOCAL_LLM_MODE:
