@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=Syne:wght@400;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -8,6 +10,10 @@
   --primary: #3b82f6;
   --secondary: #1e293b;
   --accent: #14b8a6;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 html {
@@ -19,4 +25,39 @@ body {
   color: var(--foreground);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  margin: auto;
+}
+
+/* NEXUS Living Interface Styles */
+.nexus-interface {
+  font-family: 'Inter', 'Syne', 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Disable text selection for interactive elements */
+.nexus-interactive {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+/* Custom scrollbar for NEXUS */
+.nexus-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.nexus-scrollbar::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+
+.nexus-scrollbar::-webkit-scrollbar-thumb {
+  background: #4a90e2;
+  border-radius: 4px;
+}
+
+.nexus-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #7bb3f0;
 }
