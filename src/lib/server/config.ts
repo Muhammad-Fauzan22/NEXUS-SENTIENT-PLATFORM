@@ -43,17 +43,32 @@ const config: Partial<EnvironmentVariables> = {
 };
 
 // --- Validation ---
-const requiredKeys: Array<keyof EnvironmentVariables> = [
+// Always required for app to run
+const requiredCore: Array<keyof EnvironmentVariables> = [
 	'VITE_PUBLIC_SUPABASE_URL',
 	'VITE_PUBLIC_SUPABASE_ANON_KEY',
 	'SUPABASE_URL',
-	'SUPABASE_SERVICE_ROLE_KEY',
+	'SUPABASE_SERVICE_ROLE_KEY'
+];
+for (const key of requiredCore) {
+	if (!config[key]) throw new Error(`FATAL: Missing required environment variable: ${key}`);
+}
+
+// AI keys are conditional: either external providers or local LLM/embeddings must be present
+const hasExternalAI = Boolean(
+	config.CLAUDE_API_KEY || config.GEMINI_API_KEY || config.PERPLEXITY_API_KEY || config.OPENAI_API_KEY
+);
+const hasLocalAI = Boolean(process.env.LOCAL_LLM_BASE_URL || process.env.LOCAL_EMBEDDINGS_BASE_URL);
+if (!hasExternalAI && !hasLocalAI) {
+	throw new Error(
+		'FATAL: No AI provider configured. Set one of external AI keys (CLAUDE/GEMINI/OPENAI/PERPLEXITY) or LOCAL_LLM_BASE_URL/LOCAL_EMBEDDINGS_BASE_URL.'
+	);
+}
+
+// Optional configs (warn if missing)
+const optionalKeys: Array<keyof EnvironmentVariables> = [
 	'GOOGLE_CREDENTIALS_JSON',
 	'GDRIVE_FOLDER_ID',
-	'CLAUDE_API_KEY',
-	'GEMINI_API_KEY',
-	'PERPLEXITY_API_KEY',
-	'OPENAI_API_KEY',
 	'DEEPSEEK_API_KEYS',
 	'COHERE_API_KEYS',
 	'SMTP_HOST',
@@ -61,10 +76,10 @@ const requiredKeys: Array<keyof EnvironmentVariables> = [
 	'SMTP_USER',
 	'SMTP_PASS'
 ];
-
-for (const key of requiredKeys) {
+for (const key of optionalKeys) {
 	if (!config[key]) {
-		throw new Error(`FATAL: Missing required environment variable: ${key}`);
+		// eslint-disable-next-line no-console
+		console.warn(`[WARN] Optional env not set: ${key}`);
 	}
 }
 
