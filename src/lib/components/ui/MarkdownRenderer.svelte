@@ -17,7 +17,9 @@
 	});
 
 	// Buat variabel reaktif untuk HTML yang sudah dirender
-	let renderedHtml = $derived(marked.parse(content || ''));
+	let renderedHtml = $derived(
+		markedModule ? (markedModule as any).marked.parse(content || '') : content || ''
+	);
 </script>
 
 <div class="prose dark:prose-invert max-w-none">
