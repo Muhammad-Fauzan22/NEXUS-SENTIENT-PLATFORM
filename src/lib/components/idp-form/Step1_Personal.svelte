@@ -37,8 +37,11 @@
 		</div>
 
 		<div>
-			<label class="block mb-2 text-sm font-medium text-foreground/80"> Nomor Whatsapp </label>
+			<label for="whatsapp" class="block mb-2 text-sm font-medium text-foreground/80">
+				Nomor Whatsapp
+			</label>
 			<Input
+				id="whatsapp"
 				type="tel"
 				bind:value={formData.personal.whatsapp}
 				placeholder="Masukkan nomor WhatsApp"
@@ -46,8 +49,11 @@
 		</div>
 
 		<div>
-			<label class="block mb-2 text-sm font-medium text-foreground/80"> Asal Daerah </label>
+			<label for="origin" class="block mb-2 text-sm font-medium text-foreground/80">
+				Asal Daerah
+			</label>
 			<Input
+				id="origin"
 				type="text"
 				bind:value={formData.personal.origin}
 				placeholder="Masukkan daerah asal Anda"
