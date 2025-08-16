@@ -7,6 +7,21 @@ import { z } from 'zod';
  * API endpoint untuk menerima data dari form assessment dan menyimpannya ke database
  * @param request - HTTP request yang berisi data profil mahasiswa
  * @returns Respons JSON yang menunjukkan status pemrosesan
+const ProfileSchema = z
+	.object({
+		full_name: z.string().min(1).max(200),
+		email: z.string().email().max(320),
+		whatsapp_number: z.string().min(5).max(32).optional().or(z.literal('')).transform((v) => v || null),
+		region: z.string().max(120).optional().or(z.literal('')).transform((v) => v || null),
+		gpa: z.union([z.number(), z.string()]).optional().transform((v) => (v === undefined ? null : Number(v))),
+		favorite_courses: z.string().max(1000).optional().or(z.literal('')).transform((v) => v || null),
+		research_interest: z.string().max(2000).optional().or(z.literal('')).transform((v) => v || null),
+		mastered_software: z.string().max(2000).optional().or(z.literal('')).transform((v) => v || null),
+		psychometric_results: z.record(z.string(), z.unknown()).optional().default({})
+	})
+	.strict()
+	.passthrough();
+
  */
 export async function POST({ request }) {
 	// Validasi keamanan: Periksa API key dari header Authorization
