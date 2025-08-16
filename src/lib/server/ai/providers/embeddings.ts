@@ -59,8 +59,10 @@ export async function generateEmbedding(text: string): Promise<number[]> {
 		if (!res.ok) {
 			const body = await res.text();
 			logger.error('Embedding API call failed', { status: res.status, body });
+			embBreaker.fail();
 			return randomVec();
 		}
+		embBreaker.succeed();
 		const data = await res.json();
 		const vec = data?.data?.[0]?.embedding;
 		if (!Array.isArray(vec)) {
