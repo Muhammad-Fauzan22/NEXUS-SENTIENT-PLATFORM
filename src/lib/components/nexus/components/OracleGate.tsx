@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Box, Typography, IconButton, Fade } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { OracleGateProps } from '../types';
+import { BrandingHeader } from './BrandingHeader';
 
 const OracleContainer = styled(Box)(({ theme }) => ({
   width: '100vw',
@@ -174,6 +175,13 @@ export const OracleGate: React.FC<OracleGateProps> = ({ onEnter, isActive }) => 
 
   return (
     <OracleContainer>
+      <BrandingHeader 
+        position="top-left"
+        variant="minimal"
+        showCompanyName={true}
+        companyName="NEXUS"
+      />
+      
       <PulsingLine 
         mouseX={mousePosition.x} 
         mouseY={mousePosition.y}

@@ -4,6 +4,7 @@ import { styled } from '@mui/material/styles';
 import NotificationsActiveOutlinedIcon from '@mui/icons-material/NotificationsActiveOutlined';
 import TrendingUpOutlinedIcon from '@mui/icons-material/TrendingUpOutlined';
 import { DevelopmentPillar, UserProgress, Activity } from '../types';
+import { BrandingHeader } from './BrandingHeader';
 
 const DashboardContainer = styled(Box)(({ theme }) => ({
   width: '100vw',
@@ -148,6 +149,13 @@ export const LivingDashboard: React.FC<LivingDashboardProps> = ({
 
   return (
     <DashboardContainer>
+      <BrandingHeader 
+        position="top-left"
+        variant="full"
+        showCompanyName={true}
+        companyName="NEXUS"
+      />
+      
       <HeaderSection>
         <Typography variant="h2" gutterBottom sx={{ fontFamily: '"Syne", sans-serif' }}>
           Living Dashboard

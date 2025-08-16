@@ -5,6 +5,7 @@ import ModeStandbyOutlinedIcon from '@mui/icons-material/ModeStandbyOutlined';
 import AlbumOutlinedIcon from '@mui/icons-material/AlbumOutlined';
 import Brightness2OutlinedIcon from '@mui/icons-material/Brightness2Outlined';
 import { ConstellationProps, DevelopmentPillar } from '../types';
+import { BrandingHeader } from './BrandingHeader';
 
 const ConstellationContainer = styled(Box)(({ theme }) => ({
   width: '100vw',
@@ -248,6 +249,13 @@ export const ConstellationDashboard: React.FC<ConstellationProps> = ({
 
   return (
     <ConstellationContainer ref={containerRef}>
+      <BrandingHeader 
+        position="top-right"
+        variant="minimal"
+        showCompanyName={true}
+        companyName="NEXUS"
+      />
+      
       <InfoPanel>
         <Typography variant="h6" gutterBottom>
           Konstelasi Pengembangan

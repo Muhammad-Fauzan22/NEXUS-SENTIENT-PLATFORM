@@ -16,6 +16,13 @@ const theme = createTheme({
       dark: '#3A9B5C',
       contrastText: '#FFFFFF'
     },
+    // Company brand color (red W logo)
+    error: {
+      main: '#FF0000',
+      light: '#FF4444',
+      dark: '#CC0000',
+      contrastText: '#FFFFFF'
+    },
     background: {
       default: '#000000',
       paper: '#0A0A0A'
@@ -36,11 +43,6 @@ const theme = createTheme({
       700: '#2A2A2A',
       800: '#1A1A1A',
       900: '#0A0A0A'
-    },
-    error: {
-      main: '#FF6B6B',
-      light: '#FF9999',
-      dark: '#CC5555'
     },
     warning: {
       main: '#FFD93D',

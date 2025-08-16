@@ -4,6 +4,7 @@ import { styled } from '@mui/material/styles';
 import WifiTetheringOutlinedIcon from '@mui/icons-material/WifiTetheringOutlined';
 import PixOutlinedIcon from '@mui/icons-material/PixOutlined';
 import { ChatAssessmentProps, EmotionalState, AssessmentInputType } from '../types';
+import { BrandingHeader } from './BrandingHeader';
 
 const ChatContainer = styled(Box)(({ theme }) => ({
   width: '100vw',
@@ -256,6 +257,11 @@ export const ChatAssessment: React.FC<ChatAssessmentProps> = ({
 
   return (
     <ChatContainer>
+      <BrandingHeader 
+        position="top-left"
+        variant="logo-only"
+      />
+      
       <ProgressIndicator>
         {currentQuestion} / {questions.length}
       </ProgressIndicator>

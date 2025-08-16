@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Typography, Button, Stack } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { NexusApp } from './NexusApp';
+import { CompanyLogo } from './components/CompanyLogo';
 
 const PreviewContainer = styled(Box)(({ theme }) => ({
   width: '100vw',
@@ -108,9 +109,17 @@ export const App: React.FC = () => {
   return (
     <PreviewContainer className="nexus-interface nexus-scrollbar">
       <PreviewControls>
-        <Typography variant="body2" gutterBottom sx={{ color: 'primary.main', fontWeight: 600 }}>
-          NEXUS Living Interface Demo
-        </Typography>
+        <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 2 }}>
+          <CompanyLogo size="small" variant="glow" />
+          <Box>
+            <Typography variant="body2" sx={{ color: 'error.main', fontWeight: 600 }}>
+              NEXUS Living Interface
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              Demo Platform
+            </Typography>
+          </Box>
+        </Stack>
         <Stack direction="column" spacing={1}>
           <Button 
             size="small" 
