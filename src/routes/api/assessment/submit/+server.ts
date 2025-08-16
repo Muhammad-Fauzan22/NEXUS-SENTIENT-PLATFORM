@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit';
 import { supabaseAdmin } from '$lib/server/supabase';
-import { INGEST_API_KEY } from '$env/static/public';
+import { env } from '$env/dynamic/private';
 
 /**
  * API endpoint untuk menerima data dari form assessment dan menyimpannya ke database
@@ -40,9 +40,9 @@ export async function POST({ request }) {
 		if (error) {
 			console.error('Supabase insert error:', error);
 			return json(
-				{ 
-					message: 'Failed to save data to database', 
-					details: error.message 
+				{
+					message: 'Failed to save data to database',
+					details: error.message
 				},
 				{ status: 500 }
 			);
@@ -52,8 +52,8 @@ export async function POST({ request }) {
 
 		// Respons sukses dengan data yang baru dibuat
 		return json(
-			{ 
-				message: 'Data submitted successfully', 
+			{
+				message: 'Data submitted successfully',
 				profile: newProfile
 			},
 			{ status: 201 }
