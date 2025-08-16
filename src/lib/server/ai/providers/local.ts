@@ -40,6 +40,10 @@ function assertConfigured() {
 export async function generate(prompt: string): Promise<string> {
 	try {
 		assertConfigured();
+		if (!llmBreaker.canProceed()) {
+			throw new InternalServerError('LLM circuit breaker is OPEN. Please try again later.');
+		}
+
 
 		if (MODE === 'llamacpp') {
 			// llama.cpp server: POST /completion with timeout
