@@ -1,15 +1,23 @@
 <!-- src/lib/components/ui/Button.svelte -->
 <script lang="ts">
+	import type { HTMLAttributes } from 'svelte/elements';
+	type AnchorProps = HTMLAttributes<HTMLAnchorElement>;
+	type ButtonProps = HTMLAttributes<HTMLButtonElement> & {
+		disabled?: boolean;
+		onclick?: (e: MouseEvent) => void;
+	};
 	let {
 		href,
 		variant = 'primary',
 		children,
 		...rest
-	} = $props<{
-		href?: string;
-		variant?: 'primary' | 'secondary';
-		children?: any;
-	}>();
+	} = $props<
+		{
+			href?: string;
+			variant?: 'primary' | 'secondary';
+			children?: any;
+		} & Partial<AnchorProps & ButtonProps>
+	>();
 
 	const classes =
 		`inline-block font-bold py-2 px-4 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 ` +
