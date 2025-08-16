@@ -26,14 +26,16 @@ export async function generateEmbedding(text: string): Promise<number[]> {
 		return Array(1536).fill(0).map(Math.random);
 	}
 	try {
-		const res = await fetch(`${EMB_BASE.replace(/\/$/, '')}/embeddings`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				...(EMB_API_KEY ? { Authorization: `Bearer ${EMB_API_KEY}` } : {})
-			},
-			body: JSON.stringify({ input: text, model: EMB_MODEL })
-		});
+		const res = await withRetry(() =>
+			fetch(`${EMB_BASE.replace(/\/$/, '')}/embeddings`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					...(EMB_API_KEY ? { Authorization: `Bearer ${EMB_API_KEY}` } : {})
+				},
+				body: JSON.stringify({ input: text, model: EMB_MODEL })
+			})
+		);
 		if (!res.ok) {
 			const body = await res.text();
 			logger.error('Embedding API call failed', { status: res.status, body });
