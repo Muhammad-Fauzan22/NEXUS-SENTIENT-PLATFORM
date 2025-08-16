@@ -1,7 +1,7 @@
 <!-- src/routes/login/+page.svelte -->
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import type { PageData } from './$types';
+
 	import { toast } from 'svelte-sonner';
 	import Button from '$lib/components/ui/Button.svelte';
 
