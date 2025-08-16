@@ -41,22 +41,46 @@ const config = {
 };
 
 // --- Validasi Kritis ---
-const requiredKeys = [
+// Wajib
+const requiredCore = [
 	'VITE_PUBLIC_SUPABASE_URL',
 	'VITE_PUBLIC_SUPABASE_ANON_KEY',
 	'SUPABASE_URL',
-	'SUPABASE_SERVICE_ROLE_KEY',
-	'CLAUDE_API_KEY', // Kunci utama untuk analisis
-	'GEMINI_API_KEY'  // Kunci utama untuk analisis
+	'SUPABASE_SERVICE_ROLE_KEY'
 ];
-
-for (const key of requiredKeys) {
+for (const key of requiredCore) {
 	if (!config[key]) {
-		// Menghentikan proses secara paksa jika konfigurasi vital tidak ada.
 		throw new Error(`FATAL: Missing required environment variable: ${key}. Server cannot start.`);
 	}
 }
 
+// Opsi AI: minimal salah satu tersedia (eksternal atau lokal)
+const hasExternalAI = Boolean(
+	config.CLAUDE_API_KEY || config.GEMINI_API_KEY || config.PERPLEXITY_API_KEY || config.OPENAI_API_KEY
+);
+const hasLocalAI = Boolean(process.env.LOCAL_LLM_BASE_URL || process.env.LOCAL_EMBEDDINGS_BASE_URL);
+if (!hasExternalAI && !hasLocalAI) {
+	throw new Error(
+		'FATAL: No AI provider configured. Provide external AI keys or set LOCAL_LLM_BASE_URL/LOCAL_EMBEDDINGS_BASE_URL.'
+	);
+}
+
+// Opsional (peringatan saja)
+const optionalKeys = [
+	'GOOGLE_CREDENTIALS_JSON',
+	'GDRIVE_FOLDER_ID',
+	'DEEPSEEK_API_KEYS',
+	'COHERE_API_KEYS',
+	'SMTP_HOST',
+	'SMTP_PORT',
+	'SMTP_USER',
+	'SMTP_PASS'
+];
+for (const key of optionalKeys) {
+	if (!config[key]) {
+		console.warn(`[WARN] Optional env not set: ${key}`);
+	}
+}
+
 // --- Immutability ---
-// Membekukan objek untuk mencegah modifikasi yang tidak disengaja saat runtime.
 export const env = Object.freeze(config);
