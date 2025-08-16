@@ -39,7 +39,7 @@
 	</header>
 
 	<main class="container mx-auto p-4 flex-grow">
-		<slot />
+		{@render children?.()}
 	</main>
 
 	<footer class="border-t border-secondary">
