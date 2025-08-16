@@ -61,19 +61,22 @@ export async function generate(prompt: string): Promise<string> {
 		// Default: OpenAI-compatible Chat Completions (OpenWebUI, Ollama, vLLM, llama-cpp-oai)
 		const headers: Record<string, string> = { 'Content-Type': 'application/json' };
 		if (API_KEY) headers['Authorization'] = `Bearer ${API_KEY}`;
-		const res = await fetch(`${BASE_URL.replace(/\/$/, '')}/chat/completions`, {
-			method: 'POST',
-			headers,
-			body: JSON.stringify({
-				model: MODEL,
-				messages: [
-					{ role: 'system', content: 'You are NEXUS, a helpful academic and career mentor.' },
-					{ role: 'user', content: prompt }
-				],
-				stream: false,
-				temperature: 0.7
-			})
-		});
+		const res = await withTimeout(
+			fetch(`${BASE_URL.replace(/\/$/, '')}/chat/completions`, {
+				method: 'POST',
+				headers,
+				body: JSON.stringify({
+					model: MODEL,
+					messages: [
+						{ role: 'system', content: 'You are NEXUS, a helpful academic and career mentor.' },
+						{ role: 'user', content: prompt }
+					],
+					stream: false,
+					temperature: 0.7
+				})
+			}),
+			20_000
+		);
 		if (!res.ok) {
 			const text = await res.text();
 			logger.error('Local LLM (OpenAI-compatible) call failed', { status: res.status, text });
