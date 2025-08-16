@@ -4,7 +4,7 @@
 	import { toast } from 'svelte-sonner';
 	import MarkdownRenderer from '$lib/components/ui/MarkdownRenderer.svelte';
 
-	const { data } = $props<PageData>();
+	const { data } = $props();
 
 	// State untuk mengelola loading dan hasil IDP
 	let isLoading = $state(false);
