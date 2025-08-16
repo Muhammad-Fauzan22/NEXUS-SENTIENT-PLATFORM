@@ -30,9 +30,15 @@ export async function generateIdp(profile: StructuredProfile): Promise<Generated
 		const prompt = buildAssessmentPrompt(submissionData, contextChunks);
 		logger.debug('Prompt untuk AI telah berhasil dibuat.');
 
-		// 3. Panggil Provider AI
-		const generatedContent = await azureProvider.generateStructuredContent(prompt);
+		// 3. Panggil Provider AI (melalui aiManager -> bisa local/eksternal)
+		const raw = await aiManager.executeTask('GENERATE_DRAFT', prompt);
 		logger.info({ profileId: profile.id }, 'Konten IDP berhasil digenerate oleh AI.');
+		let generatedContent: unknown;
+		try {
+			generatedContent = JSON.parse(raw);
+		} catch (e) {
+			throw new Error('AI response is not valid JSON for IDP.');
+		}
 
 		// 4. Validasi output AI dengan Zod
 		const validationResult = generatedIdpSchema.safeParse(generatedContent);
