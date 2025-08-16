@@ -5,9 +5,8 @@ import { supabase } from '$lib/db/supabase';
 export const load: PageLoad = async ({ fetch, data, depends }) => {
 	depends('supabase:auth');
 
-	const supabase = createClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
-		global: { fetch }
-	});
+	// supabase client is provided from server-side env via $lib/db/supabase
+
 
 	const {
 		data: { session },
