@@ -50,6 +50,9 @@ export async function retrieveContext(queryText: string): Promise<KnowledgeChunk
 			match_threshold: MATCH_THRESHOLD,
 			match_count: MATCH_COUNT
 		});
+		// cache store
+		ragCache.set(key, data as KnowledgeChunk[], 120_000);
+
 
 		if (error) {
 			logger.error(`Gagal saat memanggil fungsi RPC Supabase: ${error.message}`);
