@@ -10,7 +10,7 @@ import { env } from '$env/dynamic/private';
 export async function POST({ request }) {
 	// Validasi keamanan: Periksa API key dari header Authorization
 	const authHeader = request.headers.get('Authorization');
-	const expectedApiKey = INGEST_API_KEY;
+	const expectedApiKey = env.INGEST_API_KEY;
 
 	if (!authHeader || authHeader !== `Bearer ${expectedApiKey}`) {
 		return json(
