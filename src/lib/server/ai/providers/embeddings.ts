@@ -1,4 +1,18 @@
 import { logger } from '$lib/server/utils/logger';
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+async function withRetry<T>(fn: () => Promise<T>, attempts = 3) {
+	let lastErr: any;
+	for (let i = 0; i < attempts; i++) {
+		try {
+			return await fn();
+		} catch (e) {
+			lastErr = e;
+			await sleep(250 * (i + 1));
+		}
+	}
+	throw lastErr;
+}
+
 
 // Embedding provider that targets an OpenAI-compatible /v1/embeddings endpoint.
 // Works both in SvelteKit server and in Node scripts (uses process.env).
