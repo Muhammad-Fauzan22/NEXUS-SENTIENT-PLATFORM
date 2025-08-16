@@ -7,6 +7,8 @@ import { z } from 'zod';
  * API endpoint untuk menerima data dari form assessment dan menyimpannya ke database
  * @param request - HTTP request yang berisi data profil mahasiswa
  * @returns Respons JSON yang menunjukkan status pemrosesan
+ */
+
 const ProfileSchema = z
 	.object({
 		full_name: z.string().min(1).max(200),
@@ -21,8 +23,6 @@ const ProfileSchema = z
 	})
 	.strict()
 	.passthrough();
-
- */
 export async function POST({ request }) {
 	// Validasi keamanan: Periksa API key dari header Authorization
 	const authHeader = request.headers.get('Authorization');
