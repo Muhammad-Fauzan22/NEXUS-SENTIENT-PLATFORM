@@ -4,17 +4,17 @@
 	import type { PageData } from './$types';
 	import { toast } from 'svelte-sonner';
 	import Button from '$lib/components/ui/Button.svelte';
-	
-	const { data } = $props<PageData>();
-	
+
+	const { data } = $props();
+
 	// Akses Supabase client dari data layout
 	const { supabase } = data;
-	
-	// State untuk form
-	let email = '';
-	let password = '';
-	let loading = false;
-	
+
+	// State untuk form (Svelte 5 runes)
+	let email = $state('');
+	let password = $state('');
+	let loading = $state(false);
+
 	// Fungsi untuk mendaftar (Sign Up)
 	async function handleSignUp() {
 		loading = true;
@@ -23,12 +23,12 @@
 				email,
 				password
 			});
-			
+
 			if (error) {
 				toast.error(error.message || 'Terjadi kesalahan pada server.');
 				return;
 			}
-			
+
 			toast.success('Pendaftaran berhasil! Silakan cek email Anda untuk verifikasi.');
 		} catch (err) {
 			toast.error('Terjadi kesalahan saat pendaftaran.');
@@ -36,7 +36,7 @@
 			loading = false;
 		}
 	}
-	
+
 	// Fungsi untuk masuk (Sign In)
 	async function handleSignIn() {
 		loading = true;
@@ -45,12 +45,12 @@
 				email,
 				password
 			});
-			
+
 			if (error) {
 				toast.error(error.message || 'Terjadi kesalahan pada server.');
 				return;
 			}
-			
+
 			// Jika berhasil, arahkan ke halaman dashboard
 			await goto('/dashboard');
 		} catch (err) {
@@ -67,7 +67,7 @@
 			<h1 class="text-3xl font-bold text-primary">Welcome to NEXUS</h1>
 			<p class="mt-2 text-foreground/80">Sign in to your account or create a new one</p>
 		</div>
-		
+
 		<form class="mt-8 space-y-6" on:submit|preventDefault>
 			<div class="space-y-4">
 				<div>
@@ -83,7 +83,7 @@
 						placeholder="your.email@example.com"
 					/>
 				</div>
-				
+
 				<div>
 					<label for="password" class="block mb-2 text-sm font-medium text-foreground/80">
 						Password
@@ -98,25 +98,17 @@
 					/>
 				</div>
 			</div>
-			
+
 			<div class="flex flex-col sm:flex-row gap-4 pt-4">
-				<Button
-					on:click={handleSignUp}
-					disabled={loading}
-					variant="secondary"
-				>
+				<Button on:click={handleSignUp} disabled={loading} variant="secondary">
 					{#if loading}
 						Loading...
 					{:else}
 						Sign Up
 					{/if}
 				</Button>
-				
-				<Button
-					on:click={handleSignIn}
-					disabled={loading}
-					variant="primary"
-				>
+
+				<Button on:click={handleSignIn} disabled={loading} variant="primary">
 					{#if loading}
 						Loading...
 					{:else}
