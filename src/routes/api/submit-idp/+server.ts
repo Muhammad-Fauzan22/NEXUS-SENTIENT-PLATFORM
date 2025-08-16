@@ -3,6 +3,7 @@ import { json, error } from '@sveltejs/kit';
 import { createClient } from '@supabase/supabase-js';
 import { env } from '$env/dynamic/private';
 
+import { z } from 'zod';
 // Inisialisasi Supabase client
 const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY);
 
@@ -16,22 +17,22 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	try {
 		// Dapatkan sesi pengguna
 		const session = await locals.getSession();
-		
+
 		// Tambahkan Perlindungan Rute: Periksa apakah pengguna sudah login
 		if (!session) {
 			throw error(401, 'Unauthorized: You must be logged in to submit data.');
 		}
-		
+
 		// Ekstrak data dari body request
 		const formData = await request.json();
 
 		// Validasi sederhana untuk memastikan data utama ada
 		if (!formData || !formData.personal || !formData.academic) {
 			return json(
-				{ 
-					success: false, 
-					message: 'Data yang dikirim tidak lengkap.' 
-				}, 
+				{
+					success: false,
+					message: 'Data yang dikirim tidak lengkap.'
+				},
 				{ status: 400 }
 			);
 		}
@@ -64,22 +65,22 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 		// Respons sukses
 		return json(
-			{ 
-				success: true, 
-				message: 'Data berhasil disimpan!', 
-				submissionId: data.id 
-			}, 
+			{
+				success: true,
+				message: 'Data berhasil disimpan!',
+				submissionId: data.id
+			},
 			{ status: 200 }
 		);
 	} catch (err) {
 		// Tangani error parsing JSON atau error lainnya
 		console.error('Error processing IDP submission:', err);
-		
+
 		// Jika ini adalah error SvelteKit yang sudah kita throw, lempar ulang
 		if (err instanceof Error && 'status' in err) {
 			throw err;
 		}
-		
+
 		// Untuk error lainnya, kembalikan error 500
 		throw error(500, 'Terjadi kesalahan saat memproses data');
 	}
