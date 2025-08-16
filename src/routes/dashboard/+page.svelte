@@ -1,6 +1,5 @@
 <!-- src/routes/dashboard/+page.svelte -->
 <script lang="ts">
-	import type { PageData } from './$types';
 	import Button from '$lib/components/ui/Button.svelte';
 
 	const { data } = $props();
