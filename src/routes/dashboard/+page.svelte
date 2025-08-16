@@ -2,11 +2,22 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import Button from '$lib/components/ui/Button.svelte';
-	
+
 	const { data } = $props<PageData>();
-	
-	// Ekstrak sesi dan submissions dari data
 	const { session, submissions } = data;
+
+	function statusBadgeClasses(status: string): string {
+		switch (status) {
+			case 'Submitted':
+				return 'bg-blue-500/20 text-blue-300';
+			case 'Analyzing':
+				return 'bg-yellow-500/20 text-yellow-300';
+			case 'Complete':
+				return 'bg-green-500/20 text-green-300';
+			default:
+				return '';
+		}
+	}
 </script>
 
 <div class="p-8">
