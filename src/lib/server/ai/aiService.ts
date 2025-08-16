@@ -1,6 +1,7 @@
 import { claudeProvider } from './providers/claude';
 import { geminiProvider } from './providers/gemini';
 import { perplexityProvider } from './providers/perplexity';
+import { localProvider } from './providers/local';
 import { logger } from '../utils/logger';
 import { InternalServerError } from '../utils/errors';
 import type { AssessmentData } from '$lib/types/schemas/assessment';
@@ -42,7 +43,7 @@ export const aiService = {
 
 			// FASE 3: Mengembalikan Artefak Final
 			return { riasecResult, pwbResult, idpResult };
-			
+
 		} catch (error) {
 			logger.error('A critical error occurred during the AI assessment pipeline.', { error });
 			if (error instanceof InternalServerError) throw error;
