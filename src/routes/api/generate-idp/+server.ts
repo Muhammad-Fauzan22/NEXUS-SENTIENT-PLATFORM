@@ -19,8 +19,10 @@ const genAI = new GoogleGenerativeAI(env.GEMINI_API_KEY);
 const BodySchema = z.object({ submissionId: z.string().min(1) });
 export const POST: RequestHandler = async ({ request, locals }) => {
 	try {
-		// Dapatkan submissionId dari request body
-		const { submissionId } = await request.json();
+		// Dapatkan submissionId dari request body + validasi
+		const parsedBody = BodySchema.safeParse(await request.json());
+		if (!parsedBody.success) throw error(400, 'Invalid body');
+		const { submissionId } = parsedBody.data;
 
 		// Dapatkan sesi pengguna
 		const session = await locals.getSession();
