@@ -1,24 +1,9 @@
 import { env } from '$env/dynamic/private';
 import { claudeProvider } from '$lib/server/ai/providers/claude';
 import { geminiProvider } from '$lib/server/ai/providers/gemini';
+import { localProvider } from '$lib/server/ai/providers/local';
 
-// Mengelola pool API key
-const deepseekKeys = JSON.parse(env.DEEPSEEK_API_KEYS || '[]');
-const cohereKeys = JSON.parse(env.COHERE_API_KEYS || '[]');
-let deepseekIndex = 0;
-let cohereIndex = 0;
-
-/**
- * @param {string[]} pool
- * @param {number} index
- * @returns {string|null}
- */
-function getNextKey(pool, index) {
-	if (pool.length === 0) return null;
-	const key = pool[index];
-	index = (index + 1) % pool.length;
-	return key;
-}
+const preferLocal = env.PREFERRED_AI_PROVIDER === 'local' || Boolean(env.LOCAL_LLM_BASE_URL);
 
 export const aiManager = {
 	/**
@@ -29,19 +14,21 @@ export const aiManager = {
 	async executeTask(taskType, prompt, _options = {}) {
 		console.log(`Executing AI task: ${taskType}`);
 
+		const gen = async (p) => {
+			if (preferLocal) return localProvider.generate(p);
+			if (taskType === 'GENERATE_DRAFT') return claudeProvider.generate(p);
+			return geminiProvider.generate(p);
+		};
+
 		switch (taskType) {
 			case 'ANALYZE':
-				return geminiProvider.generate(prompt);
-
+				return gen(prompt);
 			case 'GENERATE_DRAFT':
-				return claudeProvider.generate(prompt);
-
+				return gen(prompt);
 			case 'SUMMARIZE':
-				return geminiProvider.generate(prompt);
-
+				return gen(prompt);
 			case 'EMBEDDING':
 				throw new Error('Embedding provider not yet implemented.');
-
 			default:
 				throw new Error(`Unknown AI task type: ${taskType}`);
 		}
