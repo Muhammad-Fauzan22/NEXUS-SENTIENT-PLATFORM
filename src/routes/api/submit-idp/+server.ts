@@ -12,6 +12,22 @@ const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY);
  * dan menyimpannya ke database Supabase
  * @param request - HTTP request yang berisi data form IDP
  * @returns Respons JSON yang menunjukkan status penerimaan data
+const IdpFormSchema = z.object({
+	personal: z.object({
+		fullName: z.string().min(1).max(200),
+		email: z.string().email().max(320),
+		whatsapp: z.string().min(5).max(32).optional().or(z.literal('')).transform((v) => v || null),
+		origin: z.string().max(120).optional().or(z.literal('')).transform((v) => v || null)
+	}),
+	academic: z.object({
+		gpa: z.union([z.number(), z.string()]).optional().transform((v) => (v === undefined ? null : Number(v))),
+		favoriteCourses: z.string().max(1000).optional().or(z.literal('')).transform((v) => v || null),
+		researchInterest: z.string().max(2000).optional().or(z.literal('')).transform((v) => v || null),
+		tools: z.string().max(2000).optional().or(z.literal('')).transform((v) => v || null)
+	}),
+	psychometric: z.record(z.string(), z.unknown()).optional().default({})
+});
+
  */
 export const POST: RequestHandler = async ({ request, locals }) => {
 	try {
