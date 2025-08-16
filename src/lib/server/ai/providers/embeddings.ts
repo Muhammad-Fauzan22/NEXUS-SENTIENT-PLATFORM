@@ -40,6 +40,11 @@ export async function generateEmbedding(text: string): Promise<number[]> {
 		logger.warn('LOCAL_EMBEDDINGS_BASE_URL is not set. Falling back to random embedding.');
 		return randomVec();
 	}
+	if (!embBreaker.canProceed()) {
+		logger.error('Embedding circuit breaker is OPEN. Using random vector.');
+		return randomVec();
+	}
+
 	try {
 		const res = await withRetry(() =>
 			fetch(`${EMB_BASE.replace(/\/$/, '')}/embeddings`, {
