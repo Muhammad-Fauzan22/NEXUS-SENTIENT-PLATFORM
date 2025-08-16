@@ -27,9 +27,9 @@ export async function retrieveContext(queryText: string): Promise<KnowledgeChunk
 	}
 
 	try {
-		// Langkah 1: Ubah query teks menjadi embedding vektor menggunakan provider AI kita
+		// Langkah 1: Ubah query teks menjadi embedding vektor menggunakan provider embedding lokal/compat.
 		logger.info(`Membuat embedding untuk query RAG: ${queryText.substring(0, 50)}...`);
-		const queryEmbedding = await azureProvider.generateEmbedding(queryText);
+		const queryEmbedding = await embeddingProvider.generateEmbedding(queryText);
 
 		// Langkah 2: Panggil fungsi RPC di Supabase untuk melakukan pencarian kemiripan
 		logger.info('Memanggil fungsi RPC match_knowledge_chunks di Supabase...');
