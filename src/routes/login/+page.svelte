@@ -68,7 +68,12 @@
 			<p class="mt-2 text-foreground/80">Sign in to your account or create a new one</p>
 		</div>
 
-		<form class="mt-8 space-y-6" onsubmit|preventDefault>
+		<form
+			class="mt-8 space-y-6"
+			onsubmit={(e) => {
+				e.preventDefault();
+			}}
+		>
 			<div class="space-y-4">
 				<div>
 					<label for="email" class="block mb-2 text-sm font-medium text-foreground/80">
