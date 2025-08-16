@@ -27,8 +27,11 @@
 		</div>
 
 		<div>
-			<label class="block mb-2 text-sm font-medium text-foreground/80"> Mata Kuliah Favorit </label>
+			<label for="favoriteCourses" class="block mb-2 text-sm font-medium text-foreground/80">
+				Mata Kuliah Favorit
+			</label>
 			<Input
+				id="favoriteCourses"
 				type="text"
 				bind:value={formData.academic.favoriteCourses}
 				placeholder="Contoh: Mekanika Fluida, Termodinamika"
