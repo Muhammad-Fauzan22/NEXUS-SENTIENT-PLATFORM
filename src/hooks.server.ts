@@ -1,15 +1,11 @@
 // src/hooks.server.ts
-import { createSupabaseServerClient } from '@supabase/auth-helpers-sveltekit';
+import { createClient } from '@supabase/supabase-js';
 import { env } from '$env/dynamic/private';
 import type { Handle } from '@sveltejs/kit';
 
 export const handle: Handle = async ({ event, resolve }) => {
 	// Inisialisasi Supabase client untuk setiap request
-	event.locals.supabase = createSupabaseServerClient({
-		supabaseUrl: env.SUPABASE_URL,
-		supabaseKey: env.SUPABASE_ANON_KEY,
-		event,
-	});
+	event.locals.supabase = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY);
 
 	// Definisikan getter untuk sesi pengguna
 	event.locals.getSession = async () => {
