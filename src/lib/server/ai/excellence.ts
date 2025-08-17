@@ -1,5 +1,5 @@
 import { supabaseAdmin } from '$lib/server/supabase';
-import { embeddingProvider } from '$lib/server/ai/providers/embedding';
+import { embeddingProvider } from '$lib/server/ai/providers/embeddings';
 
 export type ExcellenceDoc = {
 	id: string;
