@@ -15,6 +15,11 @@
 		"test:e2e:headed": "playwright test --headed",
 		"test:all": "npm run test:coverage && npm run test:e2e",
 		"lint": "prettier --check . && eslint .",
+,
+		"datasets:readme": "cat scripts/datasets/README_DATASETS.md",
+		"datasets:prep:resume": "python scripts/datasets/download_hf_resume.py",
+		"datasets:prep:advising": "python scripts/datasets/download_hf_advising.py",
+		"ingest:datasets": "ts-node -T scripts/ingest_datasets.ts"
 		"lint:fix": "prettier --write . && eslint . --fix",
 		"format": "prettier --write .",
 		"type-check": "svelte-check --tsconfig ./tsconfig.json",
