@@ -46,3 +46,5 @@ foreach ($it in $urls) {
 if (!(Test-Path './datasets/psychometric/team-roles')) {
   try { git clone https://github.com/typology/belbin-test-data-simulated.git ./datasets/psychometric/team-roles } catch { Write-Host "WARN: failed to clone belbin repo - $_" }
 }
+
+Write-Host "✅ Category A: Psychometric datasets downloaded (best-effort)"
