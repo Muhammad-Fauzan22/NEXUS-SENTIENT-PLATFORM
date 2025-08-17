@@ -1,0 +1,7 @@
+NEXUS-SENTIENT-PLATFORM/
+node_modules/
+datasets/
+.svelte-kit/
+build/
+dist/
+
