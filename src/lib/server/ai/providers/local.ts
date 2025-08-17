@@ -26,7 +26,7 @@ const llmBreaker = new CircuitBreaker(4, 30_000, 10_000);
  *  - Optional: LOCAL_LLM_API_KEY (if your gateway enforces auth)
  */
 
-const BASE_URL = dynamicEnv.LOCAL_LLM_BASE_URL;
+const BASE_URL = dynamicEnv.LOCAL_LLM_BASE_URL ?? '';
 const MODEL = dynamicEnv.LOCAL_LLM_MODEL || 'qwen2.5:1.5b-instruct-q4_K_M';
 const API_KEY = dynamicEnv.LOCAL_LLM_API_KEY;
 const MODE = (dynamicEnv.LOCAL_LLM_MODE || 'openai').toLowerCase();

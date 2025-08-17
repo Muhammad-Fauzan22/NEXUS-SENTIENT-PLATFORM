@@ -11,7 +11,7 @@ type StructuredProfile = Database['public']['Tables']['processed_profiles']['Row
  * Mengorkestrasi proses pembuatan IDP.
  */
 export async function generateIdp(profile: StructuredProfile): Promise<GeneratedIDP> {
-	logger.info({ profileId: profile.id }, 'Memulai proses generasi IDP...');
+	logger.info('Memulai proses generasi IDP...', { profileId: profile.id });
 
 	try {
 		// 1. Retrieval-Augmented Generation (RAG)
@@ -32,7 +32,7 @@ export async function generateIdp(profile: StructuredProfile): Promise<Generated
 
 		// 3. Panggil Provider AI (melalui aiManager -> bisa local/eksternal)
 		const raw = await aiManager.executeTask('GENERATE_DRAFT', prompt);
-		logger.info({ profileId: profile.id }, 'Konten IDP berhasil digenerate oleh AI.');
+		logger.info('Konten IDP berhasil digenerate oleh AI.', { profileId: profile.id });
 		let generatedContent: unknown;
 		try {
 			generatedContent = JSON.parse(raw);
@@ -43,14 +43,14 @@ export async function generateIdp(profile: StructuredProfile): Promise<Generated
 		// 4. Validasi output AI dengan Zod
 		const validationResult = generatedIdpSchema.safeParse(generatedContent);
 		if (!validationResult.success) {
-			logger.error({ errors: validationResult.error.flatten() }, 'Output IDP dari AI tidak sesuai skema.');
+			logger.error('Output IDP dari AI tidak sesuai skema.', { errors: validationResult.error.flatten() });
 			throw new Error('Gagal memvalidasi struktur data dari layanan AI.');
 		}
 
 		return validationResult.data;
 	} catch (error) {
 		const e = error as Error;
-		logger.error({ error: e, profileId: profile.id }, 'Gagal dalam pipeline generasi IDP.');
+		logger.error('Gagal dalam pipeline generasi IDP.', { error: e, profileId: profile.id });
 		throw e;
 	}
 }

@@ -47,7 +47,7 @@ export const mockAdvancedStore = {
   interaction: {
     supportedModes: [
       InteractionMode.TOUCH,
-      InteractionMode.GESTURE, 
+      InteractionMode.GESTURE,
       InteractionMode.VOICE,
       InteractionMode.EYE_TRACKING
     ],
@@ -89,7 +89,7 @@ export const mockAdvancedQuery = {
       quantumStates: ["focused", "distributed", "entangled"]
     },
     {
-      id: 2, 
+      id: 2,
       text: "Neuroplasticity Anda menunjukkan pola adaptasi yang unik. Bagaimana Anda merespons stimulus kompleks?",
       type: "neuromorphic_adaptation",
       pillar: "neural_processing",
@@ -128,56 +128,8 @@ export const mockAdvancedQuery = {
     }
   }
 };
-// Enhanced API query data
-export const mockAdvancedQuery = {
-  quantumAssessment: [
-    {
-      id: 1,
-      text: "Dalam superposisi quantum, bagaimana Anda memproses multiple realities secara simultan?",
-      type: "quantum_superposition",
-      pillar: "quantum_consciousness",
-      quantumStates: ["focused", "distributed", "entangled"]
-    },
-    {
-      id: 2, 
-      text: "Neuroplasticity Anda menunjukkan pola adaptasi yang unik. Bagaimana Anda merespons stimulus kompleks?",
-      type: "neuromorphic_adaptation",
-      pillar: "neural_processing",
-      synapticPatterns: ["spike_timing", "plasticity", "homeostasis"]
-    }
-  ],
-  aiPredictions: [
-    {
-      userId: "user_001",
-      predictions: {
-        nextOptimalAction: "constellation_exploration",
-        emotionalTrajectory: "calm_to_enthusiastic",
-        learningPath: ["quantum_mechanics", "neural_networks", "xr_development"],
-        successProbability: 0.94
-      }
-    }
-  ],
-  realTimeMetrics: {
-    activeUsers: 15847,
-    quantumProcessingLoad: 0.67,
-    neuralNetworkActivity: 0.82,
-    xrSessionsActive: 1247,
-    aiInferencesPerSecond: 2847
-  },
-  enterpriseFeatures: {
-    multiTenancy: {
-      tenants: ["university_a", "corporation_b", "research_lab_c"],
-      isolation: "quantum_encrypted",
-      resourceAllocation: "adaptive"
-    },
-    compliance: {
-      gdpr: true,
-      hipaa: true,
-      sox: true,
-      iso27001: true
-    }
-  }
-};
+// (removed duplicate mockAdvancedQuery definition)
+
 
 // Enhanced root props
 export const mockAdvancedRootProps = {

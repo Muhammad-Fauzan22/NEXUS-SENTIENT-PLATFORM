@@ -51,7 +51,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 		"script-src 'self' 'unsafe-inline'",
 		"style-src 'self' 'unsafe-inline'",
 		"img-src 'self' data:",
-		"connect-src 'self'",
+		`connect-src 'self' ${env.VITE_PUBLIC_SUPABASE_URL || ''}`.trim(),
 		"font-src 'self' data:",
 		"frame-ancestors 'none'"
 	].join('; ');

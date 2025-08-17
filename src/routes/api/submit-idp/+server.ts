@@ -12,6 +12,8 @@ const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY);
  * dan menyimpannya ke database Supabase
  * @param request - HTTP request yang berisi data form IDP
  * @returns Respons JSON yang menunjukkan status penerimaan data
+ */
+
 const IdpFormSchema = z.object({
 	personal: z.object({
 		fullName: z.string().min(1).max(200),
@@ -27,8 +29,6 @@ const IdpFormSchema = z.object({
 	}),
 	psychometric: z.record(z.string(), z.unknown()).optional().default({})
 });
-
- */
 export const POST: RequestHandler = async ({ request, locals }) => {
 	try {
 		// Dapatkan sesi pengguna

@@ -14,6 +14,7 @@ export const aiManager = {
 	async executeTask(taskType, prompt, _options = {}) {
 		console.log(`Executing AI task: ${taskType}`);
 
+		/** @param {string} p */
 		const gen = async (p) => {
 			if (preferLocal) return localProvider.generate(p);
 			if (taskType === 'GENERATE_DRAFT') return claudeProvider.generate(p);

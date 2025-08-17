@@ -4,9 +4,9 @@ import { InternalServerError } from '../utils/errors';
 import { embeddingProvider } from './providers/embeddings';
 
 import { MemoryCache } from '../cache/memoryCache';
-import crypto from 'crypto';
+import { createHash } from 'crypto';
 const ragCache = new MemoryCache<KnowledgeChunk[]>(120_000);
-function cacheKey(input: string) { return 'rag:' + crypto.createHash('sha1').update(input).digest('hex'); }
+function cacheKey(input: string) { return 'rag:' + createHash('sha1').update(input).digest('hex'); }
 
 // Definisikan tipe untuk knowledge chunk yang diambil dari database
 interface KnowledgeChunk {

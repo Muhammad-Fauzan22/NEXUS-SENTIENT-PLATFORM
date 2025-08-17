@@ -8,7 +8,7 @@ import type { GeneratedIDP } from '$lib/types/schemas';
 class AzureProvider implements AIProvider {
 	private apiKey: string;
 	private apiEndpoint: string;
-    private embeddingEndpoint: string;
+	private embeddingEndpoint: string;
 
 	constructor() {
 		if (!config.AZURE_OPENAI_KEY) {
@@ -17,7 +17,7 @@ class AzureProvider implements AIProvider {
 		this.apiKey = config.AZURE_OPENAI_KEY;
 		// TODO: Ganti URL endpoint ini dengan URL spesifik Azure Anda
 		this.apiEndpoint = 'https://YOUR_AZURE_ENDPOINT.openai.azure.com/openai/deployments/YOUR_DEPLOYMENT_NAME/chat/completions?api-version=2023-07-01-preview';
-        this.embeddingEndpoint = 'https://YOUR_AZURE_ENDPOINT.openai.azure.com/openai/deployments/YOUR_EMBEDDING_DEPLOYMENT_NAME/embeddings?api-version=2023-07-01-preview';
+		this.embeddingEndpoint = 'https://YOUR_AZURE_ENDPOINT.openai.azure.com/openai/deployments/YOUR_EMBEDDING_DEPLOYMENT_NAME/embeddings?api-version=2023-07-01-preview';
 	}
 
 	async generateStructuredContent(prompt: string): Promise<GeneratedIDP> {
@@ -35,13 +35,13 @@ class AzureProvider implements AIProvider {
 				],
 				response_format: { type: 'json_object' }, // Memaksa output JSON
 				temperature: 0.4,
-                max_tokens: 4096,
+				max_tokens: 4096,
 			})
 		});
 
 		if (!response.ok) {
 			const errorBody = await response.text();
-			logger.error({ status: response.status, body: errorBody }, 'Gagal memanggil Azure OpenAI API.');
+			logger.error('Gagal memanggil Azure OpenAI API.', { status: response.status, body: errorBody });
 			throw new InternalServerError('Gagal berkomunikasi dengan layanan AI.');
 		}
 
@@ -56,14 +56,14 @@ class AzureProvider implements AIProvider {
 			// Parsing dan validasi output JSON dari AI
 			return JSON.parse(content) as GeneratedIDP;
 		} catch (e) {
-			logger.error({ error: e, content }, 'Gagal mem-parsing JSON dari respons AI.');
+			logger.error('Gagal mem-parsing JSON dari respons AI.', { error: e, content });
 			throw new InternalServerError('Gagal memproses respons dari layanan AI.');
 		}
 	}
 
 	async generateEmbedding(text: string): Promise<number[]> {
 		logger.debug('Memanggil Azure OpenAI untuk generasi embedding...');
-        const response = await fetch(this.embeddingEndpoint, {
+		const response = await fetch(this.embeddingEndpoint, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -74,18 +74,18 @@ class AzureProvider implements AIProvider {
 			})
 		});
 
-        if (!response.ok) {
-            const errorBody = await response.text();
-			logger.error({ status: response.status, body: errorBody }, 'Gagal memanggil Azure OpenAI Embedding API.');
+		if (!response.ok) {
+			const errorBody = await response.text();
+			logger.error('Gagal memanggil Azure OpenAI Embedding API.', { status: response.status, body: errorBody });
 			throw new InternalServerError('Gagal membuat embedding.');
-        }
+		}
 
-        const result = await response.json();
-        const embedding = result.data[0]?.embedding;
+		const result = await response.json();
+		const embedding = result.data[0]?.embedding;
 
-        if (!embedding || !Array.isArray(embedding)) {
-            throw new InternalServerError('Respons embedding dari AI tidak valid.');
-        }
+		if (!embedding || !Array.isArray(embedding)) {
+			throw new InternalServerError('Respons embedding dari AI tidak valid.');
+		}
 
 		return embedding;
 	}

@@ -2,14 +2,13 @@
 import { error, type RequestHandler } from '@sveltejs/kit';
 import { createClient } from '@supabase/supabase-js';
 import { env } from '$env/dynamic/private';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { localProvider } from '$lib/server/ai/providers/local';
 import { z } from 'zod';
 
 // Inisialisasi Supabase client
 const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY);
 
-// Inisialisasi Google AI client
-const genAI = new GoogleGenerativeAI(env.GEMINI_API_KEY);
+// Menggunakan penyedia AI lokal (self-hosted) sesuai blueprint mandiri
 
 /**
  * API endpoint untuk menghasilkan Individual Development Plan (IDP)
@@ -124,34 +123,27 @@ Untuk setiap semester:
 - Format dalam Markdown dengan heading, bullet points, dan struktur yang jelas.
 `;
 
-		// Panggil Google Gemini API dengan streaming
-		const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-		const result = await model.generateContentStream(prompt);
+		// Panggil AI lokal (OpenAI-compatible / self-hosted) dan kirim hasil sebagai satu stream chunk
+		const output = await localProvider.generate(prompt);
 
-		// Buat stream respons
+		// Buat stream respons (kompatibel dengan frontend yang membaca streaming)
 		const stream = new ReadableStream({
 			async start(controller) {
 				const encoder = new TextEncoder();
-
 				try {
-					// Loop melalui hasil streaming
-					for await (const chunk of result.stream) {
-						const chunkText = chunk.text();
-						controller.enqueue(encoder.encode(chunkText));
-					}
+					// Enqueue seluruh output sebagai satu chunk
+					controller.enqueue(encoder.encode(output));
 
-					// Setelah proses AI streaming selesai, perbarui status menjadi 'Complete'
+					// Setelah proses AI selesai, perbarui status menjadi 'Complete'
 					const { error: completeUpdateError } = await supabase
 						.from('submissions')
 						.update({ status: 'Complete' })
 						.eq('id', submissionId);
 
-					// Penanganan error dasar untuk update status complete
 					if (completeUpdateError) {
 						console.error('Error updating status to Complete:', completeUpdateError);
 					}
 
-					// Tutup stream setelah selesai
 					controller.close();
 				} catch (err) {
 					controller.error(err);
