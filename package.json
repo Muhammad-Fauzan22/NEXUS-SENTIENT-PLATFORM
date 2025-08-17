@@ -34,11 +34,9 @@
 		"datasets:download:C": "powershell -ExecutionPolicy Bypass -File scripts/datasets/download_category_C.ps1",
 		"datasets:download:D": "powershell -ExecutionPolicy Bypass -File scripts/datasets/download_category_D.ps1",
 		"db:apply:esco": "node -e \"require('fs').createReadStream('supabase/sql/esco.ddl.sql').pipe(process.stdout)\"",
-		"ingest:esco": "npx ts-node -T scripts/workers/ingest_esco.ts"
-,
-    "db:apply:excellence": "node -e \"require('fs').createReadStream('supabase/sql/excellence.ddl.sql').pipe(process.stdout)\"",
-    "ingest:excellence": "npx ts-node -T scripts/workers/ingest_excellence.ts"
-
+		"ingest:esco": "npx ts-node -T scripts/workers/ingest_esco.ts",
+		"db:apply:excellence": "node -e \"require('fs').createReadStream('supabase/sql/excellence.ddl.sql').pipe(process.stdout)\"",
+		"ingest:excellence": "npx ts-node -T scripts/workers/ingest_excellence.ts"
 	},
 	"devDependencies": {
 		"@playwright/test": "^1.45.1",
