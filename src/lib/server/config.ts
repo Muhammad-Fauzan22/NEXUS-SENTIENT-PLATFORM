@@ -54,7 +54,7 @@ for (const key of requiredCore) {
 	if (!config[key]) throw new Error(`FATAL: Missing required environment variable: ${key}`);
 }
 
-// AI keys are conditional: either external providers or local LLM/embeddings must be present
+// AI keys are optional: app can run with limited features if none are set
 const hasExternalAI = Boolean(
 	config.CLAUDE_API_KEY ||
 		config.GEMINI_API_KEY ||
@@ -63,8 +63,8 @@ const hasExternalAI = Boolean(
 );
 const hasLocalAI = Boolean(process.env.LOCAL_LLM_BASE_URL || process.env.LOCAL_EMBEDDINGS_BASE_URL);
 if (!hasExternalAI && !hasLocalAI) {
-	throw new Error(
-		'FATAL: No AI provider configured. Set one of external AI keys (CLAUDE/GEMINI/OPENAI/PERPLEXITY) or LOCAL_LLM_BASE_URL/LOCAL_EMBEDDINGS_BASE_URL.'
+	console.warn(
+		"[WARN] No AI provider configured. Set one of CLAUDE/GEMINI/OPENAI/PERPLEXITY or LOCAL_LLM_BASE_URL/LOCAL_EMBEDDINGS_BASE_URL. Running in 'AI-lite' mode."
 	);
 }
 
