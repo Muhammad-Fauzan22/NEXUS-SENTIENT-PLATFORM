@@ -68,11 +68,13 @@ async function main() {
 
 	// --- EXTRACT from Notion (if configured) ---
 	const notionDbId = process.env.NOTION_KB_DATABASE_ID || '';
+kese	const notionDocsDbId = process.env.NOTION_DOCS_DATABASE_ID || '';
+	const notionDocNames = (process.env.NOTION_DOC_NAMES || '').split(',').map((s) => s.trim()).filter(Boolean);
 	const notionToken = process.env.NOTION_API_KEY || '';
 	let rawData: Omit<KnowledgeChunk, 'content_embedding' | 'id'>[] = [];
 
 	if (notionDbId && notionToken) {
-		logger.info('Fetching documents from Notion knowledge database...');
+		logger.info('Fetching documents from Notion knowledge database (generic pages)...');
 		const ns = new NotionService(notionToken);
 		try {
 			// Pull the first 20 pages to index; adjust per your needs
@@ -87,12 +89,34 @@ async function main() {
 					rawData.push({
 						source_id: `${title}#${pageId}`,
 						content: chunks[idx],
-						metadata: { pageId, title, idx }
+						metadata: { pageId, title, idx, source: 'notion:kb' }
 					});
 				}
 			}
 		} catch (e) {
-			logger.error('Failed to extract from Notion. Falling back to dummy data.', { error: e });
+			logger.error('Failed to extract from Notion KB database. Will still attempt doc-by-name if configured.', { error: e });
+		}
+	}
+
+	// Notion specific named documents (e.g., AD/ART, SOP, Kurikulum, LPJ)
+	if (notionDocsDbId && notionDocNames.length > 0 && notionToken) {
+		logger.info('Fetching specific documents by name from Notion docs database...');
+		const ns = new NotionService(notionToken);
+		for (const name of notionDocNames) {
+			try {
+				const doc = await ns.getDocumentByName(notionDocsDbId, name);
+				if (!doc) { logger.warn('Named Notion doc not found', { name }); continue; }
+				const chunks = chunkText(doc.text);
+				for (let idx = 0; idx < chunks.length; idx++) {
+					rawData.push({
+						source_id: `${doc.title}#${doc.pageId}`,
+						content: chunks[idx],
+						metadata: { pageId: doc.pageId, title: doc.title, idx, source: 'notion:docs' }
+					});
+				}
+			} catch (e) {
+				logger.error('Failed to fetch Notion document by name', { name, error: e });
+			}
 		}
 	}
 
