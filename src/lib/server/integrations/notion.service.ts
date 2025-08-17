@@ -174,4 +174,4 @@ export class NotionService {
   }
 }
 
-export const notionService = new NotionService();
+// Intentionally no default instance to avoid side-effects at build time.
