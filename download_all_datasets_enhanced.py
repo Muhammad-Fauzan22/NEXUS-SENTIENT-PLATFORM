@@ -246,3 +246,25 @@ def main():
     # O*NET dataset
     onet_zip = DATASETS_DIR / "onet.zip"
     onet_url = "https://www.onetcenter.org/dl_files/database/db_28_2_text.zip"
+    if download_file(onet_url, onet_zip, "O*NET Database"):
+        if unzip_file(onet_zip, DATASETS_DIR / "onet"):
+            successful_downloads.append("CV/onet")
+        else:
+            failed_downloads.append("CV/onet")
+    else:
+        failed_downloads.append("CV/onet")
+    
+    # C. Education/Academic/Content datasets
+    print("\n🎓 Downloading Education/Academic/Content datasets...")
+    
+    # Student performance
+    student_perf_zip = DATASETS_DIR / "student_performance.zip"
+    student_url = "https://archive.ics.uci.edu/static/public/320/student+performance.zip"
+    if download_file(student_url, student_perf_zip, "Student Performance"):
+        if unzip_file(student_perf_zip, DATASETS_DIR / "student-performance"):
+            successful_downloads.append("Education/student-performance")
+        else:
+            failed_downloads.append("Education/student-performance")
+    else:
+        failed_downloads.append("Education/student-performance")
+    
