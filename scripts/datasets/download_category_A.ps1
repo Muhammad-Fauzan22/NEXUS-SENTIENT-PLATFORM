@@ -1,6 +1,8 @@
 # Category A: Psychometric datasets (25)
 New-Item -ItemType Directory -Force -Path ./datasets/psychometric | Out-Null
 
+function Has-KaggleCred { Test-Path "$env:USERPROFILE\.kaggle\kaggle.json" }
+
 # Resolve Kaggle CLI (robust)
 function Resolve-KaggleCLI {
   try {
