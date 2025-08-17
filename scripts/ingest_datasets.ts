@@ -81,10 +81,9 @@ async function ingestFile(filePath: string) {
 						const piece = buffer;
 						const embedding = await embed(piece);
 						await supabaseAdmin.from('knowledge_chunks').insert({
-							source_id: rel,
-							content: piece,
-							content_embedding: embedding,
-							metadata: { idx, ext, source: 'dataset', category, subpath }
+							content_text: piece,
+							embedding: embedding,
+							metadata: { idx, ext, source: 'dataset', category, subpath, source_id: rel }
 						});
 						idx++;
 						produced++;
