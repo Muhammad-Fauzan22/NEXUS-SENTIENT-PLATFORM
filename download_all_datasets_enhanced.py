@@ -282,3 +282,37 @@ def main():
     if kaggle_ready:
         success = download_kaggle_dataset("Cornell-University/arxiv", str(DATASETS_DIR / "arxiv"))
         if success:
+            successful_downloads.append("Education/arxiv")
+        else:
+            failed_downloads.append("Education/arxiv")
+    else:
+        failed_downloads.append("Education/arxiv")
+    
+    # TED talks
+    if kaggle_ready:
+        success = download_kaggle_dataset("miguelcorraljr/ted-ultimate-dataset", str(DATASETS_DIR / "ted-talks"))
+        if success:
+            successful_downloads.append("Education/ted-talks")
+        else:
+            failed_downloads.append("Education/ted-talks")
+    else:
+        failed_downloads.append("Education/ted-talks")
+    
+    # HF Academic Advising
+    success = download_hf_dataset("HF Academic Advising", DATASETS_DIR / "hf-academic-advising", "stanfordnlp/coqa")
+    if success:
+        successful_downloads.append("Education/hf-academic-advising")
+    else:
+        failed_downloads.append("Education/hf-academic-advising")
+    
+    # Create summary
+    print("\n" + "=" * 50)
+    print("📊 DOWNLOAD SUMMARY")
+    print("=" * 50)
+    
+    print(f"\n✅ Successfully downloaded ({len(successful_downloads)}):")
+    for item in successful_downloads:
+        print(f"   • {item}")
+    
+    if failed_downloads:
+        print(f"\n❌ Failed downloads ({len(failed_downloads)}):")

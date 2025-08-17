@@ -26,6 +26,10 @@
 		"format": "prettier --write .",
 		"type-check": "svelte-check --tsconfig ./tsconfig.json",
 		"health-check": "curl -f http://localhost:5173/api/health || exit 1"
+,
+		"datasets:download:all:ps": "powershell -ExecutionPolicy Bypass -File scripts/datasets/download_all.ps1",
+		"datasets:download:all:sh": "bash scripts/datasets/download_all.sh"
+
 	},
 	"devDependencies": {
 		"@playwright/test": "^1.45.1",
