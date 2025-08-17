@@ -162,3 +162,39 @@ def create_manual_download_guide():
    - `conv_ai_2`
 
 ## Direct Downloads
+1. **O*NET Database**: Already downloaded ✅
+2. **Student Performance**: Already downloaded ✅
+3. **SkillNER**: Already cloned ✅
+"""
+    
+    with open("MANUAL_DOWNLOAD_GUIDE.md", "w") as f:
+        f.write(guide_content)
+    print("📋 Manual download guide created: MANUAL_DOWNLOAD_GUIDE.md")
+
+def main():
+    print("🚀 Enhanced NEXUS Platform Dataset Downloader")
+    print("=" * 50)
+    
+    # Check prerequisites
+    kaggle_ready = check_kaggle_credentials()
+    
+    # Track successful downloads
+    successful_downloads = []
+    failed_downloads = []
+    
+    # Create datasets directory structure
+    print("\n📁 Creating directory structure...")
+    directories = [
+        "big-five", "student-mental-health", "mbti-type", "dass-responses",
+        "job-descriptions", "skill-ner", "onet", "student-performance",
+        "coursera-courses", "arxiv", "ted-talks", "hf-resume-ner", "hf-academic-advising"
+    ]
+    
+    for dir_name in directories:
+        (DATASETS_DIR / dir_name).mkdir(parents=True, exist_ok=True)
+    
+    # A. Psychometrics datasets
+    print("\n📊 Downloading Psychometrics datasets...")
+    psychometrics = [
+        ("tunguz/big-five-personality-test", "big-five"),
+        ("hafiznouman786/student-mental-health", "student-mental-health"),
