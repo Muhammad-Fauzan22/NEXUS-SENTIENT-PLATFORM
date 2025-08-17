@@ -1,9 +1,10 @@
 from __future__ import annotations
-from typing import List, Dict
-from llama_cpp import Llama
+from typing import List, Dict, Any
 from .config import settings
 
-_llm: Llama | None = None
+# Lazy import llama-cpp-python to allow environments without it
+_Llama: Any | None = None
+_llm: Any | None = None
 
 SYSTEM_PROMPT = (
     "Anda adalah NEXUS, Pelatih Pribadi HMM. Bantu asesmen kompetensi, susun IDP yang terstruktur, "
@@ -11,16 +12,35 @@ SYSTEM_PROMPT = (
 )
 
 
-def get_llm() -> Llama:
-    """Lazy-load LLM lokal (GGUF via llama-cpp)."""
+def _ensure_llama_class():
+    global _Llama
+    if _Llama is not None:
+        return _Llama
+    try:
+        from llama_cpp import Llama as _LC
+        _Llama = _LC
+    except Exception:
+        _Llama = None
+    return _Llama
+
+
+def get_llm():
+    """Lazy-load LLM lokal (GGUF via llama-cpp); return None jika tidak tersedia."""
     global _llm
-    if _llm is None:
-        _llm = Llama(
+    if _llm is not None:
+        return _llm
+    LlamaClass = _ensure_llama_class()
+    if LlamaClass is None:
+        return None
+    try:
+        _llm = LlamaClass(
             model_path=settings.MODEL_GGUF_PATH,
             n_ctx=settings.LLM_CONTEXT,
             n_threads=settings.LLM_THREADS,
             verbose=False,
         )
+    except Exception:
+        _llm = None
     return _llm
 
 
@@ -44,6 +64,9 @@ def _format_prompt(messages: List[Dict[str, str]]) -> str:
 def chat(messages: List[Dict[str, str]], max_tokens: int = 512, temperature: float = 0.2) -> str:
     llm = get_llm()
     prompt = _format_prompt(messages)
+    if llm is None:
+        # Fallback deterministic stub if LLM not available
+        return "[LLM offline] Mohon aktifkan model lokal. Sementara ini, gunakan /api/search atau /api/rag untuk akses pengetahuan."
     out = llm(
         prompt,
         max_tokens=max_tokens,
@@ -66,6 +89,11 @@ def generate_idp(profile: dict, max_tokens: int = 700) -> str:
         {"role": "user", "content": rubric + "\n\nProfil:\n" + str(profile)},
     ]
     prompt = _format_prompt(messages)
+    if llm is None:
+        return (
+            "[LLM offline] Rencana IDP tidak dapat digenerate karena model lokal non-aktif. "
+            "Pastikan llama-cpp terpasang dan model GGUF tersedia."
+        )
     out = llm(
         prompt,
         max_tokens=max_tokens,
