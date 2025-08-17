@@ -93,3 +93,7 @@ coverage/
 # Tambahkan file spesifik proyek Anda yang tidak ingin diformat jika ada
 # Contoh:
 # src/lib/assets/specific-unformatted-file.txt
+
+# Ignore nested legacy repo and large datasets
+NEXUS-SENTIENT-PLATFORM/
+datasets/
