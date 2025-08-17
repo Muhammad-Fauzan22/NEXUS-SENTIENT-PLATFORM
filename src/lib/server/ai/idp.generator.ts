@@ -1,5 +1,5 @@
 import { logger } from '$lib/server/utils/logger';
-import { performanceMonitor, timed } from '$lib/server/utils/performance';
+import { performanceMonitor } from '$lib/server/utils/performance';
 import { handleError, AIProviderError } from '$lib/server/utils/errors';
 import { buildAssessmentPrompt } from '$lib/server/ai/promptBuilder';
 import { retrieveContext } from '$lib/server/ai/rag';
