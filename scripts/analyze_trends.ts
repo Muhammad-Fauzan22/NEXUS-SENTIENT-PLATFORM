@@ -2,11 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { supabaseAdmin } from './utils/supabase.admin.ts';
 import { logger } from './utils/logger.ts';
-import {
-	extractSkillsV2,
-	computeVelocity,
-	normalizeSkill
-} from '../src/lib/server/analytics/trends_analyzer';
+import { extractSkillsV2, computeVelocity, normalizeSkill } from './utils/trends.ts';
 
 const JOB_DESC_DIR = path.resolve(process.cwd(), 'datasets', 'job-descriptions');
 
