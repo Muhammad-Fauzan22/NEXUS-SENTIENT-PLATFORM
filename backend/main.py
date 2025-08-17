@@ -34,6 +34,81 @@ def _local_chunk_text(text: str, max_chars: int = 1000, overlap: int = 200) -> L
         start = max(0, end - overlap)
     return chunks
 
+# Retrieval + reranker helpers (FAISS optional, reranker optional)
+_index_cache = {
+    "rows_len": 0,
+    "matrix": None,
+}
+
+def _get_rows_and_matrix(db: Session):
+    import numpy as np
+    rows = db.query(Chunk, Document).join(Document, Chunk.document_id == Document.id).all()
+    if not rows:
+        return [], None
+    embs = [row[0].embedding for row in rows]
+    m = np.array(embs, dtype=float)
+    return rows, m
+
+_reranker = None
+
+def _load_reranker():
+    global _reranker
+    if _reranker is not None:
+        return _reranker
+    enabled = os.getenv("RERANKER_ENABLED", "0").lower() in ("1", "true", "yes")
+    if not enabled:
+        return None
+    try:
+        from sentence_transformers import CrossEncoder
+        model_name = os.getenv("RERANKER_MODEL", "cross-encoder/ms-marco-MiniLM-L-6-v2")
+        _reranker = CrossEncoder(model_name, device="cpu")
+        return _reranker
+    except Exception:
+        _reranker = None
+        return None
+
+def _retrieve_similar(db: Session, query: str, top_k: int = 5, preselect: int = 50):
+    import numpy as np
+    from numpy.linalg import norm
+    rows, m = _get_rows_and_matrix(db)
+    if not rows:
+        return []
+    q = embedding_service.embed_texts([query])[0]
+    # Try FAISS inner product over normalized vectors; fallback to numpy cosine
+    try:
+        import faiss  # type: ignore
+        m_norm = m / (norm(m, axis=1, keepdims=True) + 1e-9)
+        q_norm = q / (norm(q) + 1e-9)
+        index = faiss.IndexFlatIP(m.shape[1])
+        index.add(m_norm.astype("float32"))
+        nprobe = min(preselect, len(rows))
+        scores, idxs = index.search(q_norm.reshape(1, -1).astype("float32"), nprobe)
+        cand = [(int(idxs[0][i]), float(scores[0][i])) for i in range(idxs.shape[1])]
+    except Exception:
+        denom = (norm(m, axis=1) * norm(q) + 1e-9)
+        sims = (m @ q) / denom
+        order = sims.argsort()[::-1]
+        nprobe = min(preselect, len(order))
+        cand = [(int(order[i]), float(sims[int(order[i])])) for i in range(nprobe)]
+
+    # Optional rerank with cross-encoder
+    reranker = _load_reranker()
+    if reranker:
+        pairs = [(query, rows[i][0].text) for i, _ in cand]
+        try:
+            scores = reranker.predict(pairs)
+            ranked = sorted(zip(cand, scores), key=lambda x: float(x[1]), reverse=True)
+            cand = [(i, float(score)) for ((i, _), score) in ranked]
+        except Exception:
+            pass
+
+    cand = cand[:top_k]
+    results = []
+    for idx, score in cand:
+        chunk, doc = rows[idx]
+        results.append((chunk, doc, float(score)))
+    return results
+
 # CORS origins configurable via env CORS_ORIGINS (comma-separated or "*")
 origins_env = os.getenv("CORS_ORIGINS", "*")
 allow_origins = ["*"] if origins_env.strip() == "*" else [o.strip() for o in origins_env.split(",") if o.strip()]
@@ -170,32 +245,22 @@ def api_rag(payload: dict = Body(...), db: Session = Depends(get_session)):
     temperature = float((payload or {}).get("temperature", 0.2))
     if not query:
         raise HTTPException(status_code=400, detail="query is required")
-    # Retrieve top-k
-    rows = db.query(Chunk, Document).join(Document, Chunk.document_id == Document.id).all()
-    if not rows:
+
+    results = _retrieve_similar(db, query, top_k=k, preselect=max(10, k * 5))
+    if not results:
         return {"answer": "", "sources": []}
-    chunks = [row[0] for row in rows]
-    docs = [row[1] for row in rows]
-    import numpy as np
-    from numpy.linalg import norm
-    q_emb = embedding_service.embed_texts([query])[0]
-    m = np.array([c.embedding for c in chunks], dtype=float)
-    denom = (norm(m, axis=1) * norm(q_emb) + 1e-9)
-    sims = (m @ q_emb) / denom
-    top_idx = sims.argsort()[::-1][:k]
+
     contexts = []
     sources = []
-    for idx in top_idx:
-        idx = int(idx)
-        chunk = chunks[idx]
-        doc = docs[idx]
+    for chunk, doc, score in results:
         contexts.append(f"[{doc.title}#{chunk.chunk_index}]\n{chunk.text}")
         sources.append({
             "document_title": doc.title,
             "chunk_index": chunk.chunk_index,
-            "score": float(sims[idx]),
+            "score": float(score),
             "text": chunk.text,
         })
+
     system = ("Anda adalah NEXUS. Jawablah pertanyaan berbasis konteks berikut. "
               "Jika jawaban tidak ada dalam konteks, katakan tidak tahu. "
               "Cantumkan sumber sebagai [Judul#Chunk]. Jawab ringkas dan akurat.")
@@ -207,38 +272,51 @@ def api_rag(payload: dict = Body(...), db: Session = Depends(get_session)):
     answer = ai_core.chat(messages, max_tokens=700, temperature=temperature)
     return {"answer": answer, "sources": sources}
 
+# SSE streaming for RAG responses
+@app.post("/api/rag/stream")
+def api_rag_stream(payload: dict = Body(...), db: Session = Depends(get_session)):
+    query = (payload or {}).get("query")
+    k = int((payload or {}).get("k", 5))
+    temperature = float((payload or {}).get("temperature", 0.2))
+    if not query:
+        raise HTTPException(status_code=400, detail="query is required")
+
+    results = _retrieve_similar(db, query, top_k=k, preselect=max(10, k * 5))
+    contexts = []
+    for chunk, doc, score in results:
+        contexts.append(f"[{doc.title}#{chunk.chunk_index}]\n{chunk.text}")
+
+    system = ("Anda adalah NEXUS. Jawablah pertanyaan berbasis konteks berikut. "
+              "Jika jawaban tidak ada dalam konteks, katakan tidak tahu. "
+              "Cantumkan sumber sebagai [Judul#Chunk]. Jawab ringkas dan akurat.")
+    user = f"Konteks:\n\n" + "\n\n".join(contexts) + f"\n\nPertanyaan: {query}"
+
+    def token_gen():
+        llm = ai_core.get_llm()
+        prompt = f"<s>[INST] {system}\n\n{user} [/INST]"
+        for chunk in llm(
+            prompt,
+            max_tokens=700,
+            temperature=temperature,
+            stream=True,
+            stop=["</s>", "[INST]", "</INST>", "USER:", "ASSISTANT:"],
+        ):
+            token = chunk["choices"][0].get("text", "")
+            if token:
+                yield f"data: {json.dumps({'token': token})}\n\n"
+        yield "data: [DONE]\n\n"
+    return StreamingResponse(token_gen(), media_type="text/event-stream")
+
 @app.post("/api/search", response_model=List[SearchResult])
 def api_search(req: SearchRequest, db: Session = Depends(get_session)) -> List[SearchResult]:
-    # fetch all chunks joined with documents
-    rows = db.query(Chunk, Document).join(Document, Chunk.document_id == Document.id).all()
-    if not rows:
-        return []
-    # unpack tuples
-    chunks = [row[0] for row in rows]
-    docs = [row[1] for row in rows]
-    embs = [c.embedding for c in chunks]
-
-    import numpy as np
-    from numpy.linalg import norm
-
-    # embed query
-    q = embedding_service.embed_texts([req.query])[0]
-    m = np.array(embs, dtype=float)
-    # cosine similarity (protect from div by zero)
-    denom = (norm(m, axis=1) * norm(q) + 1e-9)
-    sims = (m @ q) / denom
-    top_idx = sims.argsort()[::-1][: req.k]
-
+    res = _retrieve_similar(db, req.query, top_k=req.k, preselect=max(10, req.k * 5))
     results: List[SearchResult] = []
-    for i in top_idx:
-        idx = int(i)
-        chunk = chunks[idx]
-        doc = docs[idx]
+    for chunk, doc, score in res:
         results.append(
             SearchResult(
                 document_title=doc.title,
                 chunk_index=chunk.chunk_index,
-                score=float(sims[idx]),
+                score=float(score),
                 text=chunk.text,
             )
         )
