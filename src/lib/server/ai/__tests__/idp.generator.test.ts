@@ -136,8 +136,9 @@ describe('IDP Generator', () => {
 		vi.mocked(retrieveContext).mockResolvedValue([]);
 		vi.mocked(buildAssessmentPrompt).mockReturnValue('Test prompt');
 		vi.mocked(aiManager.executeTask).mockResolvedValue(JSON.stringify({
-			// Missing required fields
-			linkedin_summary: 'Test summary'
+			// Invalid types to force schema validation failure
+			linkedin_summary: 123,
+			roadmap: 'not-array'
 		}));
 
 		// Act & Assert
