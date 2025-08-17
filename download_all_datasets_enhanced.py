@@ -61,3 +61,48 @@ def download_file(url, destination, description=""):
         total_size = int(response.headers.get('content-length', 0))
         downloaded = 0
         
+        with open(destination, 'wb') as f:
+            for chunk in response.iter_content(chunk_size=8192):
+                if chunk:
+                    f.write(chunk)
+                    downloaded += len(chunk)
+                    if total_size > 0:
+                        progress = (downloaded / total_size) * 100
+                        print(f"   Progress: {progress:.1f}%", end='\r')
+        
+        print(f"✅ {description} downloaded successfully!")
+        return True
+    except Exception as e:
+        print(f"❌ Error downloading {description}: {e}")
+        return False
+
+def unzip_file(zip_path, extract_to):
+    """Unzip a file with progress"""
+    try:
+        print(f"📦 Extracting {zip_path.name}...")
+        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+            zip_ref.extractall(extract_to)
+        zip_path.unlink()  # Remove zip file
+        print(f"✅ Extracted to {extract_to}")
+        return True
+    except Exception as e:
+        print(f"❌ Error extracting {zip_path}: {e}")
+        return False
+
+def download_kaggle_dataset(dataset, destination):
+    """Download dataset from Kaggle with error handling"""
+    cmd = f"kaggle datasets download -d {dataset} -p {destination} --unzip"
+    success, output = run_command(cmd, ignore_errors=True)
+    if success:
+        print(f"✅ Downloaded {dataset}")
+    else:
+        print(f"❌ Failed to download {dataset}")
+    return success
+
+def download_hf_dataset(dataset_name, save_path, dataset_path):
+    """Download Hugging Face dataset with error handling"""
+    try:
+        from datasets import load_dataset
+        print(f"📊 Downloading {dataset_name}...")
+        ds = load_dataset(dataset_path)
+        ds.save_to_disk(str(save_path))
