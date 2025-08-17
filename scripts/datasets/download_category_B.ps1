@@ -46,11 +46,21 @@ foreach ($d in $kaggle) {
   }
 }
 
-# Hugging Face (run via temp python file for Windows PowerShell)
+# Hugging Face (idempotent via temp python file)
 $pyCode = @'
+import os
 from datasets import load_dataset
-load_dataset('finetune/resume-entities-for-ner').save_to_disk('./datasets/skills/hf-resume-ner')
-load_dataset('techcrunch').save_to_disk('./datasets/skills/hf-techcrunch')
+
+def save_if_missing(path, *args, **kwargs):
+    if os.path.exists(path):
+        print(f"SKIP: {path} exists")
+        return
+    print(f"DOWNLOADING: {args[0]} -> {path}")
+    ds = load_dataset(*args, **kwargs)
+    ds.save_to_disk(path)
+
+save_if_missing('./datasets/skills/hf-resume-ner', 'finetune/resume-entities-for-ner')
+save_if_missing('./datasets/skills/hf-techcrunch', 'techcrunch')
 '@
 $tmp = [System.IO.Path]::GetTempFileName()
 Set-Content -Path $tmp -Value $pyCode -Encoding UTF8
