@@ -57,8 +57,8 @@ load_dataset("daily_dialog").save_to_disk("./datasets/language/daily-dialog")
 # Commonsense QA
 load_dataset("commonsense_qa").save_to_disk("./datasets/language/commonsense-qa")
 
-# Natural Questions (sample 1%)
-load_dataset("natural_questions", split="train[:1%]").save_to_disk("./datasets/language/natural-questions-sample")
+# Natural Questions (FULL)
+load_dataset("natural_questions", split="train").save_to_disk("./datasets/language/natural-questions-full")
 
 # Story Cloze Test
 load_dataset("story_cloze", "2016").save_to_disk("./datasets/language/story-cloze")
