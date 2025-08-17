@@ -20,12 +20,16 @@ $kaggle = @(
 
 foreach ($d in $kaggle) { & $kaggleCmd datasets download -d $d.k -p $d.p --unzip }
 
-# Hugging Face
-python - << 'PY'
+# Hugging Face (run via temp python file for Windows PowerShell)
+$pyCode = @'
 from datasets import load_dataset
-load_dataset('finetune/resume-entities-for-ner').save_to_disk('./datasets/skills/hf-resume-ner')
-load_dataset('techcrunch').save_to_disk('./datasets/skills/hf-techcrunch')
-PY
+load_dataset(''finetune/resume-entities-for-ner'').save_to_disk(''./datasets/skills/hf-resume-ner'')
+load_dataset(''techcrunch'').save_to_disk(''./datasets/skills/hf-techcrunch'')
+'@
+$tmp = [System.IO.Path]::GetTempFileName()
+Set-Content -Path $tmp -Value $pyCode -Encoding UTF8
+python $tmp
+Remove-Item $tmp
 
 # O*NET
 Invoke-WebRequest -Uri 'https://www.onetcenter.org/dl_files/database/db_28_2_text.zip' -OutFile './datasets/skills/onet_db.zip'
