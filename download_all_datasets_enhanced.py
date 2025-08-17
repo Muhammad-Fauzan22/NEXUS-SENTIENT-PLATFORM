@@ -268,3 +268,17 @@ def main():
     else:
         failed_downloads.append("Education/student-performance")
     
+    # Coursera courses
+    if kaggle_ready:
+        success = download_kaggle_dataset("siddharthm1698/coursera-course-dataset", str(DATASETS_DIR / "coursera-courses"))
+        if success:
+            successful_downloads.append("Education/coursera-courses")
+        else:
+            failed_downloads.append("Education/coursera-courses")
+    else:
+        failed_downloads.append("Education/coursera-courses")
+    
+    # ArXiv
+    if kaggle_ready:
+        success = download_kaggle_dataset("Cornell-University/arxiv", str(DATASETS_DIR / "arxiv"))
+        if success:
