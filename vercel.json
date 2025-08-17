@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "functions": {
+    "api/**/*.js": { "memory": 1024, "maxDuration": 60 },
+    "sveltekit": { "memory": 1024, "maxDuration": 60 }
+  },
+  "installCommand": "npm ci",
+  "buildCommand": "npm run build",
+  "outputDirectory": ".svelte-kit",
+  "framework": "sveltekit",
+  "routes": [
+    { "src": "/(.*)", "dest": "/" }
+  ]
+}
+

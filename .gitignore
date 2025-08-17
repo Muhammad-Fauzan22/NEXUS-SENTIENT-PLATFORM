@@ -36,3 +36,38 @@ dist/
 *.njsproj
 *.sln
 *.sw?
+
+# NEXUS additions: ignore heavy/binary and runtime artifacts
+# Datasets and models
+/datasets/
+/models/
+/data/
+
+# Build caches and framework outputs
+/.svelte-kit/
+/playwright-report/
+/build/
+
+# Logs and temp
+*.log
+realtime_sync.log
+auto_git_sync.log
+*.tmp
+*.temp
+.cache/
+
+# Archives and binaries
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.rar
+*.7z
+*.dll
+*.lib
+*.pyd
+*.exe
+*.bin
+
+# Windows special file accidentally created
+nul

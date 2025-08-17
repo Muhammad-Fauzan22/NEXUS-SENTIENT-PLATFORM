@@ -87,6 +87,29 @@ export class NotionService {
     return { pageId, title, text };
   }
 
+
+  /**
+   * Versi sederhana untuk mengambil last_edited_time halaman (untuk incremental ETL)
+   */
+  async getPageLastEditedTime(databaseId: string, docName: string): Promise<string | null> {
+    const client = await this.getClient();
+    try {
+      const res = await client.databases.query({
+        database_id: databaseId,
+        filter: { property: 'Name', title: { equals: docName } },
+        page_size: 1
+      });
+      const page = (res.results && res.results[0]) || null;
+      if (!page) return null;
+      return page.last_edited_time || null;
+    } catch (err) {
+      logger.warn('getPageLastEditedTime failed', { err });
+      return null;
+    }
+  }
+
+
+
   // Helpers
   private mapProject(page: any) {
     const title = this.extractTitle(page);

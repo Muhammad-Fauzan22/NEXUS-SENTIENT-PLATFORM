@@ -3,6 +3,7 @@ import { supabaseAdmin } from '../src/lib/server/db/supabase.admin';
 import { logger } from '../src/lib/server/utils/logger';
 import type { PostgrestError } from '@supabase/supabase-js';
 import { NotionService } from '../src/lib/server/integrations/notion.service';
+import crypto from 'node:crypto';
 
 // Load environment variables from the root .env file
 dotenv.config({ path: './.env' });
@@ -14,6 +15,10 @@ interface KnowledgeChunk {
 	content: string;
 	content_embedding: number[];
 	metadata: Record<string, unknown>;
+}
+
+function computeHash(text: string): string {
+	return crypto.createHash('sha256').update(text).digest('hex');
 }
 
 // Simple text chunker for Notion/plain text
@@ -48,16 +53,18 @@ async function processAndLoadChunks(chunks: Omit<KnowledgeChunk, 'content_embedd
 				content_embedding: embedding
 			};
 
-			const { error } = await supabaseAdmin.from('knowledge_chunks').insert(chunkWithEmbedding);
+			// Upsert by source_id + idx hash for idempotent writes (Incremental ETL V2)
+			const content_hash = computeHash(chunk.content);
+			const { error } = await supabaseAdmin
+				.from('knowledge_chunks')
+				.upsert({ ...chunkWithEmbedding, metadata: { ...chunkWithEmbedding.metadata, content_hash } }, { onConflict: 'source_id,metadata->>idx' as any });
 
 			if (error) {
-				// CORRECTED: Pass a string message and the error object in the context
-				logger.error('Failed to insert chunk into Supabase.', { error });
+				logger.error('Failed to upsert chunk into Supabase.', { error });
 			} else {
-				logger.info(`Successfully inserted chunk for source: ${chunk.source_id}`);
+				logger.info(`Upserted chunk for source: ${chunk.source_id}`);
 			}
 		} catch (err) {
-			// CORRECTED: Pass a string message and the error object in the context
 			logger.error('An error occurred during embedding or insertion.', { error: err, chunk });
 		}
 	}
@@ -100,10 +107,25 @@ async function main() {
 
 	// Notion specific named documents (e.g., AD/ART, SOP, Kurikulum, LPJ)
 	if (notionDocsDbId && notionDocNames.length > 0 && notionToken) {
-		logger.info('Fetching specific documents by name from Notion docs database...');
+		logger.info('Fetching specific documents by name from Notion docs database (incremental-aware)...');
 		const ns = new NotionService(notionToken);
 		for (const name of notionDocNames) {
 			try {
+				// Incremental check using last_edited_time stored in knowledge_chunks metadata
+				const lastEdited = await ns.getPageLastEditedTime(notionDocsDbId, name);
+				const { data: existing, error: exErr } = await supabaseAdmin
+					.from('knowledge_chunks')
+					.select('metadata')
+					.ilike('source_id', `%${name}%`)
+					.limit(1);
+				if (!exErr && existing && existing[0]?.metadata && lastEdited) {
+					const prev = (existing[0].metadata as any).last_edited_time;
+					if (prev && prev === lastEdited) {
+						logger.info('Skip unchanged Notion doc', { name });
+						continue;
+					}
+				}
+
 				const doc = await ns.getDocumentByName(notionDocsDbId, name);
 				if (!doc) { logger.warn('Named Notion doc not found', { name }); continue; }
 				const chunks = chunkText(doc.text);
@@ -111,7 +133,7 @@ async function main() {
 					rawData.push({
 						source_id: `${doc.title}#${doc.pageId}`,
 						content: chunks[idx],
-						metadata: { pageId: doc.pageId, title: doc.title, idx, source: 'notion:docs' }
+						metadata: { pageId: doc.pageId, title: doc.title, idx, source: 'notion:docs', last_edited_time: lastEdited || null }
 					});
 				}
 			} catch (e) {

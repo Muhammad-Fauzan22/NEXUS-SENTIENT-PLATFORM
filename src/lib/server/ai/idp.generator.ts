@@ -6,6 +6,7 @@ import { retrieveContext } from '$lib/server/ai/rag';
 import { aiManager } from '$lib/server/services/ai.manager';
 import type { Database } from '$lib/types/database.types';
 import { generatedIdpSchema, type GeneratedIDP, type AssessmentSubmission } from '$lib/types/schemas';
+import { getTopTrendingSkills } from '$lib/server/analytics/trends';
 
 type StructuredProfile = Database['public']['Tables']['processed_profiles']['Row'];
 
@@ -36,7 +37,7 @@ export async function generateIdp(profile: StructuredProfile): Promise<Generated
 					contextChunksCount: contextChunks.length 
 				});
 
-				// 2. Bangun Prompt
+				// 2. Bangun Prompt (+ Trending Skills)
 				const submissionData: AssessmentSubmission = {
 					aspirations: profile.aspirations,
 					portfolio_text: profile.portfolio_text,
@@ -44,14 +45,21 @@ export async function generateIdp(profile: StructuredProfile): Promise<Generated
 					pwb_scores: profile.pwb_scores as any,
 				};
 
-				const prompt = performanceMonitor.timeSync(
-					'prompt_building',
-					() => buildAssessmentPrompt(submissionData, contextChunks),
+				const trendingSkills = await performanceMonitor.timeAsync(
+					'trending_skills_fetch',
+					() => getTopTrendingSkills(profile.aspirations, 5),
 					{ profileId: profile.id }
 				);
 
-				requestLogger.debug('Prompt untuk AI telah berhasil dibuat', { 
-					promptLength: prompt.length 
+				const prompt = performanceMonitor.timeSync(
+					'prompt_building',
+					() => buildAssessmentPrompt(submissionData, contextChunks, trendingSkills),
+					{ profileId: profile.id }
+				);
+
+				requestLogger.debug('Prompt untuk AI telah berhasil dibuat', {
+					promptLength: prompt.length,
+					trendingSkillsCount: trendingSkills.length
 				});
 
 				// 3. Panggil Provider AI

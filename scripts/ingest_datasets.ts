@@ -48,19 +48,23 @@ async function ingestFile(filePath: string) {
     if (!['.txt', '.csv', '.json', '.md'].includes(ext)) return;
     const content = fs.readFileSync(filePath, 'utf8');
     const chunks = chunkText(content);
+    const rel = path.relative(ROOT, filePath);
+    const segments = rel.split(path.sep);
+    const category = segments.length > 0 ? segments[0] : 'unknown';
+    const subpath = segments.slice(1, -1).join('/');
     for (let idx = 0; idx < chunks.length; idx++) {
       const chunk = chunks[idx];
       const embedding = await embed(chunk);
-      const source_id = path.relative(ROOT, filePath);
+      const source_id = rel;
       const { error } = await supabaseAdmin.from('knowledge_chunks').insert({
         source_id,
         content: chunk,
         content_embedding: embedding,
-        metadata: { idx, ext, source: 'dataset' }
+        metadata: { idx, ext, source: 'dataset', category, subpath }
       });
       if (error) logger.error('Failed insert dataset chunk', { error, filePath });
     }
-    logger.info('Ingested file', { filePath, chunkCount: chunks.length });
+    logger.info('Ingested file', { filePath, chunkCount: chunks.length, category });
   } catch (e) {
     logger.error('Ingest failed for file', { filePath, error: e });
   }

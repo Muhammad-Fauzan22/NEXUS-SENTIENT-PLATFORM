@@ -18,13 +18,17 @@ strategis, dan dapat ditindaklanjuti.
  */
 export function buildAssessmentPrompt(
 	submissionData: AssessmentSubmission,
-	contextChunks: KnowledgeChunk[]
+	contextChunks: KnowledgeChunk[],
+	trendingSkills: string[] = []
 ): string {
 	const formattedContext = contextChunks
 		.map((chunk) => `- ${chunk.content_text}`)
 		.join('\n');
 
 	const userProfile = JSON.stringify(submissionData, null, 2);
+	const formattedTrends = trendingSkills.length
+		? `\n# EMERGING SKILL TRENDS (Integrasikan eksplisit ke dalam roadmap):\n- ${trendingSkills.join('\n- ')}`
+		: '';
 
 	return `
 ${SYSTEM_ROLE_PROMPT}
@@ -37,6 +41,8 @@ Gunakan HANYA informasi di bawah ini untuk merekomendasikan program, mata kuliah
 ---
 ${formattedContext || 'Tidak ada konteks spesifik yang ditemukan. Gunakan pengetahuan umum tentang pengembangan mahasiswa teknik.'}
 ---
+
+	${formattedTrends}
 
 # TUGAS ANDA
 Lakukan tiga tugas berikut secara berurutan:
