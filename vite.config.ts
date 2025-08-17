@@ -4,4 +4,14 @@
 // dari Vitest dengan matchers yang lebih deskriptif dan berorientasi DOM.
 // Ini memungkinkan kita untuk menulis asserstion yang lebih mudah dibaca dan lebih kuat
 // untuk komponen UI, seperti `expect(element).toBeInTheDocument()`.
-import '@testing-library/jest-dom/vitest';
+
+
+import { defineConfig } from 'vitest/config';
+
+export default defineConfig({
+    test: {
+        globals: true,
+        environment: 'jsdom',
+        setupFiles: ['./vitest-setup.ts']
+    }
+});

@@ -9,7 +9,6 @@ import { NeuralProcessor } from './components/neuromorphic/NeuralProcessor';
 import { XRInterface } from './components/xr/XRInterface';
 import { AIIntelligence } from './components/ai/AIIntelligence';
 import { AdvancedInteraction } from './components/interaction/AdvancedInteraction';
-import advancedNexusTheme from './theme/advancedTheme';
 import { mockAdvancedStore, mockAdvancedQuery } from './data/advancedMockData';
 import { NexusAppProps, EmotionalState, DevelopmentPillar } from './types';
 import { QuantumUIState, NeuromorphicPattern, XRMode, AICapability, InteractionMode } from './types/advanced';
@@ -80,9 +79,9 @@ export const AdvancedNexusApp: React.FC<AdvancedNexusAppProps> = ({
   // Enhanced emotional state detection
   const detectEmotionalState = (responses: any[]): EmotionalState => {
     if (responses.length === 0) return EmotionalState.CALM;
-    
+
     const lastResponse = responses[responses.length - 1];
-    
+
     // AI-enhanced emotion detection
     if (aiState.activeCapabilities.includes(AICapability.EMOTION_DETECTION)) {
       const confidence = aiState.emotionConfidence;
@@ -93,7 +92,7 @@ export const AdvancedNexusApp: React.FC<AdvancedNexusAppProps> = ({
         }
       }
     }
-    
+
     return EmotionalState.CALM;
   };
 
@@ -141,7 +140,7 @@ export const AdvancedNexusApp: React.FC<AdvancedNexusAppProps> = ({
 
   const handleConstellationInteraction = (elementId: string) => {
     onConstellationInteraction?.(elementId, 'click');
-    
+
     // Quantum entanglement effect
     if (quantumMode) {
       setQuantumState(prev => ({
@@ -199,7 +198,7 @@ export const AdvancedNexusApp: React.FC<AdvancedNexusAppProps> = ({
     switch (currentView) {
       case 'oracle-gate':
         return (
-          <OracleGate 
+          <OracleGate
             onEnter={handleOracleEnter}
             isActive={true}
           />
@@ -231,7 +230,7 @@ export const AdvancedNexusApp: React.FC<AdvancedNexusAppProps> = ({
           <LivingDashboard
             userProgress={mockUserProgress}
             activities={[]}
-            onActivityClick={() => {}}
+            onActivityClick={() => { }}
           />
         );
 
@@ -241,11 +240,11 @@ export const AdvancedNexusApp: React.FC<AdvancedNexusAppProps> = ({
   };
 
   const renderAdvancedComponents = () => (
-    <Box sx={{ 
-      position: 'fixed', 
-      top: 16, 
-      left: 16, 
-      right: 16, 
+    <Box sx={{
+      position: 'fixed',
+      top: 16,
+      left: 16,
+      right: 16,
       bottom: 16,
       pointerEvents: 'none',
       zIndex: 1000
@@ -264,7 +263,7 @@ export const AdvancedNexusApp: React.FC<AdvancedNexusAppProps> = ({
               </Box>
             </Fade>
           )}
-          
+
           {neuromorphicProcessing && (
             <Fade in timeout={1500}>
               <Box sx={{ flex: 1 }}>
@@ -331,15 +330,14 @@ export const AdvancedNexusApp: React.FC<AdvancedNexusAppProps> = ({
   );
 
   return (
-    <ThemeProvider theme={advancedNexusTheme}>
-      <CssBaseline />
-      
+    <>
+
       {/* Main interface */}
       {renderCurrentView()}
-      
+
       {/* Advanced overlay components */}
       {renderAdvancedComponents()}
-      
+
       {/* Debug information */}
       {debugMode && (
         <Box sx={{
@@ -363,6 +361,6 @@ export const AdvancedNexusApp: React.FC<AdvancedNexusAppProps> = ({
           <div>Emotion: {emotionalState}</div>
         </Box>
       )}
-    </ThemeProvider>
+    </ThemeProvider >
   );
 };

@@ -58,7 +58,7 @@
 			placeholder="e.g., 30"
 			required
 			min="1"
-			bind:value={userData.age}
+			bind:value={userData.age as unknown as string}
 		/>
 		<Input
 			id="occupation"
@@ -69,9 +69,7 @@
 			bind:value={userData.occupation}
 		/>
 		<div class="pt-4">
-			<Button type="submit" variant="primary" class="w-full">
-				Continue to RIASEC Assessment
-			</Button>
+			<Button variant="primary" class="w-full">Continue to RIASEC Assessment</Button>
 		</div>
 	</form>
 </Card>

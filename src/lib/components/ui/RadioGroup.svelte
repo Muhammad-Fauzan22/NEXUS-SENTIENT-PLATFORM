@@ -2,6 +2,7 @@
 <script lang="ts">
 	let {
 		group = $bindable(),
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		label,
 		options,
 		name
@@ -16,7 +17,7 @@
 <div class="mb-4">
 	<p class="font-medium mb-2">{label}</p>
 	<div class="flex flex-wrap items-center gap-x-4 gap-y-2">
-		{#each options as option, i}
+		{#each options as option}
 			<label class="flex items-center gap-2 cursor-pointer">
 				<input
 					type="radio"

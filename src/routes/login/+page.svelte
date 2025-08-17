@@ -5,9 +5,7 @@
 	import { toast } from 'svelte-sonner';
 	import Button from '$lib/components/ui/Button.svelte';
 
-	const { data } = $props();
-
-	// Akses Supabase client dari data layout
+	const { data } = $props<{ data: { supabase: any } }>();
 	const { supabase } = data;
 
 	// State untuk form (Svelte 5 runes)
@@ -19,7 +17,7 @@
 	async function handleSignUp() {
 		loading = true;
 		try {
-			const { data, error } = await supabase.auth.signUp({
+			const { error } = await supabase.auth.signUp({
 				email,
 				password
 			});
@@ -41,7 +39,7 @@
 	async function handleSignIn() {
 		loading = true;
 		try {
-			const { data, error } = await supabase.auth.signInWithPassword({
+			const { error } = await supabase.auth.signInWithPassword({
 				email,
 				password
 			});

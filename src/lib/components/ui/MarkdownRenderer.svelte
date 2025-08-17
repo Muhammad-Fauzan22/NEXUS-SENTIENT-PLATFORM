@@ -7,12 +7,10 @@
 	const { content } = $props<{ content: string }>();
 
 	let markedModule: typeof import('marked') | null = null;
-	let hljs: typeof import('highlight.js') | null = null;
 
 	onMount(async () => {
-		const [{ marked }, highlight] = await Promise.all([import('marked'), import('highlight.js')]);
+		const [{ marked }] = await Promise.all([import('marked')]);
 		markedModule = { marked } as any;
-		hljs = (highlight as any).default || (highlight as any);
 		marked.setOptions({ breaks: true, gfm: true } as any);
 	});
 

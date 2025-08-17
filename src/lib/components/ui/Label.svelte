@@ -6,11 +6,13 @@
 
 	let { ...rest }: Props = $props();
 
-	const baseClasses = 'text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70';
+	const baseClasses =
+		'text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70';
 
-	$: finalClasses = clsx(baseClasses, rest.class);
+	const finalClasses = clsx(baseClasses, rest.class as string);
 </script>
 
 <label class={finalClasses} {...rest}>
+	<!-- svelte-ignore slot_element_deprecated -->
 	<slot />
 </label>

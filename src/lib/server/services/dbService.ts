@@ -1,7 +1,7 @@
 import { supabaseAdmin } from '../db/supabase.admin';
 import { logger } from '../utils/logger';
 import { InternalServerError } from '../utils/errors';
-import type { PostgrestError } from '@supabase/supabase-js';
+
 
 // --- Definisi Tipe Data Transfer Object (DTO) ---
 

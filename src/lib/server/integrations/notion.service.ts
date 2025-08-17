@@ -1,4 +1,3 @@
-import { env as dynamicEnv } from '$env/dynamic/private';
 import { logger } from '$lib/server/utils/logger';
 
 /**
@@ -11,7 +10,7 @@ export class NotionService {
   private token: string;
 
   constructor(token?: string) {
-    this.token = token || dynamicEnv.NOTION_API_KEY || '';
+    this.token = token || process.env.NOTION_API_KEY || '';
     if (!this.token) {
       logger.warn('NOTION_API_KEY is not set. NotionService is disabled.');
     }
@@ -127,7 +126,7 @@ export class NotionService {
     const appendBlocks = async (pid: string) => {
       let cursor: string | undefined = undefined;
       do {
-        const res = await client.blocks.children.list({ block_id: pid, start_cursor: cursor });
+        const res: any = await client.blocks.children.list({ block_id: pid, start_cursor: cursor });
         for (const b of res.results as any[]) {
           blocks.push(this.blockToText(b));
           if (b.has_children) {

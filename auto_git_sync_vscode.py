@@ -190,9 +190,9 @@ class VSCodeAutoGitSync:
         settings = {
             "files.autoSave": "afterDelay",
             "files.autoSaveDelay": 1000,
-            "git.enableSmartCommit": true,
-            "git.autofetch": true,
-            "git.confirmSync": false
+            "git.enableSmartCommit": True,
+            "git.autofetch": True,
+            "git.confirmSync": False
         }
         
         settings_file = vscode_dir / "settings.json"

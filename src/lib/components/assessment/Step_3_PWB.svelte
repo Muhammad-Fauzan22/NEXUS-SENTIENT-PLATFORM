@@ -67,8 +67,8 @@
 		</div>
 
 		<div class="flex justify-between pt-4">
-			<Button on:click={() => assessmentStore.goToStep(2)} variant="secondary">Back</Button>
-			<Button type="submit" variant="primary">Submit & Generate My Plan</Button>
+			<Button onclick={() => assessmentStore.goToStep(2)} variant="secondary">Back</Button>
+			<Button variant="primary">Submit & Generate My Plan</Button>
 		</div>
 	</form>
 </Card>

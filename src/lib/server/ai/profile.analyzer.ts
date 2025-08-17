@@ -25,31 +25,32 @@ export async function analyzeProfile(
 
 	try {
 		// Menentukan tipe dominan dari skor RIASEC
-		const riasecScores = rawData.riasec_scores;
+		// narrow unknown to number map
+		const riasecScores = rawData.riasec_scores as Record<string, number>;
 		const dominantRIASEC = Object.keys(riasecScores).reduce((a, b) =>
-			riasecScores[a as keyof typeof riasecScores] > riasecScores[b as keyof typeof riasecScores] ? a : b
+			riasecScores[a] > riasecScores[b] ? a : b
 		);
 
 		// Menentukan tipe dominan dari skor PWB
-		const pwbScores = rawData.pwb_scores;
+		const pwbScores = rawData.pwb_scores as Record<string, number>;
 		const dominantPWB = Object.keys(pwbScores).reduce((a, b) =>
-			pwbScores[a as keyof typeof pwbScores] > pwbScores[b as keyof typeof pwbScores] ? a : b
+			pwbScores[a] > pwbScores[b] ? a : b
 		);
 
 		const processedProfile: StructuredProfile = {
 			// Asumsikan raw_assessment_id akan ditambahkan oleh pemanggil setelah data mentah disimpan
 			// raw_assessment_id: 'some-uuid',
-			
+
 			// Data dari asesmen langsung
 			aspirations: rawData.aspirations,
 			portfolio_text: rawData.portfolio_text,
 
 			// Hasil analisis
 			analyzed_summary: `Seorang individu dengan aspirasi di bidang ${rawData.aspirations}, menunjukkan kekuatan pada area ${dominantPWB} (PWB) dan minat vokasional yang kuat pada tipe ${dominantRIASEC} (RIASEC).`,
-			
+
 			// Data JSONB untuk skor
-			riasec_scores: rawData.riasec_scores,
-			pwb_scores: rawData.pwb_scores,
+			riasec_scores: rawData.riasec_scores as any,
+			pwb_scores: rawData.pwb_scores as any,
 		};
 
 		logger.info(`Analisis profil selesai. Tipe RIASEC dominan: ${dominantRIASEC}, PWB dominan: ${dominantPWB}.`);

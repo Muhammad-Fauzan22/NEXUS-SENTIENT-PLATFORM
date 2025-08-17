@@ -3,7 +3,6 @@ import { supabaseAdmin } from '../src/lib/server/db/supabase.admin';
 import { logger } from '../src/lib/server/utils/logger';
 import type { PostgrestError } from '@supabase/supabase-js';
 import { NotionService } from '../src/lib/server/integrations/notion.service';
-import { env as dynamicEnv } from '$env/dynamic/private';
 
 // Load environment variables from the root .env file
 dotenv.config({ path: './.env' });

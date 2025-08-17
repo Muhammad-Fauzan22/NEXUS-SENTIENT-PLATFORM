@@ -8,9 +8,17 @@
 		"build": "vite build",
 		"preview": "vite preview",
 		"test": "vitest",
+		"test:watch": "vitest --watch",
+		"test:coverage": "vitest --coverage",
+		"test:ui": "vitest --ui",
 		"test:e2e": "playwright test",
+		"test:e2e:headed": "playwright test --headed",
+		"test:all": "npm run test:coverage && npm run test:e2e",
 		"lint": "prettier --check . && eslint .",
-		"format": "prettier --write ."
+		"lint:fix": "prettier --write . && eslint . --fix",
+		"format": "prettier --write .",
+		"type-check": "svelte-check --tsconfig ./tsconfig.json",
+		"health-check": "curl -f http://localhost:5173/api/health || exit 1"
 	},
 	"devDependencies": {
 		"@playwright/test": "^1.45.1",
@@ -37,6 +45,7 @@
 	},
 	"dependencies": {
 		"@google/generative-ai": "^0.14.1",
+		"@notionhq/client": "4.0.2",
 		"@supabase/supabase-js": "^2.43.5",
 		"clsx": "^2.1.1",
 		"dotenv": "^16.4.5",

@@ -1,5 +1,5 @@
 // Mock data for NEXUS Living Interface
-import { DevelopmentPillar, EmotionalState, AssessmentInputType } from '../types';
+import { DevelopmentPillar, AssessmentInputType } from '../types';
 
 // Data for global state store
 export const mockStore = {

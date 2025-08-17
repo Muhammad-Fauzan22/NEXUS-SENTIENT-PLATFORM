@@ -20,6 +20,7 @@
     Textarea, atau komponen form lainnya. Komponen induk akan
     meneruskan komponen form yang sebenarnya ke sini.
   -->
+	<!-- svelte-ignore slot_element_deprecated -->
 	<slot />
 
 	{#if errorMessage}
@@ -29,7 +30,7 @@
 
 <!--
   CONTOH PENGGUNAAN:
-  
+
   <FormField label="Nama Lengkap" forId="fullName" errorMessage={errors.fullName}>
     <Input id="fullName" bind:value={$formData.fullName} hasError={!!errors.fullName} />
   </FormField>

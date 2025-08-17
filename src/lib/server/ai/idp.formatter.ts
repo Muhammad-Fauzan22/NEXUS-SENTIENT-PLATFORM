@@ -9,20 +9,21 @@ import type { GeneratedIDP } from '$lib/types/schemas';
  * @throws {Error} Jika input JSON tidak valid.
  */
 export function formatIdp(idpJson: GeneratedIDP): string {
-	if (!idpJson || typeof idpJson !== 'object') {
-		const errorMsg = 'Input IDP JSON tidak valid.';
-		logger.error(`[IDP Formatter] FAILED: ${errorMsg}`);
-		throw new Error(errorMsg);
-	}
+  if (!idpJson || typeof idpJson !== 'object') {
+    const errorMsg = 'Input IDP JSON tidak valid.';
+    logger.error(`[IDP Formatter] FAILED: ${errorMsg}`);
+    throw new Error(errorMsg);
+  }
 
-	logger.info('Memulai pemformatan IDP JSON ke HTML...');
+  logger.info('Memulai pemformatan IDP JSON ke HTML...');
 
-	const { linkedin_summary, potential_analysis, career_goals_analysis, roadmap } = idpJson;
+  const { linkedin_summary, potential_analysis, career_goals_analysis, roadmap } = idpJson;
 
-	let roadmapHtml = '';
-	if (roadmap && roadmap.length > 0) {
-		roadmap.forEach((semester) => {
-			roadmapHtml += `
+  let roadmapHtml = '';
+  if (roadmap && roadmap.length > 0) {
+    roadmap.forEach((semester) => {
+
+      roadmapHtml += `
         <div class="semester-block">
           <h3>Semester ${semester.semester}: ${semester.theme}</h3>
           <div class="development-area">
@@ -41,12 +42,12 @@ export function formatIdp(idpJson: GeneratedIDP): string {
           </div>
         </div>
       `;
-		});
-	} else {
-		roadmapHtml = '<p>Roadmap pengembangan belum tersedia.</p>';
-	}
+    });
+  } else {
+    roadmapHtml = '<p>Roadmap pengembangan belum tersedia.</p>';
+  }
 
-	const fullHtml = `
+  const fullHtml = `
     <!DOCTYPE html>
     <html lang="id">
     <head>
@@ -67,7 +68,7 @@ export function formatIdp(idpJson: GeneratedIDP): string {
     <body>
       <div class="container">
         <h1>Individual Development Plan</h1>
-        
+
         <div class="section">
           <h2>Ringkasan Profesional (LinkedIn)</h2>
           <p>${linkedin_summary || 'Ringkasan belum tersedia.'}</p>
@@ -93,6 +94,6 @@ export function formatIdp(idpJson: GeneratedIDP): string {
     </html>
   `;
 
-	logger.info('Pemformatan IDP ke HTML selesai.');
-	return fullHtml;
+  logger.info('Pemformatan IDP ke HTML selesai.');
+  return fullHtml;
 }

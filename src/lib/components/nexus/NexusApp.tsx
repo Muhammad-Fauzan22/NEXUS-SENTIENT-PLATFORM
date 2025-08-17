@@ -4,7 +4,6 @@ import { OracleGate } from './components/OracleGate';
 import { ChatAssessment } from './components/ChatAssessment';
 import { ConstellationDashboard } from './components/ConstellationDashboard';
 import { LivingDashboard } from './components/LivingDashboard';
-import nexusTheme from './theme/nexusTheme';
 import { mockStore, mockQuery } from './data/nexusMockData';
 import { NexusAppProps, EmotionalState, DevelopmentPillar } from './types';
 
@@ -32,15 +31,15 @@ export const NexusApp: React.FC<NexusAppProps> = ({
   // Simulate emotional state detection based on responses
   const detectEmotionalState = (responses: any[]): EmotionalState => {
     if (responses.length === 0) return EmotionalState.CALM;
-    
+
     const lastResponse = responses[responses.length - 1];
-    
+
     // Simple emotion detection logic
     if (typeof lastResponse.response === 'number') {
       if (lastResponse.response <= 2) return EmotionalState.STRESSED;
       if (lastResponse.response >= 4) return EmotionalState.ENTHUSIASTIC;
     }
-    
+
     return EmotionalState.CALM;
   };
 
@@ -74,7 +73,7 @@ export const NexusApp: React.FC<NexusAppProps> = ({
 
   const handleConstellationInteraction = (elementId: string) => {
     onConstellationInteraction?.(elementId, 'click');
-    
+
     // Simulate progress update
     if (elementId.includes('planet')) {
       const pillar = elementId as DevelopmentPillar;
@@ -121,7 +120,7 @@ export const NexusApp: React.FC<NexusAppProps> = ({
     switch (currentView) {
       case 'oracle-gate':
         return (
-          <OracleGate 
+          <OracleGate
             onEnter={handleOracleEnter}
             isActive={true}
           />
@@ -166,7 +165,7 @@ export const NexusApp: React.FC<NexusAppProps> = ({
     <ThemeProvider theme={nexusTheme}>
       <CssBaseline />
       {renderCurrentView()}
-      
+
       {debugMode && (
         <div style={{
           position: 'fixed',
