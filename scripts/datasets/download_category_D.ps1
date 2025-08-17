@@ -12,14 +12,14 @@ load_dataset("eleutherai/the_pile", "all", split="train", streaming=True)
 # SQuAD (Stanford Q&A)
 load_dataset("squad").save_to_disk("./datasets/language/squad")
 
-# Wikipedia English (sample 1%)
-load_dataset("wikipedia", "20220301.en", split="train[:1%]").save_to_disk("./datasets/language/wikipedia-sample")
+# Wikipedia English (FULL)
+load_dataset("wikipedia", "20220301.en", split="train").save_to_disk("./datasets/language/wikipedia-full")
 
 # Anthropic HH-RLHF
 load_dataset("Anthropic/hh-rlhf").save_to_disk("./datasets/language/anthropic-hh-rlhf")
 
-# Common Crawl C4 (streaming)
-load_dataset("c4", "en", split="train", streaming=True)
+# Common Crawl C4 (streaming or shard to disk via helper)
+# For FULL-on-disk, run: python scripts/datasets/download_hf_sharded.py --dataset c4 --subset en --split train --records-per-shard 10000 --output ./datasets/language/c4-full
 
 # Dolly 15k (Instruction Following)
 load_dataset("databricks/databricks-dolly-15k").save_to_disk("./datasets/language/dolly-15k")
