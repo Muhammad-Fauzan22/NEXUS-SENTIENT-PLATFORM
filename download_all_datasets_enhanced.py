@@ -106,3 +106,33 @@ def download_hf_dataset(dataset_name, save_path, dataset_path):
         print(f"📊 Downloading {dataset_name}...")
         ds = load_dataset(dataset_path)
         ds.save_to_disk(str(save_path))
+        print(f"✅ {dataset_name} saved successfully!")
+        return True
+    except Exception as e:
+        print(f"❌ Error downloading {dataset_name}: {e}")
+        return False
+
+def create_manual_download_guide():
+    """Create a manual download guide for failed datasets"""
+    guide_content = """
+# Manual Download Guide for Failed Datasets
+
+## Kaggle Datasets (Requires API Setup)
+1. **Big Five Personality Test**
+   - Dataset: `tunguz/big-five-personality-test`
+   - Command: `kaggle datasets download -d tunguz/big-five-personality-test -p ./datasets/big-five --unzip`
+
+2. **Student Mental Health**
+   - Dataset: `hafiznouman786/student-mental-health`
+   - Command: `kaggle datasets download -d hafiznouman786/student-mental-health -p ./datasets/student-mental-health --unzip`
+
+3. **MBTI Type**
+   - Dataset: `datasnaek/mbti-type`
+   - Command: `kaggle datasets download -d datasnaek/mbti-type -p ./datasets/mbti-type --unzip`
+
+4. **DASS Responses**
+   - Dataset: `lucasgreenwell/depression-anxiety-stress-scales-responses`
+   - Command: `kaggle datasets download -d lucasgreenwell/depression-anxiety-stress-scales-responses -p ./datasets/dass-responses --unzip`
+
+5. **Job Descriptions**
+   - Dataset: `ravishah1/job-description-dataset`
