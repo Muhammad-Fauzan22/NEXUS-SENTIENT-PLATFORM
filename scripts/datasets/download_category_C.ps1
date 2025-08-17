@@ -41,13 +41,31 @@ $kaggle = @(
 )
 
 foreach ($d in $kaggle) {
-    & $kaggleCmd datasets download -d $d.k -p $d.p --unzip
+    $hasFiles = (Test-Path $d.p) -and ((Get-ChildItem -Path $d.p -Recurse -File -ErrorAction SilentlyContinue | Measure-Object).Count -gt 0)
+    if ($hasFiles) {
+        Write-Host "SKIP Kaggle dataset (exists): $($d.k) -> $($d.p)"
+    } else {
+        Write-Host "DOWNLOADING Kaggle dataset: $($d.k) -> $($d.p)"
+        & $kaggleCmd datasets download -d $d.k -p $d.p --unzip
+    }
 }
 
 # UCI ML Repository datasets
-Invoke-WebRequest -Uri 'https://archive.ics.uci.edu/static/public/320/student+performance.zip' -OutFile './datasets/academic/student_performance.zip'
-Expand-Archive -Path './datasets/academic/student_performance.zip' -DestinationPath './datasets/academic/student-performance' -Force
-Remove-Item './datasets/academic/student_performance.zip'
+$uciZip = './datasets/academic/student_performance.zip'
+$uciDst = './datasets/academic/student-performance'
+$uciHasFiles = (Test-Path $uciDst) -and ((Get-ChildItem -Path $uciDst -Recurse -File -ErrorAction SilentlyContinue | Measure-Object).Count -gt 0)
+if ($uciHasFiles) {
+    Write-Host "SKIP UCI student performance (exists): $uciDst"
+} else {
+    if (!(Test-Path $uciZip)) {
+        Write-Host "DOWNLOADING UCI student performance zip -> $uciZip"
+        Invoke-WebRequest -Uri 'https://archive.ics.uci.edu/static/public/320/student+performance.zip' -OutFile $uciZip
+    } else {
+        Write-Host "FOUND existing zip: $uciZip"
+    }
+    try { Expand-Archive -Path $uciZip -DestinationPath $uciDst -Force } catch { Write-Host "WARN: failed to extract UCI - $_" }
+    if (Test-Path $uciZip) { Remove-Item $uciZip }
+}
 
 # Hugging Face datasets (via temp python file)
 $pyCode = @'
@@ -76,7 +94,9 @@ $github = @(
 )
 
 foreach ($g in $github) {
-    if (!(Test-Path $g.path)) {
+    if (Test-Path $g.path) {
+        Write-Host "SKIP Git repo (exists): $($g.path)"
+    } else {
         git clone $g.repo $g.path
     }
 }
