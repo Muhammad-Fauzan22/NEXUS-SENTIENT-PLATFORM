@@ -68,7 +68,7 @@ async function main() {
 
 	// --- EXTRACT from Notion (if configured) ---
 	const notionDbId = process.env.NOTION_KB_DATABASE_ID || '';
-kese	const notionDocsDbId = process.env.NOTION_DOCS_DATABASE_ID || '';
+	const notionDocsDbId = process.env.NOTION_DOCS_DATABASE_ID || '';
 	const notionDocNames = (process.env.NOTION_DOC_NAMES || '').split(',').map((s) => s.trim()).filter(Boolean);
 	const notionToken = process.env.NOTION_API_KEY || '';
 	let rawData: Omit<KnowledgeChunk, 'content_embedding' | 'id'>[] = [];
