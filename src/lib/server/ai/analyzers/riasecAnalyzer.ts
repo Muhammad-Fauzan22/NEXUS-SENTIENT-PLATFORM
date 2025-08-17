@@ -16,10 +16,48 @@ export interface RIASECAnalysisResult {
 
 // Peta ini adalah "sumber kebenaran" untuk skoring, memisahkan data dari logika.
 const RIASEC_QUESTION_MAP: Record<number, RIASECCode> = {
-	1: 'R', 2: 'I', 3: 'A', 4: 'S', 5: 'E', 6: 'C', 7: 'R', 8: 'I', 9: 'A', 10: 'S', 11: 'E', 12: 'C',
-	13: 'R', 14: 'I', 15: 'A', 16: 'S', 17: 'E', 18: 'C', 19: 'R', 20: 'I', 21: 'A', 22: 'S', 23: 'E', 24: 'C',
-	25: 'R', 26: 'I', 27: 'A', 28: 'S', 29: 'E', 30: 'C', 31: 'R', 32: 'I', 33: 'A', 34: 'S', 35: 'E', 36: 'C',
-	37: 'R', 38: 'I', 39: 'A', 40: 'S', 41: 'E', 42: 'C',
+	1: 'R',
+	2: 'I',
+	3: 'A',
+	4: 'S',
+	5: 'E',
+	6: 'C',
+	7: 'R',
+	8: 'I',
+	9: 'A',
+	10: 'S',
+	11: 'E',
+	12: 'C',
+	13: 'R',
+	14: 'I',
+	15: 'A',
+	16: 'S',
+	17: 'E',
+	18: 'C',
+	19: 'R',
+	20: 'I',
+	21: 'A',
+	22: 'S',
+	23: 'E',
+	24: 'C',
+	25: 'R',
+	26: 'I',
+	27: 'A',
+	28: 'S',
+	29: 'E',
+	30: 'C',
+	31: 'R',
+	32: 'I',
+	33: 'A',
+	34: 'S',
+	35: 'E',
+	36: 'C',
+	37: 'R',
+	38: 'I',
+	39: 'A',
+	40: 'S',
+	41: 'E',
+	42: 'C'
 };
 
 // --- Fungsi Logika Murni (Dapat Diuji) ---
@@ -70,7 +108,7 @@ function buildRIASECPrompt(topCodes: RIASECCode[]): string {
  * Menganalisis satu set jawaban RIASEC menggunakan AI.
  */
 async function analyze(answers: RIASECAnswer[]): Promise<RIASECAnalysisResult> {
-	logger.info('Starting RIASEC analysis based on Holland\'s theory.');
+	logger.info("Starting RIASEC analysis based on Holland's theory.");
 	const scores = calculateRIASECScores(answers);
 	const topCodes = getTopRIASECCodes(scores);
 	const prompt = buildRIASECPrompt(topCodes);
@@ -81,16 +119,18 @@ async function analyze(answers: RIASECAnswer[]): Promise<RIASECAnalysisResult> {
 
 		// Validasi ketat terhadap skema yang diharapkan.
 		if (
-			!parsedResponse.topCode || !parsedResponse.summary ||
-			!Array.isArray(parsedResponse.keywords) || !Array.isArray(parsedResponse.careers) ||
-			parsedResponse.keywords.length === 0 || parsedResponse.careers.length === 0
+			!parsedResponse.topCode ||
+			!parsedResponse.summary ||
+			!Array.isArray(parsedResponse.keywords) ||
+			!Array.isArray(parsedResponse.careers) ||
+			parsedResponse.keywords.length === 0 ||
+			parsedResponse.careers.length === 0
 		) {
 			throw new Error('AI response for RIASEC analysis did not match the required schema.');
 		}
 
 		logger.info('Successfully completed RIASEC analysis.', { topCode: parsedResponse.topCode });
 		return parsedResponse;
-
 	} catch (error) {
 		logger.error('Failed to analyze RIASEC data.', { error });
 		throw new InternalServerError('Error processing RIASEC analysis with AI.');

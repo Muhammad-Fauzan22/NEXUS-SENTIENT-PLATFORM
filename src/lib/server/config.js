@@ -56,7 +56,10 @@ for (const key of requiredCore) {
 
 // Opsi AI: minimal salah satu tersedia (eksternal atau lokal)
 const hasExternalAI = Boolean(
-	config.CLAUDE_API_KEY || config.GEMINI_API_KEY || config.PERPLEXITY_API_KEY || config.OPENAI_API_KEY
+	config.CLAUDE_API_KEY ||
+		config.GEMINI_API_KEY ||
+		config.PERPLEXITY_API_KEY ||
+		config.OPENAI_API_KEY
 );
 const hasLocalAI = Boolean(process.env.LOCAL_LLM_BASE_URL || process.env.LOCAL_EMBEDDINGS_BASE_URL);
 if (!hasExternalAI && !hasLocalAI) {

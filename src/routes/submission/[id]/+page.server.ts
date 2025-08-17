@@ -11,19 +11,19 @@ export const load: PageServerLoad = async ({ params }) => {
 	try {
 		// Ambil ID dari parameter
 		const { id } = params;
-		
+
 		// Query ke Supabase untuk mengambil data submission
 		const { data, error: dbError } = await supabase
 			.from('submissions')
 			.select('*')
 			.eq('id', id)
 			.single();
-		
+
 		// Jika terjadi error atau data tidak ditemukan
 		if (dbError || !data) {
 			throw error(404, 'Submission not found');
 		}
-		
+
 		// Jika berhasil, kembalikan data submission
 		return {
 			submission: data

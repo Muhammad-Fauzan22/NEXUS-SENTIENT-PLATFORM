@@ -22,11 +22,11 @@ class PerformanceMonitor {
 	): Promise<T> {
 		const startTime = Date.now();
 		const timer = logger.time(operation, metadata);
-		
+
 		try {
 			const result = await fn();
 			const duration = Date.now() - startTime;
-			
+
 			this.recordMetric({
 				operation,
 				duration,
@@ -34,12 +34,12 @@ class PerformanceMonitor {
 				success: true,
 				metadata
 			});
-			
+
 			timer();
 			return result;
 		} catch (error) {
 			const duration = Date.now() - startTime;
-			
+
 			this.recordMetric({
 				operation,
 				duration,
@@ -50,7 +50,7 @@ class PerformanceMonitor {
 					error: error instanceof Error ? error.message : 'Unknown error'
 				}
 			});
-			
+
 			timer();
 			throw error;
 		}
@@ -59,17 +59,13 @@ class PerformanceMonitor {
 	/**
 	 * Time a synchronous operation
 	 */
-	timeSync<T>(
-		operation: string,
-		fn: () => T,
-		metadata?: Record<string, unknown>
-	): T {
+	timeSync<T>(operation: string, fn: () => T, metadata?: Record<string, unknown>): T {
 		const startTime = Date.now();
-		
+
 		try {
 			const result = fn();
 			const duration = Date.now() - startTime;
-			
+
 			this.recordMetric({
 				operation,
 				duration,
@@ -77,11 +73,11 @@ class PerformanceMonitor {
 				success: true,
 				metadata
 			});
-			
+
 			return result;
 		} catch (error) {
 			const duration = Date.now() - startTime;
-			
+
 			this.recordMetric({
 				operation,
 				duration,
@@ -92,7 +88,7 @@ class PerformanceMonitor {
 					error: error instanceof Error ? error.message : 'Unknown error'
 				}
 			});
-			
+
 			throw error;
 		}
 	}
@@ -102,14 +98,15 @@ class PerformanceMonitor {
 	 */
 	private recordMetric(metric: PerformanceMetrics): void {
 		this.metrics.push(metric);
-		
+
 		// Keep only the last N metrics to prevent memory leaks
 		if (this.metrics.length > this.maxMetrics) {
 			this.metrics = this.metrics.slice(-this.maxMetrics);
 		}
 
 		// Log slow operations
-		if (metric.duration > 5000) { // 5 seconds
+		if (metric.duration > 5000) {
+			// 5 seconds
 			logger.warn(`Slow operation detected: ${metric.operation}`, {
 				duration: metric.duration,
 				success: metric.success,
@@ -130,8 +127,8 @@ class PerformanceMonitor {
 		p95Duration: number;
 		recentOperations: PerformanceMetrics[];
 	} {
-		const filteredMetrics = operation 
-			? this.metrics.filter(m => m.operation === operation)
+		const filteredMetrics = operation
+			? this.metrics.filter((m) => m.operation === operation)
 			: this.metrics;
 
 		if (filteredMetrics.length === 0) {
@@ -146,8 +143,8 @@ class PerformanceMonitor {
 			};
 		}
 
-		const durations = filteredMetrics.map(m => m.duration).sort((a, b) => a - b);
-		const successCount = filteredMetrics.filter(m => m.success).length;
+		const durations = filteredMetrics.map((m) => m.duration).sort((a, b) => a - b);
+		const successCount = filteredMetrics.filter((m) => m.success).length;
 
 		return {
 			totalOperations: filteredMetrics.length,
@@ -181,11 +178,10 @@ export function timed(operation?: string) {
 		const operationName = operation || `${target.constructor.name}.${propertyKey}`;
 
 		descriptor.value = async function (...args: any[]) {
-			return performanceMonitor.timeAsync(
-				operationName,
-				() => originalMethod.apply(this, args),
-				{ className: target.constructor.name, methodName: propertyKey }
-			);
+			return performanceMonitor.timeAsync(operationName, () => originalMethod.apply(this, args), {
+				className: target.constructor.name,
+				methodName: propertyKey
+			});
 		};
 
 		return descriptor;

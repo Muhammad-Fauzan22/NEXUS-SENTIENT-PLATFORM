@@ -5,7 +5,7 @@ import { supabase } from '$lib/client/supabase';
 export const load: PageLoad = async ({ depends }: { depends: (key: string) => void }) => {
 	depends('supabase:auth');
 	const {
-		data: { session },
+		data: { session }
 	} = await supabase.auth.getSession();
 	return { supabase, session };
 };

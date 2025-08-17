@@ -60,14 +60,18 @@
 				<div class="bg-green-900/30 border border-green-800 rounded-md p-6">
 					<h2 class="text-2xl font-bold text-green-400 mb-4">Success!</h2>
 					<p class="text-green-300">{serverMessage}</p>
-					<p class="text-green-300/80 mt-4">Your Individual Development Plan will be generated shortly.</p>
+					<p class="text-green-300/80 mt-4">
+						Your Individual Development Plan will be generated shortly.
+					</p>
 				</div>
 			{:else if submissionStatus === 'error'}
 				<div class="bg-red-900/30 border border-red-800 rounded-md p-6">
 					<h2 class="text-2xl font-bold text-red-400 mb-4">Submission Failed</h2>
 					<p class="text-red-300">{serverMessage}</p>
-					<button 
-						onclick={() => { submissionStatus = null; }}
+					<button
+						onclick={() => {
+							submissionStatus = null;
+						}}
 						class="mt-6 bg-primary text-foreground px-6 py-2 rounded-md hover:bg-primary/90 transition-colors"
 					>
 						Try Again
@@ -91,7 +95,7 @@
 		{/if}
 
 		<div class="mt-8 flex justify-between">
-			<button 
+			<button
 				class="bg-secondary text-foreground px-6 py-2 rounded-md disabled:opacity-50"
 				disabled={currentStep === 1}
 				onclick={prevStep}
@@ -112,7 +116,7 @@
 						{/if}
 					</button>
 				{/if}
-				<button 
+				<button
 					class="bg-primary text-foreground px-6 py-2 rounded-md disabled:opacity-50"
 					disabled={currentStep === 4}
 					onclick={nextStep}

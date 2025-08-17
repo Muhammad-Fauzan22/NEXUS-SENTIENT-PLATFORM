@@ -14,16 +14,16 @@
 	const isLoading = writable(false);
 
 	function nextStep() {
-		currentStep.update(n => n + 1);
+		currentStep.update((n) => n + 1);
 	}
 
 	function prevStep() {
-		currentStep.update(n => n - 1);
+		currentStep.update((n) => n - 1);
 	}
 
 	async function handleSubmit() {
 		isLoading.set(true);
-		
+
 		try {
 			const res = await fetch('/api/submit-idp', {
 				method: 'POST',
@@ -66,21 +66,13 @@
 		{/if}
 
 		<div class="mt-8 flex justify-between">
-			<Button 
-				variant="secondary"
-				disabled={$currentStep === 1}
-				on:click={prevStep}
-			>
+			<Button variant="secondary" disabled={$currentStep === 1} on:click={prevStep}>
 				Previous
 			</Button>
-			
+
 			<div class="flex gap-2">
 				{#if $currentStep === 4}
-					<Button 
-						variant="primary"
-						disabled={$isLoading}
-						on:click={handleSubmit}
-					>
+					<Button variant="primary" disabled={$isLoading} on:click={handleSubmit}>
 						{#if $isLoading}
 							Submitting...
 						{:else}
@@ -88,15 +80,9 @@
 						{/if}
 					</Button>
 				{/if}
-				
+
 				{#if $currentStep < 4}
-					<Button 
-						variant="primary"
-						disabled={$currentStep === 4}
-						on:click={nextStep}
-					>
-						Next
-					</Button>
+					<Button variant="primary" disabled={$currentStep === 4} on:click={nextStep}>Next</Button>
 				{/if}
 			</div>
 		</div>

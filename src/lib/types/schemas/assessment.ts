@@ -25,7 +25,6 @@ export interface AssessmentData {
 	pwb_answers: PWBAnswer[];
 }
 
-
 // --- Skema Output & Hasil Analisis AI ---
 // Mendefinisikan bentuk data terstruktur yang dihasilkan oleh layanan AI.
 

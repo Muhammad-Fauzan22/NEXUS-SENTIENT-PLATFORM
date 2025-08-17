@@ -35,7 +35,7 @@ export function createRequestLogger(event: RequestEvent) {
 	}
 
 	const requestLogger = logger.child(context);
-	
+
 	// Log incoming request
 	requestLogger.info('Request received', {
 		headers: Object.fromEntries(event.request.headers.entries())
@@ -47,7 +47,7 @@ export function createRequestLogger(event: RequestEvent) {
 		logResponse: (status: number, responseTime: number, error?: Error) => {
 			const logLevel = status >= 500 ? 'error' : status >= 400 ? 'warn' : 'info';
 			const message = error ? `Request failed: ${error.message}` : 'Request completed';
-			
+
 			requestLogger[logLevel](message, {
 				status,
 				responseTime,
@@ -60,9 +60,7 @@ export function createRequestLogger(event: RequestEvent) {
 /**
  * Performance timing decorator for API handlers
  */
-export function withRequestLogging<T extends (...args: any[]) => Promise<Response>>(
-	handler: T
-): T {
+export function withRequestLogging<T extends (...args: any[]) => Promise<Response>>(handler: T): T {
 	return (async (...args: Parameters<T>) => {
 		const event = args[0] as RequestEvent;
 		const { logger: requestLogger, logResponse } = createRequestLogger(event);
@@ -71,16 +69,16 @@ export function withRequestLogging<T extends (...args: any[]) => Promise<Respons
 		try {
 			const response = await handler(...args);
 			const responseTime = Date.now() - startTime;
-			
+
 			logResponse(response.status, responseTime);
-			
+
 			return response;
 		} catch (error) {
 			const responseTime = Date.now() - startTime;
 			const err = error instanceof Error ? error : new Error('Unknown error');
-			
+
 			logResponse(500, responseTime, err);
-			
+
 			throw error;
 		}
 	}) as T;

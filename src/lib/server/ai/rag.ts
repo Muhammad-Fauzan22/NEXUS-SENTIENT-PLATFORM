@@ -6,7 +6,9 @@ import { embeddingProvider } from './providers/embeddings';
 import { MemoryCache } from '../cache/memoryCache';
 import { createHash } from 'crypto';
 const ragCache = new MemoryCache<KnowledgeChunk[]>(120_000);
-function cacheKey(input: string) { return 'rag:' + createHash('sha1').update(input).digest('hex'); }
+function cacheKey(input: string) {
+	return 'rag:' + createHash('sha1').update(input).digest('hex');
+}
 
 // Definisikan tipe untuk knowledge chunk yang diambil dari database
 interface KnowledgeChunk {
@@ -53,21 +55,24 @@ export async function retrieveContext(queryText: string): Promise<KnowledgeChunk
 		// cache store
 		ragCache.set(key, data as KnowledgeChunk[], 120_000);
 
-
 		if (error) {
 			logger.error(`Gagal saat memanggil fungsi RPC Supabase: ${error.message}`);
 			throw new InternalServerError('Gagal melakukan pencarian konteks.');
 		}
 
 		if (!data || data.length === 0) {
-			logger.info(`Tidak ada konteks relevan yang ditemukan untuk query: ${queryText.substring(0, 50)}...`);
+			logger.info(
+				`Tidak ada konteks relevan yang ditemukan untuk query: ${queryText.substring(0, 50)}...`
+			);
 			return [];
 		}
 
 		logger.info(`Konteks relevan berhasil diambil. Jumlah: ${data.length}`);
 		return data as KnowledgeChunk[];
 	} catch (e: any) {
-		logger.error(`Terjadi error tak terduga dalam pipeline RAG untuk query: ${queryText.substring(0, 50)}... Error: ${e.message}`);
+		logger.error(
+			`Terjadi error tak terduga dalam pipeline RAG untuk query: ${queryText.substring(0, 50)}... Error: ${e.message}`
+		);
 		// Mengembalikan array kosong untuk memastikan sistem tetap bisa berjalan
 		// meskipun RAG gagal.
 		return [];

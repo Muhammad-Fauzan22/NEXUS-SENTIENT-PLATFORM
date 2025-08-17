@@ -58,11 +58,15 @@ function createAssessmentStore() {
 		// Aksi utama untuk mengirimkan asesmen ke backend
 		submitAssessment: async () => {
 			let currentState: AssessmentState | undefined;
-			const unsubscribe = subscribe(state => currentState = state);
+			const unsubscribe = subscribe((state) => (currentState = state));
 			unsubscribe(); // Langsung unsubscribe agar tidak terjadi memory leak
 
-			if (!currentState?.userData || !currentState.riasecAnswers.length || !currentState.pwbAnswers.length) {
-				update(state => ({
+			if (
+				!currentState?.userData ||
+				!currentState.riasecAnswers.length ||
+				!currentState.pwbAnswers.length
+			) {
+				update((state) => ({
 					...state,
 					submission: { state: 'error', error: 'Incomplete assessment data. Cannot submit.' }
 				}));
@@ -70,7 +74,7 @@ function createAssessmentStore() {
 			}
 
 			// Set state ke 'loading' untuk memicu UI pemuatan
-			update(state => ({ ...state, submission: { state: 'loading', error: null } }));
+			update((state) => ({ ...state, submission: { state: 'loading', error: null } }));
 
 			try {
 				const payload = {
@@ -79,11 +83,15 @@ function createAssessmentStore() {
 					pwb_answers: currentState.pwbAnswers
 				};
 
-				const response = await apiClient.post<{ success: boolean; submissionId: string; idp: IDPResult }>('/api/assessment/submit', payload);
+				const response = await apiClient.post<{
+					success: boolean;
+					submissionId: string;
+					idp: IDPResult;
+				}>('/api/assessment/submit', payload);
 
 				if (response.success) {
 					// Jika berhasil, simpan hasil dan set state ke 'success'
-					update(state => ({
+					update((state) => ({
 						...state,
 						result: response.idp,
 						submission: { state: 'success', error: null }
@@ -92,9 +100,10 @@ function createAssessmentStore() {
 					throw new Error('API response indicated submission was not successful.');
 				}
 			} catch (err) {
-				const message = err instanceof Error ? err.message : 'An unknown error occurred during submission.';
+				const message =
+					err instanceof Error ? err.message : 'An unknown error occurred during submission.';
 				// Jika gagal, simpan pesan error dan set state ke 'error'
-				update(state => ({
+				update((state) => ({
 					...state,
 					submission: { state: 'error', error: message }
 				}));

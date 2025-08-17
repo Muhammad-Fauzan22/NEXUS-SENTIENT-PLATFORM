@@ -7,9 +7,7 @@
 
 <div class="space-y-6">
 	<div>
-		<label for="fullName" class="block text-sm font-medium text-foreground/80">
-			Full Name
-		</label>
+		<label for="fullName" class="block text-sm font-medium text-foreground/80"> Full Name </label>
 		<input
 			id="fullName"
 			type="text"
@@ -20,9 +18,7 @@
 	</div>
 
 	<div>
-		<label for="email" class="block text-sm font-medium text-foreground/80">
-			Email Address
-		</label>
+		<label for="email" class="block text-sm font-medium text-foreground/80"> Email Address </label>
 		<input
 			id="email"
 			type="email"

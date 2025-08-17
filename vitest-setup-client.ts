@@ -16,13 +16,13 @@ import fetch, { Headers, Request, Response } from 'node-fetch';
 // Cek apakah `fetch` sudah tersedia secara global (misalnya, di Node.js 18+)
 // Jika belum, pasang polyfill dari `node-fetch`
 if (!globalThis.fetch) {
-    globalThis.fetch = fetch as any; // Casting ke any untuk kompatibilitas tipe
-    globalThis.Headers = Headers as any;
-    globalThis.Request = Request as any;
-    globalThis.Response = Response as any;
-    console.log('[Vitest Setup Client] Polyfill `fetch` diaplikasikan.');
+	globalThis.fetch = fetch as any; // Casting ke any untuk kompatibilitas tipe
+	globalThis.Headers = Headers as any;
+	globalThis.Request = Request as any;
+	globalThis.Response = Response as any;
+	console.log('[Vitest Setup Client] Polyfill `fetch` diaplikasikan.');
 } else {
-    console.log('[Vitest Setup Client] `fetch` sudah tersedia secara global.');
+	console.log('[Vitest Setup Client] `fetch` sudah tersedia secara global.');
 }
 
 // --- b. Polyfill untuk `window` dan `document` (jika diperlukan oleh library tertentu) ---

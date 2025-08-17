@@ -52,7 +52,7 @@ class Logger {
 
 	private writeLog(logEntry: LogEntry): void {
 		const logString = JSON.stringify(logEntry, null, this.environment === 'development' ? 2 : 0);
-		
+
 		switch (logEntry.level) {
 			case 'DEBUG':
 				console.debug(logString);
@@ -105,13 +105,13 @@ class Logger {
 			error: childLogger.error.bind(childLogger)
 		};
 
-		childLogger.debug = (message: string, context?: LogContext) => 
+		childLogger.debug = (message: string, context?: LogContext) =>
 			originalMethods.debug(message, { ...additionalContext, ...context });
-		childLogger.info = (message: string, context?: LogContext) => 
+		childLogger.info = (message: string, context?: LogContext) =>
 			originalMethods.info(message, { ...additionalContext, ...context });
-		childLogger.warn = (message: string, context?: LogContext) => 
+		childLogger.warn = (message: string, context?: LogContext) =>
 			originalMethods.warn(message, { ...additionalContext, ...context });
-		childLogger.error = (message: string, context?: LogContext) => 
+		childLogger.error = (message: string, context?: LogContext) =>
 			originalMethods.error(message, { ...additionalContext, ...context });
 
 		return childLogger;
@@ -123,7 +123,7 @@ class Logger {
 	time(label: string, context?: LogContext): () => void {
 		const start = Date.now();
 		this.debug(`Timer started: ${label}`, context);
-		
+
 		return () => {
 			const duration = Date.now() - start;
 			this.info(`Timer finished: ${label}`, { ...context, duration });

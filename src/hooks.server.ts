@@ -20,7 +20,6 @@ function checkRateLimit(ip: string | null | undefined): boolean {
 	return rec.count <= RATE_LIMIT_MAX;
 }
 
-
 export const handle: Handle = async ({ event, resolve }) => {
 	// Inisialisasi Supabase client untuk setiap request
 	event.locals.supabase = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY);
@@ -28,13 +27,14 @@ export const handle: Handle = async ({ event, resolve }) => {
 	// Definisikan getter untuk sesi pengguna
 	event.locals.getSession = async () => {
 		const {
-			data: { session },
+			data: { session }
 		} = await event.locals.supabase.auth.getSession();
 		return session;
 	};
 
 	// Rate limit sederhana per IP
-	const ip = event.getClientAddress?.() || event.request.headers.get('x-forwarded-for') || undefined;
+	const ip =
+		event.getClientAddress?.() || event.request.headers.get('x-forwarded-for') || undefined;
 	if (!checkRateLimit(ip)) {
 		return new Response('Too Many Requests', { status: 429 });
 	}

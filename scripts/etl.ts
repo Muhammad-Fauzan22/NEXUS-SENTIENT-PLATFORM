@@ -57,7 +57,10 @@ async function processAndLoadChunks(chunks: Omit<KnowledgeChunk, 'content_embedd
 			const content_hash = computeHash(chunk.content);
 			const { error } = await supabaseAdmin
 				.from('knowledge_chunks')
-				.upsert({ ...chunkWithEmbedding, metadata: { ...chunkWithEmbedding.metadata, content_hash } }, { onConflict: 'source_id,metadata->>idx' as any });
+				.upsert(
+					{ ...chunkWithEmbedding, metadata: { ...chunkWithEmbedding.metadata, content_hash } },
+					{ onConflict: 'source_id,metadata->>idx' as any }
+				);
 
 			if (error) {
 				logger.error('Failed to upsert chunk into Supabase.', { error });
@@ -76,7 +79,10 @@ async function main() {
 	// --- EXTRACT from Notion (if configured) ---
 	const notionDbId = process.env.NOTION_KB_DATABASE_ID || '';
 	const notionDocsDbId = process.env.NOTION_DOCS_DATABASE_ID || '';
-	const notionDocNames = (process.env.NOTION_DOC_NAMES || '').split(',').map((s) => s.trim()).filter(Boolean);
+	const notionDocNames = (process.env.NOTION_DOC_NAMES || '')
+		.split(',')
+		.map((s) => s.trim())
+		.filter(Boolean);
 	const notionToken = process.env.NOTION_API_KEY || '';
 	let rawData: Omit<KnowledgeChunk, 'content_embedding' | 'id'>[] = [];
 
@@ -101,13 +107,18 @@ async function main() {
 				}
 			}
 		} catch (e) {
-			logger.error('Failed to extract from Notion KB database. Will still attempt doc-by-name if configured.', { error: e });
+			logger.error(
+				'Failed to extract from Notion KB database. Will still attempt doc-by-name if configured.',
+				{ error: e }
+			);
 		}
 	}
 
 	// Notion specific named documents (e.g., AD/ART, SOP, Kurikulum, LPJ)
 	if (notionDocsDbId && notionDocNames.length > 0 && notionToken) {
-		logger.info('Fetching specific documents by name from Notion docs database (incremental-aware)...');
+		logger.info(
+			'Fetching specific documents by name from Notion docs database (incremental-aware)...'
+		);
 		const ns = new NotionService(notionToken);
 		for (const name of notionDocNames) {
 			try {
@@ -127,13 +138,22 @@ async function main() {
 				}
 
 				const doc = await ns.getDocumentByName(notionDocsDbId, name);
-				if (!doc) { logger.warn('Named Notion doc not found', { name }); continue; }
+				if (!doc) {
+					logger.warn('Named Notion doc not found', { name });
+					continue;
+				}
 				const chunks = chunkText(doc.text);
 				for (let idx = 0; idx < chunks.length; idx++) {
 					rawData.push({
 						source_id: `${doc.title}#${doc.pageId}`,
 						content: chunks[idx],
-						metadata: { pageId: doc.pageId, title: doc.title, idx, source: 'notion:docs', last_edited_time: lastEdited || null }
+						metadata: {
+							pageId: doc.pageId,
+							title: doc.title,
+							idx,
+							source: 'notion:docs',
+							last_edited_time: lastEdited || null
+						}
 					});
 				}
 			} catch (e) {
@@ -158,7 +178,8 @@ async function main() {
 			},
 			{
 				source_id: 'doc-002',
-				content: 'Supabase provides a suite of tools including a Postgres database and authentication.',
+				content:
+					'Supabase provides a suite of tools including a Postgres database and authentication.',
 				metadata: { section: 'Introduction' }
 			}
 		];

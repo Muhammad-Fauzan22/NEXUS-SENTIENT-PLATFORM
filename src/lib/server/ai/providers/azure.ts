@@ -16,8 +16,10 @@ class AzureProvider implements AIProvider {
 		}
 		this.apiKey = config.AZURE_OPENAI_KEY;
 		// TODO: Ganti URL endpoint ini dengan URL spesifik Azure Anda
-		this.apiEndpoint = 'https://YOUR_AZURE_ENDPOINT.openai.azure.com/openai/deployments/YOUR_DEPLOYMENT_NAME/chat/completions?api-version=2023-07-01-preview';
-		this.embeddingEndpoint = 'https://YOUR_AZURE_ENDPOINT.openai.azure.com/openai/deployments/YOUR_EMBEDDING_DEPLOYMENT_NAME/embeddings?api-version=2023-07-01-preview';
+		this.apiEndpoint =
+			'https://YOUR_AZURE_ENDPOINT.openai.azure.com/openai/deployments/YOUR_DEPLOYMENT_NAME/chat/completions?api-version=2023-07-01-preview';
+		this.embeddingEndpoint =
+			'https://YOUR_AZURE_ENDPOINT.openai.azure.com/openai/deployments/YOUR_EMBEDDING_DEPLOYMENT_NAME/embeddings?api-version=2023-07-01-preview';
 	}
 
 	async generateStructuredContent(prompt: string): Promise<GeneratedIDP> {
@@ -30,18 +32,24 @@ class AzureProvider implements AIProvider {
 			},
 			body: JSON.stringify({
 				messages: [
-					{ role: 'system', content: 'Anda adalah asisten AI yang menghasilkan output JSON yang valid.' },
+					{
+						role: 'system',
+						content: 'Anda adalah asisten AI yang menghasilkan output JSON yang valid.'
+					},
 					{ role: 'user', content: prompt }
 				],
 				response_format: { type: 'json_object' }, // Memaksa output JSON
 				temperature: 0.4,
-				max_tokens: 4096,
+				max_tokens: 4096
 			})
 		});
 
 		if (!response.ok) {
 			const errorBody = await response.text();
-			logger.error('Gagal memanggil Azure OpenAI API.', { status: response.status, body: errorBody });
+			logger.error('Gagal memanggil Azure OpenAI API.', {
+				status: response.status,
+				body: errorBody
+			});
 			throw new InternalServerError('Gagal berkomunikasi dengan layanan AI.');
 		}
 
@@ -76,7 +84,10 @@ class AzureProvider implements AIProvider {
 
 		if (!response.ok) {
 			const errorBody = await response.text();
-			logger.error('Gagal memanggil Azure OpenAI Embedding API.', { status: response.status, body: errorBody });
+			logger.error('Gagal memanggil Azure OpenAI Embedding API.', {
+				status: response.status,
+				body: errorBody
+			});
 			throw new InternalServerError('Gagal membuat embedding.');
 		}
 

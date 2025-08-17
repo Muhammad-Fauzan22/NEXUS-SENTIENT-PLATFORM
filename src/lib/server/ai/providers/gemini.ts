@@ -21,17 +21,20 @@ async function generate(prompt: string): Promise<string> {
 		const result = await model.generateContent(prompt);
 		const response = result.response;
 		const text = response.text();
-		
+
 		if (!text) {
-			logger.warn('Gemini API returned a successful response but with empty content.', { responseData: response });
+			logger.warn('Gemini API returned a successful response but with empty content.', {
+				responseData: response
+			});
 		}
 
 		return text.trim();
 	} catch (error) {
 		// Menangani error spesifik dari SDK dan mencatatnya dengan benar
-		const sdkError = error instanceof Error ? { message: error.message, stack: error.stack } : error;
+		const sdkError =
+			error instanceof Error ? { message: error.message, stack: error.stack } : error;
 		logger.error('An unexpected error occurred while calling Gemini API', { sdkError });
-		
+
 		// Melemparkan error terstandarisasi untuk konsistensi di seluruh aplikasi.
 		throw new InternalServerError('Failed to communicate with Gemini API.');
 	}

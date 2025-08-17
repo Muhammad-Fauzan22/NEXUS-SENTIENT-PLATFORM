@@ -12,9 +12,7 @@ type StructuredProfile = Database['public']['Tables']['processed_profiles']['Ins
  * @returns Promise yang resolve menjadi objek profil terstruktur.
  * @throws {Error} Jika data input tidak valid.
  */
-export async function analyzeProfile(
-	rawData: AssessmentSubmission
-): Promise<StructuredProfile> {
+export async function analyzeProfile(rawData: AssessmentSubmission): Promise<StructuredProfile> {
 	if (!rawData || typeof rawData !== 'object') {
 		const errorMsg = 'Data asesmen mentah tidak valid atau kosong.';
 		logger.error(`[Profile Analyzer] FAILED: ${errorMsg}`);
@@ -50,12 +48,13 @@ export async function analyzeProfile(
 
 			// Data JSONB untuk skor
 			riasec_scores: rawData.riasec_scores as any,
-			pwb_scores: rawData.pwb_scores as any,
+			pwb_scores: rawData.pwb_scores as any
 		};
 
-		logger.info(`Analisis profil selesai. Tipe RIASEC dominan: ${dominantRIASEC}, PWB dominan: ${dominantPWB}.`);
+		logger.info(
+			`Analisis profil selesai. Tipe RIASEC dominan: ${dominantRIASEC}, PWB dominan: ${dominantPWB}.`
+		);
 		return processedProfile;
-
 	} catch (error) {
 		const e = error as Error;
 		const errorMsg = `Gagal menganalisis data asesmen: ${e.message}`;

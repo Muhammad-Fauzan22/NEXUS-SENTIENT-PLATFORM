@@ -56,7 +56,10 @@ for (const key of requiredCore) {
 
 // AI keys are conditional: either external providers or local LLM/embeddings must be present
 const hasExternalAI = Boolean(
-	config.CLAUDE_API_KEY || config.GEMINI_API_KEY || config.PERPLEXITY_API_KEY || config.OPENAI_API_KEY
+	config.CLAUDE_API_KEY ||
+		config.GEMINI_API_KEY ||
+		config.PERPLEXITY_API_KEY ||
+		config.OPENAI_API_KEY
 );
 const hasLocalAI = Boolean(process.env.LOCAL_LLM_BASE_URL || process.env.LOCAL_EMBEDDINGS_BASE_URL);
 if (!hasExternalAI && !hasLocalAI) {

@@ -18,14 +18,43 @@ const IdpFormSchema = z.object({
 	personal: z.object({
 		fullName: z.string().min(1).max(200),
 		email: z.string().email().max(320),
-		whatsapp: z.string().min(5).max(32).optional().or(z.literal('')).transform((v) => v || null),
-		origin: z.string().max(120).optional().or(z.literal('')).transform((v) => v || null)
+		whatsapp: z
+			.string()
+			.min(5)
+			.max(32)
+			.optional()
+			.or(z.literal(''))
+			.transform((v) => v || null),
+		origin: z
+			.string()
+			.max(120)
+			.optional()
+			.or(z.literal(''))
+			.transform((v) => v || null)
 	}),
 	academic: z.object({
-		gpa: z.union([z.number(), z.string()]).optional().transform((v) => (v === undefined ? null : Number(v))),
-		favoriteCourses: z.string().max(1000).optional().or(z.literal('')).transform((v) => v || null),
-		researchInterest: z.string().max(2000).optional().or(z.literal('')).transform((v) => v || null),
-		tools: z.string().max(2000).optional().or(z.literal('')).transform((v) => v || null)
+		gpa: z
+			.union([z.number(), z.string()])
+			.optional()
+			.transform((v) => (v === undefined ? null : Number(v))),
+		favoriteCourses: z
+			.string()
+			.max(1000)
+			.optional()
+			.or(z.literal(''))
+			.transform((v) => v || null),
+		researchInterest: z
+			.string()
+			.max(2000)
+			.optional()
+			.or(z.literal(''))
+			.transform((v) => v || null),
+		tools: z
+			.string()
+			.max(2000)
+			.optional()
+			.or(z.literal(''))
+			.transform((v) => v || null)
 	}),
 	psychometric: z.record(z.string(), z.unknown()).optional().default({})
 });
@@ -42,7 +71,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		// Ekstrak data dari body request + validasi
 		const parsed = IdpFormSchema.safeParse(await request.json());
 		if (!parsed.success) {
-			return json({ success: false, message: 'Data tidak valid', issues: parsed.error.issues }, { status: 400 });
+			return json(
+				{ success: false, message: 'Data tidak valid', issues: parsed.error.issues },
+				{ status: 400 }
+			);
 		}
 		const formData = parsed.data;
 

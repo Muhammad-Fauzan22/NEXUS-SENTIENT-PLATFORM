@@ -53,7 +53,7 @@ function buildPWBPrompt(totalScore: number): string {
  * Menganalisis satu set jawaban PWB menggunakan AI.
  */
 async function analyze(answers: PWBAnswer[]): Promise<PWBAnalysisResult> {
-	logger.info('Starting PWB analysis based on Ryff\'s model.');
+	logger.info("Starting PWB analysis based on Ryff's model.");
 	const totalScore = calculatePWBScore(answers);
 	const prompt = buildPWBPrompt(totalScore);
 
@@ -72,9 +72,11 @@ async function analyze(answers: PWBAnswer[]): Promise<PWBAnalysisResult> {
 			throw new Error('AI response for PWB analysis did not match the required schema.');
 		}
 
-		logger.info('Successfully completed PWB analysis.', { score: parsedResponse.totalScore, level: parsedResponse.level });
+		logger.info('Successfully completed PWB analysis.', {
+			score: parsedResponse.totalScore,
+			level: parsedResponse.level
+		});
 		return parsedResponse;
-
 	} catch (error) {
 		logger.error('Failed to analyze PWB data.', { error });
 		throw new InternalServerError('Error processing PWB analysis with AI.');

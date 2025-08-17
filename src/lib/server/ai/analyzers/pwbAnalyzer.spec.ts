@@ -37,13 +37,20 @@ describe('pwbAnalyzer Unit Tests', () => {
 
 		it('should calculate the maximum possible score correctly', () => {
 			const answers: PWBAnswer[] = [
-				{ question_id: 1, score: 6 }, { question_id: 2, score: 6 },
-				{ question_id: 3, score: 6 }, { question_id: 4, score: 6 },
-				{ question_id: 5, score: 6 }, { question_id: 6, score: 6 },
-				{ question_id: 7, score: 6 }, { question_id: 8, score: 6 },
-				{ question_id: 9, score: 6 }, { question_id: 10, score: 6 },
-				{ question_id: 11, score: 6 }, { question_id: 12, score: 6 },
-				{ question_id: 13, score: 6 }, { question_id: 14, score: 6 }
+				{ question_id: 1, score: 6 },
+				{ question_id: 2, score: 6 },
+				{ question_id: 3, score: 6 },
+				{ question_id: 4, score: 6 },
+				{ question_id: 5, score: 6 },
+				{ question_id: 6, score: 6 },
+				{ question_id: 7, score: 6 },
+				{ question_id: 8, score: 6 },
+				{ question_id: 9, score: 6 },
+				{ question_id: 10, score: 6 },
+				{ question_id: 11, score: 6 },
+				{ question_id: 12, score: 6 },
+				{ question_id: 13, score: 6 },
+				{ question_id: 14, score: 6 }
 			];
 			const expectedScore = 84; // 14 questions * 6 points
 			const result = calculatePWBScore(answers);

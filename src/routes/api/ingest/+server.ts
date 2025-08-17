@@ -12,10 +12,7 @@ export async function POST({ request }) {
 	const expectedApiKey = process.env.INGEST_API_KEY;
 
 	if (!authHeader || authHeader !== `Bearer ${expectedApiKey}`) {
-		return json(
-			{ error: 'Unauthorized' },
-			{ status: 401 }
-		);
+		return json({ error: 'Unauthorized' }, { status: 401 });
 	}
 
 	try {
@@ -24,10 +21,7 @@ export async function POST({ request }) {
 
 		// Validasi struktur data dasar
 		if (!data.fullName || !data.email) {
-			return json(
-				{ error: 'Invalid data structure' },
-				{ status: 400 }
-			);
+			return json({ error: 'Invalid data structure' }, { status: 400 });
 		}
 
 		// TODO: Save data to Supabase
@@ -35,17 +29,14 @@ export async function POST({ request }) {
 
 		// Respons sukses dengan data yang diterima (untuk debugging)
 		return json(
-			{ 
-				message: 'Data ingested successfully', 
-				receivedData: data as IStudentProfile 
+			{
+				message: 'Data ingested successfully',
+				receivedData: data as IStudentProfile
 			},
 			{ status: 200 }
 		);
 	} catch (error) {
 		// Tangani error parsing JSON atau error lainnya
-		return json(
-			{ error: 'Invalid JSON payload' },
-			{ status: 400 }
-		);
+		return json({ error: 'Invalid JSON payload' }, { status: 400 });
 	}
 }

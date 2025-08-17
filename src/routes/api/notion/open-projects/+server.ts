@@ -5,16 +5,16 @@ import { z } from 'zod';
 const QuerySchema = z.object({ databaseId: z.string().min(10) });
 
 export const GET: RequestHandler = async ({ url }) => {
-  const databaseId = url.searchParams.get('databaseId');
-  const parsed = QuerySchema.safeParse({ databaseId });
-  if (!parsed.success) throw error(400, 'Missing or invalid databaseId');
+	const databaseId = url.searchParams.get('databaseId');
+	const parsed = QuerySchema.safeParse({ databaseId });
+	if (!parsed.success) throw error(400, 'Missing or invalid databaseId');
 
-  try {
-    const notion = new NotionService();
-    const projects = await notion.findOpenProjects(parsed.data.databaseId);
-    return json({ projects });
-  } catch (e) {
-    console.error('Failed to retrieve open projects from Notion', e);
-    throw error(500, 'Failed to fetch projects');
-  }
+	try {
+		const notion = new NotionService();
+		const projects = await notion.findOpenProjects(parsed.data.databaseId);
+		return json({ projects });
+	} catch (e) {
+		console.error('Failed to retrieve open projects from Notion', e);
+		throw error(500, 'Failed to fetch projects');
+	}
 };

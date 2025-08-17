@@ -4,7 +4,7 @@ name: NEXUS Deploy - Build Verification
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ['main']
   workflow_dispatch:
 
 jobs:

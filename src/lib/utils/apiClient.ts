@@ -16,7 +16,11 @@ interface ApiErrorResponse {
  * @returns Promise yang me-resolve dengan data JSON dari respons.
  * @throws Error dengan pesan dari server jika permintaan gagal.
  */
-async function request<T>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', path: string, data?: unknown): Promise<T> {
+async function request<T>(
+	method: 'GET' | 'POST' | 'PUT' | 'DELETE',
+	path: string,
+	data?: unknown
+): Promise<T> {
 	const opts: RequestInit = {
 		method,
 		headers: {}

@@ -6,4 +6,3 @@ export const load: PageServerLoad = async ({ locals }: { locals: App.Locals }) =
 		session: await locals.getSession()
 	};
 };
-

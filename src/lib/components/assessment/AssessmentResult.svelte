@@ -46,7 +46,9 @@
 						<div class="border-t border-gray-200 pt-3 mt-3">
 							<h4 class="font-semibold text-gray-800">{item.title}</h4>
 							<p class="text-gray-600 mt-1">{item.description}</p>
-							<p class="text-xs text-gray-500 mt-1"><em><strong>Why:</strong> {item.rationale}</em></p>
+							<p class="text-xs text-gray-500 mt-1">
+								<em><strong>Why:</strong> {item.rationale}</em>
+							</p>
 						</div>
 					{/each}
 				</div>
@@ -57,7 +59,9 @@
 						<div class="border-t border-gray-200 pt-3 mt-3">
 							<h4 class="font-semibold text-gray-800">{item.title}</h4>
 							<p class="text-gray-600 mt-1">{item.description}</p>
-							<p class="text-xs text-gray-500 mt-1"><em><strong>Why:</strong> {item.rationale}</em></p>
+							<p class="text-xs text-gray-500 mt-1">
+								<em><strong>Why:</strong> {item.rationale}</em>
+							</p>
 						</div>
 					{/each}
 				</div>

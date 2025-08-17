@@ -90,18 +90,21 @@ async function generate(input: IDPGeneratorInput): Promise<IDPResult> {
 
 		// Validasi ketat terhadap skema yang diharapkan.
 		if (
-			!parsedResponse.title || !parsedResponse.strengthsAnalysis?.summary ||
-			!parsedResponse.growthAreas?.summary || !Array.isArray(parsedResponse.actionPlan?.strengths) ||
+			!parsedResponse.title ||
+			!parsedResponse.strengthsAnalysis?.summary ||
+			!parsedResponse.growthAreas?.summary ||
+			!Array.isArray(parsedResponse.actionPlan?.strengths) ||
 			!Array.isArray(parsedResponse.actionPlan?.growth) ||
 			parsedResponse.actionPlan.strengths.length === 0 ||
 			parsedResponse.actionPlan.growth.length === 0
 		) {
-			throw new Error('AI response for IDP generation did not match the required scientific schema.');
+			throw new Error(
+				'AI response for IDP generation did not match the required scientific schema.'
+			);
 		}
 
 		logger.info('Successfully completed IDP generation.', { user: input.userData.name });
 		return parsedResponse;
-
 	} catch (error) {
 		logger.error('Failed to generate IDP.', { error });
 		throw new InternalServerError('Error processing IDP generation with AI.');

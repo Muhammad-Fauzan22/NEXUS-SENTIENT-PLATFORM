@@ -5,7 +5,11 @@ import { buildAssessmentPrompt } from '$lib/server/ai/promptBuilder';
 import { retrieveContext } from '$lib/server/ai/rag';
 import { aiManager } from '$lib/server/services/ai.manager';
 import type { Database } from '$lib/types/database.types';
-import { generatedIdpSchema, type GeneratedIDP, type AssessmentSubmission } from '$lib/types/schemas';
+import {
+	generatedIdpSchema,
+	type GeneratedIDP,
+	type AssessmentSubmission
+} from '$lib/types/schemas';
 import { getTopTrendingSkills } from '$lib/server/analytics/trends';
 
 type StructuredProfile = Database['public']['Tables']['processed_profiles']['Row'];
@@ -14,9 +18,9 @@ type StructuredProfile = Database['public']['Tables']['processed_profiles']['Row
  * Mengorkestrasi proses pembuatan IDP dengan performance monitoring.
  */
 export async function generateIdp(profile: StructuredProfile): Promise<GeneratedIDP> {
-	const requestLogger = logger.child({ 
-		profileId: profile.id, 
-		operation: 'generateIdp' 
+	const requestLogger = logger.child({
+		profileId: profile.id,
+		operation: 'generateIdp'
 	});
 
 	return performanceMonitor.timeAsync(
@@ -45,7 +49,9 @@ export async function generateIdp(profile: StructuredProfile): Promise<Generated
 					{ profileId: profile.id }
 				);
 				requestLogger.debug('Excellence context retrieved', { count: excellenceDocs.length });
-				const excellenceChunks = excellenceDocs.map((d) => ({ content_text: d.content })).slice(0, 5);
+				const excellenceChunks = excellenceDocs
+					.map((d) => ({ content_text: d.content }))
+					.slice(0, 5);
 				const combinedContext = [...contextChunks, ...excellenceChunks];
 
 				// 2. Bangun Prompt (+ Trending Skills)
@@ -53,7 +59,7 @@ export async function generateIdp(profile: StructuredProfile): Promise<Generated
 					aspirations: profile.aspirations,
 					portfolio_text: profile.portfolio_text,
 					riasec_scores: profile.riasec_scores as any,
-					pwb_scores: profile.pwb_scores as any,
+					pwb_scores: profile.pwb_scores as any
 				};
 
 				const trendingSkills = await performanceMonitor.timeAsync(
@@ -80,21 +86,19 @@ export async function generateIdp(profile: StructuredProfile): Promise<Generated
 					{ profileId: profile.id, promptLength: prompt.length }
 				);
 
-				requestLogger.info('Konten IDP berhasil digenerate oleh AI', { 
+				requestLogger.info('Konten IDP berhasil digenerate oleh AI', {
 					profileId: profile.id,
-					responseLength: raw.length 
+					responseLength: raw.length
 				});
 
 				// 4. Parse JSON response
 				let generatedContent: unknown;
 				try {
-					generatedContent = performanceMonitor.timeSync(
-						'json_parsing',
-						() => JSON.parse(raw),
-						{ profileId: profile.id }
-					);
+					generatedContent = performanceMonitor.timeSync('json_parsing', () => JSON.parse(raw), {
+						profileId: profile.id
+					});
 				} catch (parseError) {
-					requestLogger.error('AI response is not valid JSON', { 
+					requestLogger.error('AI response is not valid JSON', {
 						parseError: parseError instanceof Error ? parseError.message : 'Unknown parse error',
 						rawResponse: raw.substring(0, 500) // Log first 500 chars for debugging
 					});
@@ -109,30 +113,29 @@ export async function generateIdp(profile: StructuredProfile): Promise<Generated
 				);
 
 				if (!validationResult.success) {
-					requestLogger.error('Output IDP dari AI tidak sesuai skema', { 
+					requestLogger.error('Output IDP dari AI tidak sesuai skema', {
 						errors: validationResult.error.flatten(),
-						profileId: profile.id 
+						profileId: profile.id
 					});
 					throw new AIProviderError('Gagal memvalidasi struktur data dari layanan AI.');
 				}
 
-				requestLogger.info('IDP generation completed successfully', { 
-					profileId: profile.id 
+				requestLogger.info('IDP generation completed successfully', {
+					profileId: profile.id
 				});
 
 				return validationResult.data;
-
 			} catch (error) {
-				const apiError = handleError(error, { 
-					profileId: profile.id, 
-					operation: 'generateIdp' 
+				const apiError = handleError(error, {
+					profileId: profile.id,
+					operation: 'generateIdp'
 				});
-				
-				requestLogger.error('Gagal dalam pipeline generasi IDP', { 
+
+				requestLogger.error('Gagal dalam pipeline generasi IDP', {
 					error: apiError.message,
-					profileId: profile.id 
+					profileId: profile.id
 				});
-				
+
 				throw apiError;
 			}
 		},

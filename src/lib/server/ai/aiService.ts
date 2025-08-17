@@ -33,7 +33,9 @@ export const aiService = {
 
 			// FASE 2: Sintesis & Generasi
 			// Menggunakan hasil analisis untuk menghasilkan laporan akhir.
-			logger.info('Starting synthesis phase (IDP Generation).', { email: assessmentData.user_data.email });
+			logger.info('Starting synthesis phase (IDP Generation).', {
+				email: assessmentData.user_data.email
+			});
 			const idpResult = await idpGenerator.generate({
 				userData: assessmentData.user_data,
 				riasecAnalysis: riasecResult,
@@ -42,7 +44,6 @@ export const aiService = {
 
 			// FASE 3: Mengembalikan Artefak Final
 			return { riasecResult, pwbResult, idpResult };
-
 		} catch (error) {
 			logger.error('A critical error occurred during the AI assessment pipeline.', { error });
 			if (error instanceof InternalServerError) throw error;

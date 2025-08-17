@@ -47,8 +47,22 @@ describe('IDP Generator', () => {
 		created_at: '2024-01-01T00:00:00Z',
 		aspirations: 'Saya ingin menjadi software engineer',
 		portfolio_text: 'Pengalaman dalam web development',
-		riasec_scores: { realistic: 3, investigative: 5, artistic: 2, social: 4, enterprising: 3, conventional: 2 },
-		pwb_scores: { autonomy: 4, environmental_mastery: 5, personal_growth: 5, positive_relations: 4, purpose_in_life: 5, self_acceptance: 4 },
+		riasec_scores: {
+			realistic: 3,
+			investigative: 5,
+			artistic: 2,
+			social: 4,
+			enterprising: 3,
+			conventional: 2
+		},
+		pwb_scores: {
+			autonomy: 4,
+			environmental_mastery: 5,
+			personal_growth: 5,
+			positive_relations: 4,
+			purpose_in_life: 5,
+			self_acceptance: 4
+		},
 		user_id: 'test-user-id',
 		full_name: 'Test User',
 		email: 'test@example.com',
@@ -70,35 +84,37 @@ describe('IDP Generator', () => {
 			{ id: '1', content_text: 'Test context', similarity: 0.8 }
 		]);
 		vi.mocked(buildAssessmentPrompt).mockReturnValue('Test prompt');
-		vi.mocked(aiManager.executeTask).mockResolvedValue(JSON.stringify({
-			linkedin_summary: 'Test summary',
-			potential_analysis: 'Test analysis',
-			career_goals_analysis: 'Test goals',
-			roadmap: [
-				{
-					semester: 1,
-					theme: 'Foundation',
-					academic: {
-						focus: 'Programming basics',
-						courses: ['CS101'],
-						knowledge: 'Programming fundamentals',
-						skills: 'Coding',
-						attitude: 'Curious',
-						kpis: ['Complete CS101']
-					},
-					non_academic: {
-						focus: 'Networking',
-						development_programs: ['Coding bootcamp'],
-						clubs: ['Programming club'],
-						mentors: ['Senior developer'],
-						knowledge: 'Industry trends',
-						skills: 'Communication',
-						attitude: 'Collaborative',
-						kpis: ['Join programming club']
+		vi.mocked(aiManager.executeTask).mockResolvedValue(
+			JSON.stringify({
+				linkedin_summary: 'Test summary',
+				potential_analysis: 'Test analysis',
+				career_goals_analysis: 'Test goals',
+				roadmap: [
+					{
+						semester: 1,
+						theme: 'Foundation',
+						academic: {
+							focus: 'Programming basics',
+							courses: ['CS101'],
+							knowledge: 'Programming fundamentals',
+							skills: 'Coding',
+							attitude: 'Curious',
+							kpis: ['Complete CS101']
+						},
+						non_academic: {
+							focus: 'Networking',
+							development_programs: ['Coding bootcamp'],
+							clubs: ['Programming club'],
+							mentors: ['Senior developer'],
+							knowledge: 'Industry trends',
+							skills: 'Communication',
+							attitude: 'Collaborative',
+							kpis: ['Join programming club']
+						}
 					}
-				}
-			]
-		}));
+				]
+			})
+		);
 
 		// Act
 		const result = await generateIdp(mockProfile);
@@ -108,7 +124,9 @@ describe('IDP Generator', () => {
 		expect(result.linkedin_summary).toBe('Test summary');
 		expect(result.roadmap).toHaveLength(1);
 		expect(result.roadmap[0].semester).toBe(1);
-		expect(retrieveContext).toHaveBeenCalledWith('Saya ingin menjadi software engineer. Pengalaman dalam web development');
+		expect(retrieveContext).toHaveBeenCalledWith(
+			'Saya ingin menjadi software engineer. Pengalaman dalam web development'
+		);
 		expect(buildAssessmentPrompt).toHaveBeenCalled();
 		expect(aiManager.executeTask).toHaveBeenCalledWith('GENERATE_DRAFT', 'Test prompt');
 	});
@@ -135,11 +153,13 @@ describe('IDP Generator', () => {
 
 		vi.mocked(retrieveContext).mockResolvedValue([]);
 		vi.mocked(buildAssessmentPrompt).mockReturnValue('Test prompt');
-		vi.mocked(aiManager.executeTask).mockResolvedValue(JSON.stringify({
-			// Invalid types to force schema validation failure
-			linkedin_summary: 123,
-			roadmap: 'not-array'
-		}));
+		vi.mocked(aiManager.executeTask).mockResolvedValue(
+			JSON.stringify({
+				// Invalid types to force schema validation failure
+				linkedin_summary: 123,
+				roadmap: 'not-array'
+			})
+		);
 
 		// Act & Assert
 		await expect(generateIdp(mockProfile)).rejects.toThrow();
@@ -153,12 +173,14 @@ describe('IDP Generator', () => {
 
 		vi.mocked(retrieveContext).mockRejectedValue(new Error('RAG failure'));
 		vi.mocked(buildAssessmentPrompt).mockReturnValue('Test prompt');
-		vi.mocked(aiManager.executeTask).mockResolvedValue(JSON.stringify({
-			linkedin_summary: 'Test summary',
-			potential_analysis: 'Test analysis',
-			career_goals_analysis: 'Test goals',
-			roadmap: []
-		}));
+		vi.mocked(aiManager.executeTask).mockResolvedValue(
+			JSON.stringify({
+				linkedin_summary: 'Test summary',
+				potential_analysis: 'Test analysis',
+				career_goals_analysis: 'Test goals',
+				roadmap: []
+			})
+		);
 
 		// Act & Assert
 		await expect(generateIdp(mockProfile)).rejects.toThrow();

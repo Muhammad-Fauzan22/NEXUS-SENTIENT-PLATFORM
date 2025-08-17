@@ -13,12 +13,41 @@ const ProfileSchema = z
 	.object({
 		full_name: z.string().min(1).max(200),
 		email: z.string().email().max(320),
-		whatsapp_number: z.string().min(5).max(32).optional().or(z.literal('')).transform((v) => v || null),
-		region: z.string().max(120).optional().or(z.literal('')).transform((v) => v || null),
-		gpa: z.union([z.number(), z.string()]).optional().transform((v) => (v === undefined ? null : Number(v))),
-		favorite_courses: z.string().max(1000).optional().or(z.literal('')).transform((v) => v || null),
-		research_interest: z.string().max(2000).optional().or(z.literal('')).transform((v) => v || null),
-		mastered_software: z.string().max(2000).optional().or(z.literal('')).transform((v) => v || null),
+		whatsapp_number: z
+			.string()
+			.min(5)
+			.max(32)
+			.optional()
+			.or(z.literal(''))
+			.transform((v) => v || null),
+		region: z
+			.string()
+			.max(120)
+			.optional()
+			.or(z.literal(''))
+			.transform((v) => v || null),
+		gpa: z
+			.union([z.number(), z.string()])
+			.optional()
+			.transform((v) => (v === undefined ? null : Number(v))),
+		favorite_courses: z
+			.string()
+			.max(1000)
+			.optional()
+			.or(z.literal(''))
+			.transform((v) => v || null),
+		research_interest: z
+			.string()
+			.max(2000)
+			.optional()
+			.or(z.literal(''))
+			.transform((v) => v || null),
+		mastered_software: z
+			.string()
+			.max(2000)
+			.optional()
+			.or(z.literal(''))
+			.transform((v) => v || null),
 		psychometric_results: z.record(z.string(), z.unknown()).optional().default({})
 	})
 	.strict()
@@ -29,10 +58,7 @@ export async function POST({ request }) {
 	const expectedApiKey = env.INGEST_API_KEY;
 
 	if (!authHeader || authHeader !== `Bearer ${expectedApiKey}`) {
-		return json(
-			{ error: 'Unauthorized' },
-			{ status: 401 }
-		);
+		return json({ error: 'Unauthorized' }, { status: 401 });
 	}
 
 	try {
@@ -81,9 +107,6 @@ export async function POST({ request }) {
 	} catch (error) {
 		// Tangani error parsing JSON atau error lainnya
 		console.error('Request processing error:', error);
-		return json(
-			{ error: 'Invalid JSON payload' },
-			{ status: 400 }
-		);
+		return json({ error: 'Invalid JSON payload' }, { status: 400 });
 	}
 }

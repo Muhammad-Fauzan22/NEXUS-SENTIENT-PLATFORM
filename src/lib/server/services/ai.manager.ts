@@ -36,31 +36,31 @@ class AIManager {
 		prompt: string,
 		options: AITaskOptions = {}
 	): Promise<string> {
-		logger.info(`Executing AI task: ${taskType}`, { 
-			taskType, 
+		logger.info(`Executing AI task: ${taskType}`, {
+			taskType,
 			promptLength: prompt.length,
-			preferLocal: this.preferLocal 
+			preferLocal: this.preferLocal
 		});
 
 		try {
 			const response = await this.getProviderForTask(taskType).generate(prompt, options);
-			
-			logger.info(`AI task completed successfully`, { 
-				taskType, 
-				responseLength: response.length 
+
+			logger.info(`AI task completed successfully`, {
+				taskType,
+				responseLength: response.length
 			});
-			
+
 			return response;
 		} catch (error) {
-			logger.error(`AI task failed`, { 
-				taskType, 
-				error: error instanceof Error ? error.message : 'Unknown error' 
+			logger.error(`AI task failed`, {
+				taskType,
+				error: error instanceof Error ? error.message : 'Unknown error'
 			});
-			
+
 			if (error instanceof InternalServerError) {
 				throw error;
 			}
-			
+
 			throw new InternalServerError(`Failed to execute AI task: ${taskType}`);
 		}
 	}
@@ -93,7 +93,10 @@ class AIManager {
 	 * Checks if AI services are available
 	 * @returns Promise resolving to availability status
 	 */
-	async healthCheck(): Promise<{ status: 'healthy' | 'degraded' | 'unhealthy'; providers: Record<string, boolean> }> {
+	async healthCheck(): Promise<{
+		status: 'healthy' | 'degraded' | 'unhealthy';
+		providers: Record<string, boolean>;
+	}> {
 		const providers: Record<string, boolean> = {};
 
 		try {

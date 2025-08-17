@@ -41,9 +41,11 @@ async function generate(prompt: string): Promise<string> {
 		const data = await response.json();
 		// Ekstraksi konten yang aman dengan optional chaining
 		const content = data.content?.[0]?.text || '';
-		
+
 		if (!content) {
-			logger.warn('Claude API returned a successful response but with empty content.', { responseData: data });
+			logger.warn('Claude API returned a successful response but with empty content.', {
+				responseData: data
+			});
 		}
 
 		return content.trim();

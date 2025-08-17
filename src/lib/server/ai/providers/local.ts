@@ -33,7 +33,9 @@ const MODE = (dynamicEnv.LOCAL_LLM_MODE || 'openai').toLowerCase();
 
 function assertConfigured() {
 	if (!BASE_URL) {
-		throw new InternalServerError('LOCAL_LLM_BASE_URL is not set. Please configure your local LLM endpoint.');
+		throw new InternalServerError(
+			'LOCAL_LLM_BASE_URL is not set. Please configure your local LLM endpoint.'
+		);
 	}
 }
 
@@ -44,14 +46,19 @@ export async function generate(prompt: string): Promise<string> {
 			throw new InternalServerError('LLM circuit breaker is OPEN. Please try again later.');
 		}
 
-
 		if (MODE === 'llamacpp') {
 			// llama.cpp server: POST /completion with timeout
 			const res = await withTimeout(
 				fetch(`${BASE_URL.replace(/\/$/, '')}/completion`, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ prompt, stream: false, temperature: 0.7, mirostat: 0, stop: ['</s>'] })
+					body: JSON.stringify({
+						prompt,
+						stream: false,
+						temperature: 0.7,
+						mirostat: 0,
+						stop: ['</s>']
+					})
 				}),
 				20_000
 			);
@@ -94,13 +101,16 @@ export async function generate(prompt: string): Promise<string> {
 		}
 		llmBreaker.succeed();
 		const data = await res.json();
-		const out = (data?.choices?.[0]?.message?.content || data?.choices?.[0]?.text || '').toString().trim();
+		const out = (data?.choices?.[0]?.message?.content || data?.choices?.[0]?.text || '')
+			.toString()
+			.trim();
 		return out;
 	} catch (error) {
 		logger.error('Local LLM provider encountered an unexpected error', { error });
-		throw error instanceof InternalServerError ? error : new InternalServerError('Local LLM provider failed.');
+		throw error instanceof InternalServerError
+			? error
+			: new InternalServerError('Local LLM provider failed.');
 	}
 }
 
 export const localProvider = { generate };
-

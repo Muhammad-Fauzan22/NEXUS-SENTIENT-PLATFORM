@@ -42,7 +42,9 @@ async function generate(prompt: string): Promise<string> {
 		const content = data.choices?.[0]?.message?.content || '';
 
 		if (!content) {
-			logger.warn('Perplexity API returned a successful response but with empty content.', { responseData: data });
+			logger.warn('Perplexity API returned a successful response but with empty content.', {
+				responseData: data
+			});
 		}
 
 		return content.trim();

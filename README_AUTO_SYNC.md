@@ -5,23 +5,29 @@ Sistem ini memungkinkan VSCode untuk secara otomatis mengupload perubahan code k
 ## 🚀 Cara Menggunakan
 
 ### 1. Setup Awal
+
 Pastikan Anda sudah memiliki:
+
 - Python 3.x terinstall
 - GitHub CLI (gh) terinstall
 - Repository sudah di-push ke GitHub
 
 ### 2. Install Dependencies
+
 ```bash
 pip install watchdog
 ```
 
 ### 3. Login ke GitHub CLI
+
 ```bash
 gh auth login
 ```
 
 ### 4. Jalankan Auto-Sync
+
 Double-click file `start_vscode_sync.bat` atau jalankan dari terminal:
+
 ```bash
 python auto_git_sync_vscode.py
 ```
@@ -29,6 +35,7 @@ python auto_git_sync_vscode.py
 ## ⚙️ Konfigurasi VSCode
 
 Sistem ini akan otomatis mengatur VSCode settings untuk:
+
 - Auto-save file setiap 1 detik
 - Disable Git sync confirmation
 - Enable smart commit
@@ -49,16 +56,19 @@ Sistem ini akan otomatis mengatur VSCode settings untuk:
 ## 🛠️ Customization
 
 ### Ganti Branch
+
 ```bash
 python auto_git_sync_vscode.py --branch develop
 ```
 
 ### Ganti Remote
+
 ```bash
 python auto_git_sync_vscode.py --remote upstream
 ```
 
 ### Status Check
+
 ```bash
 python auto_git_sync_vscode.py --status
 ```
@@ -66,17 +76,20 @@ python auto_git_sync_vscode.py --status
 ## 🚨 Troubleshooting
 
 ### Error: "Not a git repository"
+
 ```bash
 git init
 git remote add origin https://github.com/username/repo.git
 ```
 
 ### Error: "Remote not found"
+
 ```bash
 git remote add origin https://github.com/username/repo.git
 ```
 
 ### Error: "GitHub CLI not authenticated"
+
 ```bash
 gh auth login
 ```
@@ -100,6 +113,7 @@ Jika ingin setup manual tanpa script:
 ## 📊 Monitoring
 
 Cek log file `auto_git_sync.log` untuk melihat aktivitas sync:
+
 ```bash
 tail -f auto_git_sync.log
 ```

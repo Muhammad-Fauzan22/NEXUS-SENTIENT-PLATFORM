@@ -71,7 +71,6 @@
 		{:else}
 			<MarketInsights aspirasi={submissions?.[0]?.research_interest || 'engineering'} />
 		{/if}
-
 	</div>
 
 	<Button href="/" variant="primary">Create New IDP Submission</Button>

@@ -4,18 +4,19 @@ Blueprint Absolut & Final v2.0: Pembangunan Markas Digital HMM yang Mandiri di s
 
 Fokus: arsitektur gratis/open-source, LLM & Embeddings lokal (tanpa API berbayar), integrasi Notion/Slack/Teams/Drive, serta ETL RAG dokumen HMM.
 
-
 NOTE: This repo currently runs as a single SvelteKit app (adapter-node) with Supabase + Notion + RAG (pgvector). The legacy FastAPI references below reflect earlier plans; the live codebase here uses SvelteKit endpoints for APIs and TS-based ETL/ingestion.
 
 ---
 
 ## 1) Konsep Inti — Ekosistem Ganda
+
 - Sayap Organisasi (Otak Kolektif): Notion sebagai Single Source of Truth (SOP, Proker, Anggota, Arsip). Integrasi via Notion API.
 - Sayap Personal (NEXUS — Pelatih Pribadi): Aplikasi web di Replit, untuk asesmen, IDP, dan jembatan ke peluang di Notion.
 
 ---
 
 ## 2) Arsitektur Teknis
+
 - Backend: Python FastAPI
 - Frontend: SvelteKit (TypeScript)
 - Database: Replit PostgreSQL (atau PostgreSQL standar)
@@ -29,6 +30,7 @@ Catatan Replit: Mistral 7B kuantisasi 4-bit tetap berat. Jika memori terbatas, g
 ---
 
 ## 3) Struktur Direktori
+
 ```
 .
 ├─ backend/
@@ -54,31 +56,35 @@ Catatan Replit: Mistral 7B kuantisasi 4-bit tetap berat. Jika memori terbatas, g
 ---
 
 ## 4) Variabel Lingkungan (Secrets)
+
 Set di Replit Secrets atau .env lokal:
+
 - NOTION_TOKEN
-- NOTION_DB_PROJECTS_ID      # DB Program Kerja Utama
-- NOTION_DB_DOCS_ID          # DB Dokumen & Arsip Utama
-- DATABASE_URL               # Replit Postgres atau URL Postgres lain
+- NOTION_DB_PROJECTS_ID # DB Program Kerja Utama
+- NOTION_DB_DOCS_ID # DB Dokumen & Arsip Utama
+- DATABASE_URL # Replit Postgres atau URL Postgres lain
 - (Opsional) SLACK_BOT_TOKEN, TEAMS_BOT_ID, TEAMS_BOT_PASSWORD
 - (Opsional) GOOGLE_SERVICE_ACCOUNT_JSON (string JSON / base64)
 
 ---
 
 ## 5) Setup Replit
-1) Buat Repl baru (Python — FastAPI).
-2) Tambahkan file replit.nix dan requirements.txt (lihat bagian 8 & 9).
-3) Set Secrets (lihat bagian 4).
-4) Inisialisasi frontend:
+
+1. Buat Repl baru (Python — FastAPI).
+2. Tambahkan file replit.nix dan requirements.txt (lihat bagian 8 & 9).
+3. Set Secrets (lihat bagian 4).
+4. Inisialisasi frontend:
    - Jalankan: `npx create svelte@latest frontend`
    - Pilih: Skeleton + TypeScript + ESLint + Prettier
    - `cd frontend && npm install`
-5) Unduh model lokal: `python models/download_models.py`
-6) Jalankan backend: `uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload`
-7) Jalankan frontend: `npm run dev -- --host 0.0.0.0 --port 5173`
+5. Unduh model lokal: `python models/download_models.py`
+6. Jalankan backend: `uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload`
+7. Jalankan frontend: `npm run dev -- --host 0.0.0.0 --port 5173`
 
 ---
 
 ## 6) Setup Lokal (opsional)
+
 - Prasyarat: Python 3.11, Node.js 20, cmake, gcc, OpenBLAS (untuk build llama-cpp-python)
 - Instal deps Python: `python -m venv .venv && .venv/Scripts/pip install -r requirements.txt` (Windows)
 - Env vars: buat `.env` dengan isi variabel pada bagian 4.
@@ -87,6 +93,7 @@ Set di Replit Secrets atau .env lokal:
 ---
 
 ## 7) Alur Operasional
+
 - ETL dokumen:
   - `python scripts/etl.py --refresh`
   - Menarik dokumen penting dari Notion (filter Kategori/SOP/Arsip), chunking, embed via MiniLM, simpan ke DB.
@@ -99,6 +106,7 @@ Set di Replit Secrets atau .env lokal:
 ---
 
 ## 8) replit.nix (disarankan)
+
 ```
 { pkgs }: {
   deps = [
@@ -118,6 +126,7 @@ Set di Replit Secrets atau .env lokal:
 ---
 
 ## 9) requirements.txt (disarankan)
+
 ```
 fastapi==0.111.0
 uvicorn[standard]==0.30.0
@@ -136,6 +145,7 @@ llama-cpp-python==0.2.76
 ---
 
 ## 10) Endpoint Ringkas
+
 - GET `/health` → ok
 - POST `/api/chat` → { messages: [{role, content}, ...] } → balasan LLM lokal
 - POST `/api/idp` → { profile: {...} } → rencana IDP
@@ -146,13 +156,15 @@ llama-cpp-python==0.2.76
 ---
 
 ## 11) Asumsi Skema Notion (Saran)
+
 - DB Program Kerja Utama: Properties minimal → `Name` (title), `Status` (select: Open/Closed), `Divisi` (multi-select), `Deskripsi` (rich text), `Link Pendaftaran` (url)
 - DB Dokumen & Arsip Utama: `Name` (title), `Kategori` (select: KDKMM/SOP/Arsip/Lainnya), `Konten` (rich text/blocks)
-Catat `database_id` masing-masing untuk Secrets.
+  Catat `database_id` masing-masing untuk Secrets.
 
 ---
 
 ## 12) Model Lokal dan Performa
+
 - Default: Mistral-7B-Instruct-Q4_K_M (GGUF) → kualitas baik, kebutuhan memori lebih besar.
 - Fallback: Qwen2.5-3B-Instruct-Q4_K_M (GGUF) → lebih ringan, latensi lebih rendah di Replit.
 - Atur `n_threads` (mis. 2) dan `n_ctx` (2048–3072) agar stabil. Sesuaikan file `backend/ai_core.py`.
@@ -160,6 +172,7 @@ Catat `database_id` masing-masing untuk Secrets.
 ---
 
 ## 13) Langkah Berikutnya (Roadmap Otomasi)
+
 - Tambah scheduler ETL incremental (berdasar `last_edited_time` Notion).
 - Caching embeddings ke file `data/` untuk query cepat.
 - Integrasi webhook Slack/Teams (opsional tahap awal, bisa polling dulu).
@@ -168,6 +181,7 @@ Catat `database_id` masing-masing untuk Secrets.
 ---
 
 ## 14) Troubleshooting
+
 - Build `llama-cpp-python` gagal → pastikan cmake/gcc/openblas ada (replit.nix). Turunkan ke model GGUF 3B.
 - OOM saat load model → pakai file GGUF kuantisasi lebih ketat (Q4_K_S/Q5_0) atau model 3B.
 - Notion tidak mengembalikan konten lengkap → gunakan endpoint blocks children untuk gabung teks.

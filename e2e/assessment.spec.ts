@@ -37,7 +37,9 @@ test('Full assessment end-to-end flow', async ({ page }) => {
 
 	// Menegaskan bahwa halaman hasil akhir ditampilkan.
 	// Timeout diperpanjang menjadi 60 detik untuk mengakomodasi latensi API AI.
-	await expect(page.getByRole('heading', { name: 'Individual Development Plan for E2E Test User' })).toBeVisible({ timeout: 60000 });
+	await expect(
+		page.getByRole('heading', { name: 'Individual Development Plan for E2E Test User' })
+	).toBeVisible({ timeout: 60000 });
 
 	// Verifikasi akhir untuk memastikan konten rencana aksi telah dirender.
 	await expect(page.getByRole('heading', { name: 'Your Action Plan' })).toBeVisible();

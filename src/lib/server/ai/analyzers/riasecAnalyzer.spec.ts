@@ -12,8 +12,8 @@ describe('riasecAnalyzer Unit Tests', () => {
 				{ question_id: 7, answer: 'yes' }, // R
 				{ question_id: 2, answer: 'yes' }, // I
 				{ question_id: 4, answer: 'yes' }, // S
-				{ question_id: 5, answer: 'no' },  // E (should not be counted)
-				{ question_id: 6, answer: 'yes' }  // C
+				{ question_id: 5, answer: 'no' }, // E (should not be counted)
+				{ question_id: 6, answer: 'yes' } // C
 			];
 			const expectedScores: Record<RIASECCode, number> = { R: 2, I: 1, A: 0, S: 1, E: 0, C: 1 };
 			expect(calculateRIASECScores(answers)).toEqual(expectedScores);

@@ -78,11 +78,13 @@ Anda adalah seorang konselor karir dan akademik ahli dari Departemen Teknik Mesi
    - Software/Tools yang Dikuasai: ${submission.mastered_software || 'Tidak disediakan'}
 
 3. **Hasil Asesmen Psikometri (RIASEC):**
-   ${submission.psychometric_results ?
-				Object.entries(submission.psychometric_results as Record<string, unknown>)
-					.map(([key, value]) => `   - ${key}: ${value}`)
-					.join('\n')
-				: '   Data tidak tersedia'}
+   ${
+			submission.psychometric_results
+				? Object.entries(submission.psychometric_results as Record<string, unknown>)
+						.map(([key, value]) => `   - ${key}: ${value}`)
+						.join('\n')
+				: '   Data tidak tersedia'
+		}
 
 **TUGAS ANDA:**
 
@@ -156,10 +158,9 @@ Untuk setiap semester:
 			headers: {
 				'Content-Type': 'text/plain; charset=utf-8',
 				'Cache-Control': 'no-cache',
-				'Connection': 'keep-alive'
+				Connection: 'keep-alive'
 			}
 		});
-
 	} catch (err) {
 		console.error('Error in IDP generation:', err);
 

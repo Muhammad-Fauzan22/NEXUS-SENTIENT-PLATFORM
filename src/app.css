@@ -5,205 +5,228 @@
 @tailwind utilities;
 
 :root {
-  --background: #0a0a0a;
-  --foreground: #f4f4f5;
-  --primary: #3b82f6;
-  --secondary: #1e293b;
-  --accent: #14b8a6;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+	--background: #0a0a0a;
+	--foreground: #f4f4f5;
+	--primary: #3b82f6;
+	--secondary: #1e293b;
+	--accent: #14b8a6;
+	font-synthesis: none;
+	text-rendering: optimizeLegibility;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }
 
 html {
-  scroll-behavior: smooth;
+	scroll-behavior: smooth;
 }
 
 body {
-  background-color: var(--background);
-  color: var(--foreground);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+	background-color: var(--background);
+	color: var(--foreground);
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }
 
 #root {
-  margin: auto;
+	margin: auto;
 }
 
 /* NEXUS Living Interface Styles */
 .nexus-interface {
-  font-family: 'Inter', 'Syne', 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+	font-family:
+		'Inter',
+		'Syne',
+		'Space Grotesk',
+		-apple-system,
+		BlinkMacSystemFont,
+		sans-serif;
 }
 
 /* Disable text selection for interactive elements */
 .nexus-interactive {
-  user-select: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
+	user-select: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
 }
 
 /* Custom scrollbar for NEXUS */
 .nexus-scrollbar::-webkit-scrollbar {
-  width: 8px;
+	width: 8px;
 }
 
 .nexus-scrollbar::-webkit-scrollbar-track {
-  background: #0a0a0a;
+	background: #0a0a0a;
 }
 
 .nexus-scrollbar::-webkit-scrollbar-thumb {
-  background: #4a90e2;
-  border-radius: 4px;
+	background: #4a90e2;
+	border-radius: 4px;
 }
 
 .nexus-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #7bb3f0;
+	background: #7bb3f0;
 }
 
 /* Company branding styles */
 .company-logo-glow {
-  filter: drop-shadow(0 0 20px #FF0000);
-  transition: filter 0.3s ease;
+	filter: drop-shadow(0 0 20px #ff0000);
+	transition: filter 0.3s ease;
 }
 
 .company-logo-glow:hover {
-  filter: drop-shadow(0 0 30px #FF0000);
+	filter: drop-shadow(0 0 30px #ff0000);
 }
 
 /* Red accent animations */
 @keyframes redPulse {
-  0%, 100% {
-    box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
-  }
-  50% {
-    box-shadow: 0 0 40px rgba(255, 0, 0, 0.6);
-  }
+	0%,
+	100% {
+		box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+	}
+	50% {
+		box-shadow: 0 0 40px rgba(255, 0, 0, 0.6);
+	}
 }
 
 .red-accent-pulse {
-  animation: redPulse 3s ease-in-out infinite;
+	animation: redPulse 3s ease-in-out infinite;
 }
 
 /* Advanced NEXUS quantum effects */
 @keyframes quantumFlicker {
-  0%, 100% { opacity: 0.8; }
-  50% { opacity: 1; }
+	0%,
+	100% {
+		opacity: 0.8;
+	}
+	50% {
+		opacity: 1;
+	}
 }
 
 @keyframes neuralPulse {
-  0%, 100% { 
-    transform: scale(1);
-    filter: brightness(1);
-  }
-  50% { 
-    transform: scale(1.05);
-    filter: brightness(1.2);
-  }
+	0%,
+	100% {
+		transform: scale(1);
+		filter: brightness(1);
+	}
+	50% {
+		transform: scale(1.05);
+		filter: brightness(1.2);
+	}
 }
 
 @keyframes xrScan {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
 }
 
 @keyframes aiProcessing {
-  0%, 100% { 
-    background-position: 0% 50%;
-  }
-  50% { 
-    background-position: 100% 50%;
-  }
+	0%,
+	100% {
+		background-position: 0% 50%;
+	}
+	50% {
+		background-position: 100% 50%;
+	}
 }
 
 /* Quantum UI effects */
 .quantum-superposition {
-  animation: quantumFlicker 2s ease-in-out infinite;
+	animation: quantumFlicker 2s ease-in-out infinite;
 }
 
 .neural-activity {
-  animation: neuralPulse 1.5s ease-in-out infinite;
+	animation: neuralPulse 1.5s ease-in-out infinite;
 }
 
 .xr-interface {
-  animation: xrScan 4s linear infinite;
+	animation: xrScan 4s linear infinite;
 }
 
 .ai-processing {
-  background: linear-gradient(45deg, #FF0080, #FF44AA, #FF0080);
-  background-size: 200% 200%;
-  animation: aiProcessing 3s ease infinite;
+	background: linear-gradient(45deg, #ff0080, #ff44aa, #ff0080);
+	background-size: 200% 200%;
+	animation: aiProcessing 3s ease infinite;
 }
 
 /* Advanced interaction feedback */
 .gesture-detected {
-  box-shadow: 0 0 30px rgba(80, 200, 120, 0.8);
-  animation: neuralPulse 0.5s ease-out;
+	box-shadow: 0 0 30px rgba(80, 200, 120, 0.8);
+	animation: neuralPulse 0.5s ease-out;
 }
 
 .voice-active {
-  box-shadow: 0 0 30px rgba(0, 212, 255, 0.8);
-  animation: quantumFlicker 1s ease-in-out;
+	box-shadow: 0 0 30px rgba(0, 212, 255, 0.8);
+	animation: quantumFlicker 1s ease-in-out;
 }
 
 .eye-tracking {
-  box-shadow: 0 0 30px rgba(255, 107, 0, 0.8);
+	box-shadow: 0 0 30px rgba(255, 107, 0, 0.8);
 }
 
 /* Performance optimization classes */
 .quantum-accelerated {
-  transform: translateZ(0);
-  will-change: transform, opacity;
+	transform: translateZ(0);
+	will-change: transform, opacity;
 }
 
 .neural-optimized {
-  backface-visibility: hidden;
-  perspective: 1000px;
+	backface-visibility: hidden;
+	perspective: 1000px;
 }
 
 /* Personalization System Styles */
 .personalization-glassmorphism {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 24px;
+	background: rgba(255, 255, 255, 0.1);
+	backdrop-filter: blur(20px);
+	border: 1px solid rgba(255, 255, 255, 0.2);
+	border-radius: 24px;
 }
 
 .personalization-card-hover {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .personalization-card-hover:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+	transform: translateY(-4px);
+	box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
 }
 
 /* Adaptive theme animations */
 @keyframes adaptiveGlow {
-  0%, 100% {
-    box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
-  }
-  50% {
-    box-shadow: 0 0 40px rgba(139, 92, 246, 0.6);
-  }
+	0%,
+	100% {
+		box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+	}
+	50% {
+		box-shadow: 0 0 40px rgba(139, 92, 246, 0.6);
+	}
 }
 
 .adaptive-theme-glow {
-  animation: adaptiveGlow 3s ease-in-out infinite;
+	animation: adaptiveGlow 3s ease-in-out infinite;
 }
 
 /* Learning analytics visualizations */
 .learning-analytics-pulse {
-  animation: neuralPulse 2s ease-in-out infinite;
+	animation: neuralPulse 2s ease-in-out infinite;
 }
 
 /* Profile synchronization indicator */
 @keyframes syncRotate {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
 }
 
 .profile-sync-active {
-  animation: syncRotate 1s linear infinite;
+	animation: syncRotate 1s linear infinite;
 }

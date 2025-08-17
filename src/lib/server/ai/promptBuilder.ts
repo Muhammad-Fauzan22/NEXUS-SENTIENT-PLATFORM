@@ -21,9 +21,7 @@ export function buildAssessmentPrompt(
 	contextChunks: KnowledgeChunk[],
 	trendingSkills: string[] = []
 ): string {
-	const formattedContext = contextChunks
-		.map((chunk) => `- ${chunk.content_text}`)
-		.join('\n');
+	const formattedContext = contextChunks.map((chunk) => `- ${chunk.content_text}`).join('\n');
 
 	const userProfile = JSON.stringify(submissionData, null, 2);
 	const formattedTrends = trendingSkills.length
