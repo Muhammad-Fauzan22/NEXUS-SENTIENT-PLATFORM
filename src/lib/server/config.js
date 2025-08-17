@@ -63,8 +63,8 @@ const hasExternalAI = Boolean(
 );
 const hasLocalAI = Boolean(process.env.LOCAL_LLM_BASE_URL || process.env.LOCAL_EMBEDDINGS_BASE_URL);
 if (!hasExternalAI && !hasLocalAI) {
-	throw new Error(
-		'FATAL: No AI provider configured. Provide external AI keys or set LOCAL_LLM_BASE_URL/LOCAL_EMBEDDINGS_BASE_URL.'
+	console.warn(
+		"[WARN] No AI provider configured. Provide external AI keys or set LOCAL_LLM_BASE_URL/LOCAL_EMBEDDINGS_BASE_URL. Running in 'AI-lite' mode."
 	);
 }
 
