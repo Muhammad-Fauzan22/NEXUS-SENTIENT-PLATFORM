@@ -2,6 +2,8 @@
 <script lang="ts">
 	import Button from '$lib/components/ui/Button.svelte';
 
+	import MarketInsights from '$lib/components/dashboard/MarketInsights.svelte';
+
 	const { data } = $props();
 	const { session, submissions } = data;
 
