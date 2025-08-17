@@ -12,6 +12,10 @@ const MAX_FILES = 1000;
 const CHUNK_SIZE = 1000;
 const OVERLAP = 150;
 
+const targetDir = process.argv.includes('--dir')
+	? path.resolve(process.argv[process.argv.indexOf('--dir') + 1])
+	: ROOT;
+
 function walkFiles(dir: string): string[] {
 	const out: string[] = [];
 	const stack = [dir];
