@@ -1,0 +1,4 @@
+# NEXUS Platform Dataset Downloader Requirements
+requests>=2.25.0
+kaggle>=1.5.0
+datasets>=2.0.0
