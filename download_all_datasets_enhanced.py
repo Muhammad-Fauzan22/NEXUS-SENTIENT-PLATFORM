@@ -215,3 +215,34 @@ def main():
     # B. CV/Jobs/Skills datasets
     print("\n💼 Downloading CV/Jobs/Skills datasets...")
     
+    # HF Resume NER
+    success = download_hf_dataset("HF Resume NER", DATASETS_DIR / "hf-resume-ner", "zeroshot/twitter-resume")
+    if success:
+        successful_downloads.append("CV/hf-resume-ner")
+    else:
+        failed_downloads.append("CV/hf-resume-ner")
+    
+    # Job descriptions
+    if kaggle_ready:
+        success = download_kaggle_dataset("ravishah1/job-description-dataset", str(DATASETS_DIR / "job-descriptions"))
+        if success:
+            successful_downloads.append("CV/job-descriptions")
+        else:
+            failed_downloads.append("CV/job-descriptions")
+    else:
+        failed_downloads.append("CV/job-descriptions")
+    
+    # SkillNER
+    skillner_path = DATASETS_DIR / "skill-ner"
+    if not (skillner_path / "README.md").exists():
+        success, _ = run_command(f"git clone https://github.com/AnasAito/SkillNER.git {skillner_path}")
+        if success:
+            successful_downloads.append("CV/skill-ner")
+        else:
+            failed_downloads.append("CV/skill-ner")
+    else:
+        successful_downloads.append("CV/skill-ner")
+    
+    # O*NET dataset
+    onet_zip = DATASETS_DIR / "onet.zip"
+    onet_url = "https://www.onetcenter.org/dl_files/database/db_28_2_text.zip"
