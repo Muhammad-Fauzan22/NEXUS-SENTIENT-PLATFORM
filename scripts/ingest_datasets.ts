@@ -63,7 +63,7 @@ async function ingestFile(filePath: string) {
 						const { error } = await supabaseAdmin.from('knowledge_chunks').insert({
 							content_text: piece,
 							content_embedding: embedding,
-							metadata: { idx, ext, source: 'dataset', category, subpath, source_id }
+							source_document: source_id
 						});
 						if (error) logger.error('Failed insert dataset chunk', { error, filePath });
 						idx++;
