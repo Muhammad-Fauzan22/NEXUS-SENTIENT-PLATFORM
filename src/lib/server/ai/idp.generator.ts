@@ -33,9 +33,20 @@ export async function generateIdp(profile: StructuredProfile): Promise<Generated
 					{ profileId: profile.id, queryLength: ragQuery.length }
 				);
 
-				requestLogger.debug('RAG context retrieved', { 
-					contextChunksCount: contextChunks.length 
+				requestLogger.debug('RAG context retrieved', {
+					contextChunksCount: contextChunks.length
 				});
+
+				// 1.b Retrieval from Excellence Library
+				const { retrieveExcellenceContext } = await import('$lib/server/ai/excellence');
+				const excellenceDocs = await performanceMonitor.timeAsync(
+					'excellence_retrieval',
+					() => retrieveExcellenceContext(ragQuery, 5),
+					{ profileId: profile.id }
+				);
+				requestLogger.debug('Excellence context retrieved', { count: excellenceDocs.length });
+				const excellenceChunks = excellenceDocs.map((d) => ({ content_text: d.content })).slice(0, 5);
+				const combinedContext = [...contextChunks, ...excellenceChunks];
 
 				// 2. Bangun Prompt (+ Trending Skills)
 				const submissionData: AssessmentSubmission = {
@@ -53,7 +64,7 @@ export async function generateIdp(profile: StructuredProfile): Promise<Generated
 
 				const prompt = performanceMonitor.timeSync(
 					'prompt_building',
-					() => buildAssessmentPrompt(submissionData, contextChunks, trendingSkills),
+					() => buildAssessmentPrompt(submissionData, combinedContext, trendingSkills),
 					{ profileId: profile.id }
 				);
 
