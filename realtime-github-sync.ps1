@@ -12,6 +12,10 @@ param(
     [switch]$Force
 )
 
+# Force UTF-8 output to avoid encoding issues with special characters
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+$OutputEncoding = [Console]::OutputEncoding
+
 # Color codes for better UX
 $Colors = @{
     Success = "Green"
@@ -184,7 +188,7 @@ function Get-CommitMessage {
     param([array]$ChangedFiles)
     
     if ($ChangedFiles.Count -eq 0) {
-        return "🔄 Empty sync - $(Get-Date -Format 'HH:mm:ss')"
+        return "sync: no changes - $(Get-Date -Format 'HH:mm:ss')"
     }
     
     if ($ChangedFiles.Count -eq 1) {
@@ -196,14 +200,14 @@ function Get-CommitMessage {
             "\?\?" { "Add" }
             default { "Modify" }
         }
-        return "📝 $action: $($file.Path) - $(Get-Date -Format 'HH:mm:ss')"
+        return "commit: $action $($file.Path) - $(Get-Date -Format 'HH:mm:ss')"
     }
     
     # Multiple files - group by extension
     $extensions = $ChangedFiles | Group-Object { [System.IO.Path]::GetExtension($_.Path) }
     $summary = ($extensions | ForEach-Object { "$($_.Count) $($_.Name)" }) -join ", "
     
-    return "🔄 Sync: $summary - $(Get-Date -Format 'HH:mm:ss')"
+    return "sync: $summary - $(Get-Date -Format 'HH:mm:ss')"
 }
 
 # Sync changes to GitHub
