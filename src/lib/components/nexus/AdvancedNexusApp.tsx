@@ -331,7 +331,8 @@ export const AdvancedNexusApp: React.FC<AdvancedNexusAppProps> = ({
   );
 
   return (
-    <>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
 
       {/* Main interface */}
       {renderCurrentView()}
@@ -362,6 +363,6 @@ export const AdvancedNexusApp: React.FC<AdvancedNexusAppProps> = ({
           <div>Emotion: {emotionalState}</div>
         </Box>
       )}
-    </ThemeProvider >
+    </ThemeProvider>
   );
 };
