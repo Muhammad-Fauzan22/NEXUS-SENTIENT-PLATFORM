@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ThemeProvider, CssBaseline, Box, Stack, Fade } from '@mui/material';
+import theme from './theme/nexusTheme';
 import { OracleGate } from './components/OracleGate';
 import { ChatAssessment } from './components/ChatAssessment';
 import { ConstellationDashboard } from './components/ConstellationDashboard';
