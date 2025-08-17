@@ -1,8 +1,12 @@
 <!-- src/routes/submission/[id]/+page.svelte -->
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { toast } from 'svelte-sonner';
-	import MarkdownRenderer from '$lib/components/ui/MarkdownRenderer.svelte';
-
+	let MarkdownRenderer: any = $state(null);
+	onMount(async () => {
+		const mod = await import('$lib/components/ui/MarkdownRenderer.svelte');
+		MarkdownRenderer = mod.default;
+	});
 	const { data } = $props();
 
 	// State untuk mengelola loading dan hasil IDP

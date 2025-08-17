@@ -1,19 +1,33 @@
 from __future__ import annotations
 import os
 from typing import Generator
-from sqlalchemy import create_engine, Column, Integer, String, Text, ForeignKey
+from sqlalchemy import create_engine, Column, Integer, String, Text, ForeignKey, JSON
 from sqlalchemy.orm import sessionmaker, declarative_base, relationship
 from sqlalchemy.exc import OperationalError
-from sqlalchemy.dialects.postgresql import JSONB
+try:
+    from sqlalchemy.dialects.postgresql import JSONB as PG_JSONB
+except Exception:
+    PG_JSONB = None
 from .config import settings
 
 DATABASE_URL = settings.DATABASE_URL or os.getenv("DATABASE_URL")
 if not DATABASE_URL:
-    raise RuntimeError("DATABASE_URL is not set in environment.")
+    # Fallback to local SQLite for development
+    os.makedirs("data", exist_ok=True)
+    DATABASE_URL = "sqlite:///data/nexus.db"
 
-engine = create_engine(DATABASE_URL)
+# Configure engine with SQLite-specific args when needed
+engine_kwargs = {}
+if DATABASE_URL.startswith("sqlite"):
+    engine_kwargs["connect_args"] = {"check_same_thread": False}
+
+engine = create_engine(DATABASE_URL, **engine_kwargs)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
+
+# Decide embedding JSON type based on backend
+IS_POSTGRES = DATABASE_URL.startswith("postgresql")
+EmbeddingJSONType = PG_JSONB if (IS_POSTGRES and PG_JSONB is not None) else JSON
 
 class Document(Base):
     __tablename__ = "documents"
@@ -31,8 +45,8 @@ class Chunk(Base):
     document_id = Column(Integer, ForeignKey("documents.id", ondelete="CASCADE"))
     chunk_index = Column(Integer, nullable=False)
     text = Column(Text, nullable=False)
-    # Embedding as JSONB (Postgres). If not Postgres, fallback will still store JSON-serializable via SQLAlchemy
-    embedding = Column(JSONB, nullable=False)
+    # Embedding as JSON/JSONB depending on backend
+    embedding = Column(EmbeddingJSONType, nullable=False)
 
     document = relationship("Document", back_populates="chunks")
 
