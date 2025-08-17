@@ -136,3 +136,29 @@ def create_manual_download_guide():
 
 5. **Job Descriptions**
    - Dataset: `ravishah1/job-description-dataset`
+   - Command: `kaggle datasets download -d ravishah1/job-description-dataset -p ./datasets/job-descriptions --unzip`
+
+6. **Coursera Courses**
+   - Dataset: `siddharthm1698/coursera-course-dataset`
+   - Command: `kaggle datasets download -d siddharthm1698/coursera-course-dataset -p ./datasets/coursera-courses --unzip`
+
+7. **ArXiv**
+   - Dataset: `Cornell-University/arxiv`
+   - Command: `kaggle datasets download -d Cornell-University/arxiv -p ./datasets/arxiv --unzip`
+
+8. **TED Talks**
+   - Dataset: `miguelcorraljr/ted-ultimate-dataset`
+   - Command: `kaggle datasets download -d miguelcorraljr/ted-ultimate-dataset -p ./datasets/ted-talks --unzip`
+
+## Alternative Hugging Face Datasets
+1. **Resume NER** - Try these alternatives:
+   - `zeroshot/twitter-resume` 
+   - `buseskorkmaz/wikiann_resume_ner`
+   - `darentang/resumeNER`
+
+2. **Academic Advising** - Try these alternatives:
+   - `stanfordnlp/coqa`
+   - `microsoft/DialoGPT`
+   - `conv_ai_2`
+
+## Direct Downloads
