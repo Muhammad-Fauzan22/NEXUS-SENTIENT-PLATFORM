@@ -31,8 +31,8 @@ Invoke-WebRequest -Uri 'https://archive.ics.uci.edu/static/public/320/student+pe
 Expand-Archive -Path './datasets/academic/student_performance.zip' -DestinationPath './datasets/academic/student-performance' -Force
 Remove-Item './datasets/academic/student_performance.zip'
 
-# Hugging Face datasets
-python - << 'PY'
+# Hugging Face datasets (via temp python file)
+$pyCode = @'
 from datasets import load_dataset
 
 # Academic Advising Dataset
@@ -43,7 +43,11 @@ load_dataset("billsum").save_to_disk("./datasets/academic/hf-summarization")
 
 # Resume NER
 load_dataset("finetune/resume-entities-for-ner").save_to_disk("./datasets/academic/hf-resume-ner")
-PY
+'@
+$tmp = [System.IO.Path]::GetTempFileName()
+Set-Content -Path $tmp -Value $pyCode -Encoding UTF8
+python $tmp
+Remove-Item $tmp
 
 # GitHub repositories (optional)
 $github = @(
