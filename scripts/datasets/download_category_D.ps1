@@ -2,8 +2,8 @@
 # Bahasa, Percakapan & Pengetahuan Umum - 25 Dataset Sempurna
 New-Item -ItemType Directory -Force -Path ./datasets/language | Out-Null
 
-# Hugging Face datasets (streaming and local)
-python - << 'PY'
+# Hugging Face datasets (streaming and local) via temp python file
+$pyCode = @'
 from datasets import load_dataset
 
 # The Pile (streaming for large dataset)
@@ -65,7 +65,11 @@ load_dataset("story_cloze", "2016").save_to_disk("./datasets/language/story-cloz
 
 # Code Alpaca (Instruction Following)
 load_dataset("sahil2801/CodeAlpaca-20k").save_to_disk("./datasets/language/code-alpaca")
-PY
+'@
+$tmp = [System.IO.Path]::GetTempFileName()
+Set-Content -Path $tmp -Value $pyCode -Encoding UTF8
+python $tmp
+Remove-Item $tmp
 
 # Kaggle datasets
 $kaggleCmd = Join-Path $env:APPDATA 'Python\Python313\Scripts\kaggle.exe'
