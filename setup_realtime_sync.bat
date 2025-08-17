@@ -28,3 +28,38 @@ if errorlevel 1 (
     echo ❌ GitHub CLI not found! Please install GitHub CLI.
     echo Download from: https://cli.github.com/
     pause
+    exit /b 1
+)
+
+REM Check Python
+python --version >nul 2>&1
+if errorlevel 1 (
+    echo ❌ Python not found! Please install Python 3.x
+    pause
+    exit /b 1
+)
+
+REM Install dependencies
+echo 📦 Installing dependencies...
+pip install watchdog
+
+REM Check if git repository
+if not exist ".git" (
+    echo ❌ Not a git repository!
+    echo Please run: git init
+    pause
+    exit /b 1
+)
+
+REM Check GitHub authentication
+echo 🔐 Checking GitHub authentication...
+gh auth status >nul 2>&1
+if errorlevel 1 (
+    echo 🔐 Please login to GitHub CLI...
+    gh auth login
+)
+
+REM Test push
+echo 🧪 Testing GitHub connection...
+git push >nul 2>&1
+if errorlevel 1 (
