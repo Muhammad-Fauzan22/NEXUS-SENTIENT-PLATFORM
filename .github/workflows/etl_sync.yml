@@ -1,0 +1,39 @@
+name: Nightly ETL & Trends
+
+on:
+  schedule:
+    - cron: '17 20 * * *' # every day at 20:17 UTC
+  workflow_dispatch: {}
+
+jobs:
+  etl-and-trends:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Prepare env
+        run: |
+          echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" >> $GITHUB_ENV
+          echo "SUPABASE_SERVICE_ROLE_KEY=${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" >> $GITHUB_ENV
+          echo "VITE_PUBLIC_SUPABASE_URL=${{ secrets.VITE_PUBLIC_SUPABASE_URL }}" >> $GITHUB_ENV
+          echo "VITE_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.VITE_PUBLIC_SUPABASE_ANON_KEY }}" >> $GITHUB_ENV
+          echo "LOG_LEVEL=INFO" >> $GITHUB_ENV
+
+      - name: Analyze trends (if dataset exists)
+        run: |
+          npx ts-node -T scripts/analyze_trends.ts || echo "analyze_trends failed or no data"
+
+      - name: Excellence ingest (optional)
+        run: |
+          npm run ingest:excellence || echo "excellence ingest skipped"
+
