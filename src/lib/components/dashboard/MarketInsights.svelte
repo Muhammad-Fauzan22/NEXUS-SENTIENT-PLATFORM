@@ -1,5 +1,5 @@
 <script lang="ts">
-  export let aspirasi: string;
+  const { aspirasi } = $props<{ aspirasi: string }>();
   let loading = $state(false);
   let topDemand: { skill_name: string; mention_count_7d: number; velocity_score: number }[] = $state([]);
   let rising: { skill_name: string; mention_count_7d: number; velocity_score: number }[] = $state([]);
