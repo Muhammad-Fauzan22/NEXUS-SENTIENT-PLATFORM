@@ -1,17 +1,14 @@
 <!-- src/lib/components/ui/RadioGroup.svelte -->
 <script lang="ts">
-	let {
-		group = $bindable(),
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		label,
-		options,
-		name
-	} = $props<{
-		group: string;
+	// Props
+	let { label, options, group = $bindable<string | undefined>(), name } = $props<{
 		label: string;
 		options: string[];
-		name: string;
+		group?: string;
+		name?: string;
 	}>();
+	// touch group so TS sees it used when only referenced via bind:
+	$effect(() => { void group; });
 </script>
 
 <div class="mb-4">
@@ -21,7 +18,7 @@
 			<label class="flex items-center gap-2 cursor-pointer">
 				<input
 					type="radio"
-					{name}
+					name={name ?? label}
 					value={option}
 					bind:group
 					class="w-4 h-4 text-primary bg-secondary border-secondary focus:ring-primary focus:ring-2"

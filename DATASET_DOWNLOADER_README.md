@@ -1,131 +1,118 @@
 # NEXUS Platform Dataset Downloader
 
-## Overview
+Panduan resmi untuk mengunduh dataset NEXUS secara end-to-end di Windows dengan preflight checks, logging, dan verifikasi otomatis.
 
-This tool automatically downloads all datasets specified in the README_DATASETS.md file for the NEXUS Sentient Platform.
+## Ringkasan Alur
+- Satu klik Windows: `download_all_categories.bat`
+  - Install dependensi dataset (pip + requirements_datasets.txt)
+  - Preflight checks (internet, Kaggle credentials/CLI, disk space)
+  - Orkestrasi unduhan per kategori (A–D) via PowerShell script
+  - Verifikasi hasil unduhan (robust) dan output laporan
+  - Log lengkap: `datasets_download.log` dan `datasets_verify.log`
 
 ## Quick Start
 
-### Method 1: Double-click (Windows)
+### Metode 1: Satu-Klik (Windows)
+1) Double-click `download_all_categories.bat`
+2) Ikuti proses di layar (otomatis install dependencies, preflight, download, verify)
+3) Cek log hasil:
+   - `datasets_download.log` untuk proses download
+   - `datasets_verify.log` untuk hasil verifikasi
 
-1. Double-click `download_datasets.bat`
-2. Follow the on-screen instructions
+### Metode 2: Command Line
+- Orkestrasi unduhan:
+  ```bash
+  python download_all_datasets_enhanced.py
+  ```
+- Verifikasi manual:
+  ```bash
+  python verify_datasets.py
+  ```
 
-### Method 2: Command Line
+## Prasyarat
 
-```bash
-python download_all_datasets.py
-```
+- Python 3.8+
+- pip (tersedia default di instalasi Python)
+- Kaggle API (hanya untuk dataset Kaggle)
+  - Buat token di https://www.kaggle.com/settings/account → Create New API Token
+  - Simpan `kaggle.json` ke salah satu lokasi:
+    - Windows default: `C:\Users\<YourUser>\.kaggle\kaggle.json`
+    - Atau gunakan env `KAGGLE_CONFIG_DIR` (mis. `C:\secure\kaggle`) lalu simpan `kaggle.json` di sana
+- Dependencies Python (otomatis via batch):
+  - `pip install -r requirements_datasets.txt`
+  - Berisi: `requests`, `kaggle`, `datasets`
 
-## Prerequisites
+## Preflight Checks (otomatis)
+- Konektivitas Internet: Kaggle, HuggingFace, GitHub
+- Kredensial Kaggle: memverifikasi keberadaan `kaggle.json`
+- Kaggle CLI: `kaggle --version`
+- Kapasitas Disk: total/used/free + rekomendasi untuk kategori besar
+- Jika tidak ada internet, proses akan dihentikan lebih awal (exit code 2)
+- Jika Kaggle CLI/credentials tidak ada, proses tetap lanjut untuk non-Kaggle items (HF/direct), namun di-warning
 
-### 1. Python Environment
+## Kategori Dataset (ringkas)
+- A. Psychometrics
+- B. CV/Jobs/Skills
+- C. Education/Academic/Content
+- D. Language/Conversation/General Knowledge
 
-- Python 3.7 or higher
-- pip package manager
+Detail per kategori dikelola oleh skrip PowerShell di `scripts/datasets/`.
 
-### 2. Kaggle API Setup (Required for Kaggle datasets)
-
-1. Visit [Kaggle Account Settings](https://www.kaggle.com/settings/account)
-2. Click "Create New API Token" to download `kaggle.json`
-3. Place `kaggle.json` in: `C:\Users\<YourUser>\.kaggle\kaggle.json`
-
-### 3. Install Dependencies
-
-```bash
-pip install requests kaggle datasets
-```
-
-## Downloaded Datasets
-
-### A. Psychometrics (4 datasets)
-
-- **Big Five Personality Test** - Personality assessment data
-- **Student Mental Health** - Mental health survey data
-- **MBTI Type** - Myers-Briggs personality type data
-- **DASS Responses** - Depression, Anxiety, Stress Scale responses
-
-### B. CV/Jobs/Skills (5 datasets)
-
-- **HF Resume NER** - Resume entities for Named Entity Recognition
-- **Job Descriptions** - Job posting descriptions dataset
-- **SkillNER** - Skills extraction dataset
-- **O\*NET Database** - Occupational information network
-- **HF Resume NER** - Resume entities dataset
-
-### C. Education/Academic/Content (7 datasets)
-
-- **Student Performance** - Academic performance dataset
-- **Coursera Courses** - Online course dataset
-- **ArXiv** - Academic paper dataset
-- **TED Talks** - TED presentation dataset
-- **HF Academic Advising** - Academic advising conversations
-
-## Output Structure
-
-```
-datasets/
-├── big-five/
-├── student-mental-health/
-├── mbti-type/
-├── dass-responses/
-├── hf-resume-ner/
-├── job-descriptions/
-├── skill-ner/
-├── onet/
-├── student-performance/
-├── coursera-courses/
-├── arxiv/
-├── ted-talks/
-├── hf-academic-advising/
-└── hf-resume-ner/
-```
+## Verifikasi Dataset (robust)
+- `verify_datasets.py` melakukan verifikasi fleksibel:
+  - Mengenali dataset sebagai direktori atau file tunggal (zip/tar/jsonl)
+  - Variasi nama dengan hyphen/underscore
+  - Menandai dataset streaming besar tertentu sebagai "optional"
+- Output:
+  - Ringkasan di konsol
+  - Laporan JSON: `datasets_verification_report.json`
+  - Log verifikasi (saat dijalankan dari batch): `datasets_verify.log`
 
 ## Troubleshooting
+- Kaggle credentials hilang
+  - Pastikan `kaggle.json` berada di lokasi yang benar
+  - Cek `kaggle datasets list` untuk menguji kredensial/CLI
+- Koneksi/lambat/timeouts
+  - Jalankan ulang batch; beberapa sumber (Kaggle/HF) kadang throttling
+  - Gunakan jaringan stabil atau VPN bila perlu
+- Disk penuh
+  - Kategori D bisa membutuhkan ruang besar; kosongkan disk atau pindahkan root repo ke drive dengan ruang lebih lega
+- Gagal unzip/clone
+  - Cek `datasets_download.log` untuk error spesifik
+  - Jalankan ulang kategori terkait atau unduh manual sesuai perintah di `scripts/datasets/README_DATASETS.md`
 
-### Common Issues
-
-1. **Kaggle API Error**
-   - Ensure `kaggle.json` is in correct location
-   - Check internet connection
-   - Verify Kaggle account has API access
-
-2. **Permission Errors**
-   - Run as administrator if needed
-   - Check folder permissions
-
-3. **Network Issues**
-   - Use VPN if Kaggle is blocked
-   - Check firewall settings
-
-### Manual Download Commands
-
-If automatic download fails, use these manual commands:
-
-```bash
-# Psychometrics
-kaggle datasets download -d tunguz/big-five-personality-test -p ./datasets/big-five --unzip
-kaggle datasets download -d hafiznouman786/student-mental-health -p ./datasets/student-mental-health --unzip
-kaggle datasets download -d datasnaek/mbti-type -p ./datasets/mbti-type --unzip
-kaggle datasets download -d lucasgreenwell/depression-anxiety-stress-scales-responses -p ./datasets/dass-responses --unzip
-
-# Jobs/Skills
-python scripts/datasets/download_hf_resume.py
-kaggle datasets download -d ravishah1/job-description-dataset -p ./datasets/job-descriptions --unzip
-git clone https://github.com/AnasAito/SkillNER.git ./datasets/skill-ner
-
-# Education
-python scripts/datasets/download_hf_advising.py
+## Struktur Output (contoh)
+```
+datasets/
+├── psychometric/
+│   ├── big-five/
+│   ├── ...
+├── skills/
+│   ├── job-descriptions/
+│   ├── onet_db.zip (contoh file)
+│   └── ...
+├── academic/
+│   ├── coursera-courses/
+│   └── ...
+└── language/
+    ├── wikipedia-full/
+    ├── natural-questions-full/
+    └── ...
 ```
 
-## Next Steps
+## Perintah Manual (jika diperlukan)
+Lihat `scripts/datasets/README_DATASETS.md` untuk daftar perintah per kategori (Kaggle, HF, direct, GitHub) bila otomatis gagal.
 
-After downloading all datasets:
+## Langkah Setelah Download
+- Jalankan verifikasi manual (opsional):
+  ```bash
+  python verify_datasets.py
+  ```
+- Lanjut ingest (bila diperlukan):
+  ```bash
+  npm run ingest:datasets
+  ```
 
-1. Run ingestion: `npm run ingest:datasets`
-2. Check dataset integrity
-3. Configure vector database ingestion
-
-## Support
-
-For issues or questions, please refer to the main README_DATASETS.md file or create an issue in the repository.
+## Catatan Keamanan
+- Jangan menyimpan token API dalam kode/sumber. Simpan di env manager atau file kredensial resmi (mis. `.kaggle/kaggle.json`).
+- Revoke token yang pernah terpapar publik dan buat baru.

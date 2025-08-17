@@ -1,9 +1,27 @@
 # Category A: Psychometric datasets (25)
 New-Item -ItemType Directory -Force -Path ./datasets/psychometric | Out-Null
 
-# Resolve Kaggle CLI
-$kaggleCmd = Join-Path $env:APPDATA 'Python\Python313\Scripts\kaggle.exe'
-if (!(Test-Path $kaggleCmd)) { $kaggleCmd = 'kaggle' }
+# Resolve Kaggle CLI (robust)
+function Resolve-KaggleCLI {
+  try {
+    $cmd = Get-Command kaggle -ErrorAction SilentlyContinue
+    if ($cmd) { return $cmd.Source }
+  } catch {}
+  $candidates = @()
+  if ($env:APPDATA) {
+    $pyRoot = Join-Path $env:APPDATA 'Python'
+    $candidates += Get-ChildItem -Path $pyRoot -Directory -ErrorAction SilentlyContinue | ForEach-Object { Join-Path $_.FullName 'Scripts\kaggle.exe' }
+  }
+  if ($env:LOCALAPPDATA) {
+    $pyLocal = Join-Path $env:LOCALAPPDATA 'Programs\Python'
+    $candidates += Get-ChildItem -Path $pyLocal -Directory -ErrorAction SilentlyContinue | ForEach-Object { Join-Path $_.FullName 'Scripts\kaggle.exe' }
+  }
+  foreach ($cand in $candidates) { if (Test-Path $cand) { return $cand } }
+  return $null
+}
+$kaggleCmd = Resolve-KaggleCLI
+if (-not $kaggleCmd) { $kaggleCmd = 'kaggle' }
+Write-Host "Using Kaggle CLI: $kaggleCmd"
 
 $datasets = @(
   @{ k='tunguz/big-five-personality-test'; p='./datasets/psychometric/big-five' },
@@ -26,11 +44,18 @@ $datasets = @(
   @{ k='whenamI/student-motivation-and-engagement'; p='./datasets/psychometric/motivation-engagement' },
   @{ k='kulturehire/understanding-student-stress-and-support'; p='./datasets/psychometric/social-support' },
   @{ k='romilsuthar/academic-motivation-scale'; p='./datasets/psychometric/academic-motivation' },
-  @{ k='ruchi798/loneliness-dataset'; p='./datasets/psychometric/loneliness' },
   @{ k='ipip-ori/hexaco'; p='./datasets/psychometric/hexaco' }
 )
 
-foreach ($d in $datasets) { & $kaggleCmd datasets download -d $d.k -p $d.p --unzip }
+foreach ($d in $datasets) {
+  $hasFiles = (Test-Path $d.p) -and ((Get-ChildItem -Path $d.p -Recurse -File -ErrorAction SilentlyContinue | Measure-Object).Count -gt 0)
+  if ($hasFiles) {
+    Write-Host "SKIP Kaggle dataset (exists): $($d.k) -> $($d.p)"
+  } else {
+    Write-Host "DOWNLOADING Kaggle dataset: $($d.k) -> $($d.p)"
+    & $kaggleCmd datasets download -d $d.k -p $d.p --unzip
+  }
+}
 
 # Direct downloads (OpenPsychometrics) - optional, continue on failure
 $urls = @(
@@ -39,7 +64,14 @@ $urls = @(
   @{u='https://openpsychometrics.org/_rawdata/CRT.zip'; o='./datasets/psychometric/cognitive-reflection.zip'}
 )
 foreach ($it in $urls) {
-  try { Invoke-WebRequest -Uri $it.u -OutFile $it.o -ErrorAction Stop } catch { Write-Host "WARN: failed to fetch $($it.u) - $_" }
+  if (Test-Path $it.o) {
+    Write-Host "SKIP direct download (exists): $($it.o)"
+    continue
+  }
+  try {
+    Write-Host "DOWNLOADING direct: $($it.u) -> $($it.o)"
+    Invoke-WebRequest -Uri $it.u -OutFile $it.o -ErrorAction Stop
+  } catch { Write-Host "WARN: failed to fetch $($it.u) - $_" }
 }
 
 # GitHub (Team Roles Belbin - simulated) - optional

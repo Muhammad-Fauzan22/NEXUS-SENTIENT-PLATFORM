@@ -71,9 +71,27 @@ Set-Content -Path $tmp -Value $pyCode -Encoding UTF8
 python $tmp
 Remove-Item $tmp
 
-# Kaggle datasets
-$kaggleCmd = Join-Path $env:APPDATA 'Python\Python313\Scripts\kaggle.exe'
-if (!(Test-Path $kaggleCmd)) { $kaggleCmd = 'kaggle' }
+# Kaggle datasets (resolve CLI robustly)
+function Resolve-KaggleCLI {
+    try {
+        $cmd = Get-Command kaggle -ErrorAction SilentlyContinue
+        if ($cmd) { return $cmd.Source }
+    } catch {}
+    $candidates = @()
+    if ($env:APPDATA) {
+        $pyRoot = Join-Path $env:APPDATA 'Python'
+        $candidates += Get-ChildItem -Path $pyRoot -Directory -ErrorAction SilentlyContinue | ForEach-Object { Join-Path $_.FullName 'Scripts\kaggle.exe' }
+    }
+    if ($env:LOCALAPPDATA) {
+        $pyLocal = Join-Path $env:LOCALAPPDATA 'Programs\Python'
+        $candidates += Get-ChildItem -Path $pyLocal -Directory -ErrorAction SilentlyContinue | ForEach-Object { Join-Path $_.FullName 'Scripts\kaggle.exe' }
+    }
+    foreach ($cand in $candidates) { if (Test-Path $cand) { return $cand } }
+    return $null
+}
+$kaggleCmd = Resolve-KaggleCLI
+if (-not $kaggleCmd) { $kaggleCmd = 'kaggle' }
+Write-Host "Using Kaggle CLI: $kaggleCmd"
 $kaggle = @(
     @{ k='deepcontractor/2-million-reddit-comments'; p='./datasets/language/reddit-comments' },
     @{ k='quora-question-pairs'; p='./datasets/language/quora-question-pairs' }

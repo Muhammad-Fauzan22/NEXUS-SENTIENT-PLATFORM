@@ -35,21 +35,12 @@ export async function analyzeProfile(rawData: AssessmentSubmission): Promise<Str
 			pwbScores[a] > pwbScores[b] ? a : b
 		);
 
-		const processedProfile: StructuredProfile = {
-			// Asumsikan raw_assessment_id akan ditambahkan oleh pemanggil setelah data mentah disimpan
-			// raw_assessment_id: 'some-uuid',
-
-			// Data dari asesmen langsung
+		const processedProfile = {
 			aspirations: rawData.aspirations,
 			portfolio_text: rawData.portfolio_text,
-
-			// Hasil analisis
-			analyzed_summary: `Seorang individu dengan aspirasi di bidang ${rawData.aspirations}, menunjukkan kekuatan pada area ${dominantPWB} (PWB) dan minat vokasional yang kuat pada tipe ${dominantRIASEC} (RIASEC).`,
-
-			// Data JSONB untuk skor
 			riasec_scores: rawData.riasec_scores as any,
 			pwb_scores: rawData.pwb_scores as any
-		};
+		} as StructuredProfile;
 
 		logger.info(
 			`Analisis profil selesai. Tipe RIASEC dominan: ${dominantRIASEC}, PWB dominan: ${dominantPWB}.`

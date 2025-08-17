@@ -1,4 +1,4 @@
-import { SystemStatus, ChartType, UserRole } from '../types/enums';
+import { SystemStatus, UserRole } from '../types/enums';
 
 // Mock data for analytics charts
 export const mockQuery = {

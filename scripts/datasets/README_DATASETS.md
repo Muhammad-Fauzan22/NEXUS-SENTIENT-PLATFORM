@@ -1,78 +1,89 @@
-# NEXUS Datasets: Starter Pack and Acquisition Guide
+# NEXUS Datasets: Acquisition Guide (Updated)
 
-This folder contains commands and helper scripts to fetch and prepare high‑value, free datasets for assessment, training, and evaluation in the NEXUS platform.
+Panduan resmi untuk mengunduh dataset NEXUS (starter pack dan tambahan) menggunakan alur satu‑klik, dengan preflight, logging, dan verifikasi otomatis.
 
 IMPORTANT
-- Do not paste API tokens inside code. Keep tokens in your local env manager (Windows Credential Manager) or .kaggle/kaggle.json only.
-- Run commands from repository root. Output will be placed under ./datasets.
+- Jangan menaruh token API di dalam kode. Simpan token di env manager atau kaggle.json.
+- Jalankan perintah dari root repository. Output berada di ./datasets.
 
-Prereqs (run once)
-1) Kaggle CLI
-- Create API token in Kaggle → Settings → Create New Token → downloads kaggle.json
-- Put kaggle.json into: C:\Users\\<YourUser>\\.kaggle\\kaggle.json
-- Install CLI: pip install kaggle
+## Alur Satu‑Klik (Disarankan)
+- Jalankan: `download_all_categories.bat`
+  - Install dependencies (requirements_datasets.txt)
+  - Preflight (internet, Kaggle credentials/CLI, disk space)
+  - Orkestrasi download kategori A–D (PowerShell)
+  - Verifikasi otomatis (python verify_datasets.py)
+  - Logging: `datasets_download.log` dan `datasets_verify.log`
 
-2) Hugging Face datasets
-- pip install datasets
+## Prasyarat
+1) Kaggle CLI + kredensial
+- Buat API token di Kaggle → Settings → Create New Token → `kaggle.json`
+- Simpan di: `C:\Users\<User>\.kaggle\kaggle.json` atau set `KAGGLE_CONFIG_DIR`
+- Install CLI: `pip install kaggle`
+
+2) Hugging Face Datasets
+- `pip install datasets`
 
 3) Git
-- git --version (ensure installed)
+- Pastikan `git --version` bekerja
 
-Folders used
-- ./datasets/big-five
-- ./datasets/student-mental-health
-- ./datasets/mbti-type
-- ./datasets/dass-responses
-- ./datasets/job-descriptions
-- ./datasets/skill-ner
-- ./datasets/onet
-- ./datasets/student-performance
-- ./datasets/coursera-courses
-- ./datasets/arxiv
-- ./datasets/ted-talks
-- ./datasets/hf-resume-ner
-- ./datasets/hf-academic-advising
+## Struktur Folder (contoh)
+- ./datasets/psychometric/... (Category A)
+- ./datasets/skills/... (Category B)
+- ./datasets/academic/... (Category C)
+- ./datasets/language/... (Category D)
 
-Quick commands (Windows PowerShell)
-# A. Psychometrics
-kaggle datasets download -d tunguz/big-five-personality-test -p ./datasets/big-five --unzip
-kaggle datasets download -d hafiznouman786/student-mental-health -p ./datasets/student-mental-health --unzip
-kaggle datasets download -d datasnaek/mbti-type -p ./datasets/mbti-type --unzip
-kaggle datasets download -d lucasgreenwell/depression-anxiety-stress-scales-responses -p ./datasets/dass-responses --unzip
+## Perintah Manual (Cadangan)
+Gunakan jika otomatis gagal. Jalankan dari root repo.
 
-# B. CV / Jobs / Skills
+A. Psychometrics (Kaggle)
+```
+kaggle datasets download -d tunguz/big-five-personality-test -p ./datasets/psychometric/big-five --unzip
+kaggle datasets download -d hafiznouman786/student-mental-health -p ./datasets/psychometric/student-mental-health --unzip
+kaggle datasets download -d datasnaek/mbti-type -p ./datasets/psychometric/mbti-type --unzip
+kaggle datasets download -d lucasgreenwell/depression-anxiety-stress-scales-responses -p ./datasets/psychometric/dass-responses --unzip
+```
+Direct (opsional)
+```
+powershell -Command "Invoke-WebRequest -Uri 'https://openpsychometrics.org/_rawdata/RSES.zip' -OutFile './datasets/psychometric/self-esteem.zip'"
+```
+
+B. CV/Jobs/Skills
+```
 python scripts/datasets/download_hf_resume.py
-kaggle datasets download -d ravishah1/job-description-dataset -p ./datasets/job-descriptions --unzip
-git clone https://github.com/AnasAito/SkillNER.git ./datasets/skill-ner
-powershell -Command "Invoke-WebRequest -Uri 'https://www.onetcenter.org/dl_files/database/db_28_2_text.zip' -OutFile './datasets/onet.zip'"
+kaggle datasets download -d ravishah1/job-description-dataset -p ./datasets/skills/job-descriptions --unzip
+git clone https://github.com/AnasAito/SkillNER.git ./datasets/skills/skill-ner
+powershell -Command "Invoke-WebRequest -Uri 'https://www.onetcenter.org/dl_files/database/db_28_2_text.zip' -OutFile './datasets/skills/onet_db.zip'"
+```
 
-# C. Education / Academic / Content
-powershell -Command "Invoke-WebRequest -Uri 'https://archive.ics.uci.edu/static/public/320/student+performance.zip' -OutFile './datasets/student_performance.zip'"
-kaggle datasets download -d siddharthm1698/coursera-course-dataset -p ./datasets/coursera-courses --unzip
-kaggle datasets download -d Cornell-University/arxiv -p ./datasets/arxiv --unzip
-kaggle datasets download -d miguelcorraljr/ted-ultimate-dataset -p ./datasets/ted-talks --unzip
+C. Education/Academic/Content
+```
+powershell -Command "Invoke-WebRequest -Uri 'https://archive.ics.uci.edu/static/public/320/student+performance.zip' -OutFile './datasets/academic/student_performance.zip'"
+kaggle datasets download -d siddharthm1698/coursera-course-dataset -p ./datasets/academic/coursera-courses --unzip
+kaggle datasets download -d Cornell-University/arxiv -p ./datasets/academic/arxiv --unzip
+kaggle datasets download -d miguelcorraljr/ted-ultimate-dataset -p ./datasets/academic/ted-talks --unzip
 python scripts/datasets/download_hf_advising.py
+```
 
-After download
-- Unzip any .zip files if not auto‑unzipped
-- You can now run: npm run ingest:datasets (see below)
+D. Language/Conversation/General Knowledge (HF/Kaggle/Direct)
+- Perintah lengkap sudah di `scripts/datasets/download_category_D.ps1`.
+- Beberapa dataset besar hanya di-stream (The Pile) dan ditandai optional di verifikasi.
 
-Ingestion into vector DB (Supabase)
-- The script scripts/ingest_datasets.ts will traverse selected files and push text chunks into the knowledge_chunks table, generating embeddings using your configured provider.
+## Verifikasi Dataset (Robust)
+- Jalankan manual: `python verify_datasets.py`
+- Fitur:
+  - Deteksi direktori atau file tunggal (zip, tar, jsonl)
+  - Variasi nama hyphen/underscore
+  - Optional dataset (contoh: The Pile streaming)
+- Output JSON: `datasets_verification_report.json`
 
-Run ingestion
-npm run ingest:datasets
+## Troubleshooting Cepat
+- Kaggle error: pastikan `kaggle.json` benar dan `kaggle datasets list` berjalan
+- Timeout/Rate limit: jalankan ulang, gunakan koneksi stabil atau VPN
+- Disk penuh: pindahkan repo atau kosongkan ruang; kategori D besar
+- Gagal unzip/clone: cek `datasets_download.log` untuk error spesifik, ulang per kategori
 
-Environment needed for ingestion
-- SUPABASE_URL
-- SUPABASE_SERVICE_ROLE_KEY
-- LOCAL/remote embeddings provider env (same as existing ETL uses)
+## Ingest ke Vector DB (opsional)
+- Ikuti petunjuk di ETL/ingestion (mis. `npm run ingest:datasets` dan set environment Supabase/embeddings)
 
-Notion integration
-- Do NOT paste your Notion token into code. Set NOTION_API_KEY in your environment.
-- For targeted Notion docs: set NOTION_DOCS_DATABASE_ID and NOTION_DOC_NAMES (comma separated)
-- For generic Notion KB: set NOTION_KB_DATABASE_ID
-
-Security note for tokens in chat
-- If any token was ever posted in chat, revoke it immediately in the respective provider and create a new one before proceeding.
-
+Security Note
+- Revoke token yang pernah terpapar dan buat yang baru. Jangan taruh token di kode.

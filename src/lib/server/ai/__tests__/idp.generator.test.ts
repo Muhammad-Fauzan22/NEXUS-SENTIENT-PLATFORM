@@ -20,8 +20,8 @@ vi.mock('$lib/server/utils/logger', () => ({
 
 vi.mock('$lib/server/utils/performance', () => ({
 	performanceMonitor: {
-		timeAsync: vi.fn((name, fn) => fn()),
-		timeSync: vi.fn((name, fn) => fn())
+		timeAsync: vi.fn((_: any, fn: any) => fn()),
+		timeSync: vi.fn((_: any, fn: any) => fn())
 	}
 }));
 

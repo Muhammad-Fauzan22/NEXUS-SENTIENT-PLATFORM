@@ -30,11 +30,11 @@ export function createRequestLogger(event: RequestEvent) {
 	};
 
 	// Add user context if available
-	if (event.locals.session?.user?.id) {
-		context.userId = event.locals.session.user.id;
+	if ((event.locals as any).session?.user?.id) {
+		context.userId = (event.locals as any).session.user.id;
 	}
 
-	const requestLogger = logger.child(context);
+	const requestLogger = logger.child(context as any);
 
 	// Log incoming request
 	requestLogger.info('Request received', {
@@ -63,7 +63,7 @@ export function createRequestLogger(event: RequestEvent) {
 export function withRequestLogging<T extends (...args: any[]) => Promise<Response>>(handler: T): T {
 	return (async (...args: Parameters<T>) => {
 		const event = args[0] as RequestEvent;
-		const { logger: requestLogger, logResponse } = createRequestLogger(event);
+		const { logResponse } = createRequestLogger(event);
 		const startTime = Date.now();
 
 		try {

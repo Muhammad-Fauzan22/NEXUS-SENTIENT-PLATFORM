@@ -5,7 +5,7 @@ import { supabaseAdmin } from '$lib/server/supabase';
 import { logger } from '$lib/server/utils/logger';
 import { handleError, createErrorResponse } from '$lib/server/utils/errors';
 
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async () => {
 	const correlationId = crypto.randomUUID();
 	const requestLogger = logger.child({ correlationId, endpoint: '/api/health' });
 
@@ -72,7 +72,7 @@ export const GET: RequestHandler = async ({ url }) => {
 
 async function checkDatabase() {
 	try {
-		const { data, error } = await supabaseAdmin.from('processed_profiles').select('id').limit(1);
+		const { error } = await supabaseAdmin.from('processed_profiles').select('id').limit(1);
 
 		if (error) {
 			throw new Error(`Database query failed: ${error.message}`);

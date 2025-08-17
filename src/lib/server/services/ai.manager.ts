@@ -103,7 +103,7 @@ class AIManager {
 			// Test local provider if preferred
 			if (this.preferLocal) {
 				try {
-					await localProvider.generate('Health check', { timeout: 5000 });
+					await localProvider.generate('Health check');
 					providers.local = true;
 				} catch {
 					providers.local = false;
@@ -112,14 +112,14 @@ class AIManager {
 
 			// Test external providers
 			try {
-				await claudeProvider.generate('Health check', { timeout: 5000 });
+				await claudeProvider.generate('Health check');
 				providers.claude = true;
 			} catch {
 				providers.claude = false;
 			}
 
 			try {
-				await geminiProvider.generate('Health check', { timeout: 5000 });
+				await geminiProvider.generate('Health check');
 				providers.gemini = true;
 			} catch {
 				providers.gemini = false;

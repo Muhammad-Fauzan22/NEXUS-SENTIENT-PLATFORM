@@ -1,9 +1,27 @@
 # Category B: CV/Skills/Industry datasets (25)
 New-Item -ItemType Directory -Force -Path ./datasets/skills | Out-Null
 
-# Resolve Kaggle CLI
-$kaggleCmd = Join-Path $env:APPDATA 'Python\Python313\Scripts\kaggle.exe'
-if (!(Test-Path $kaggleCmd)) { $kaggleCmd = 'kaggle' }
+# Resolve Kaggle CLI (robust)
+function Resolve-KaggleCLI {
+  try {
+    $cmd = Get-Command kaggle -ErrorAction SilentlyContinue
+    if ($cmd) { return $cmd.Source }
+  } catch {}
+  $candidates = @()
+  if ($env:APPDATA) {
+    $pyRoot = Join-Path $env:APPDATA 'Python'
+    $candidates += Get-ChildItem -Path $pyRoot -Directory -ErrorAction SilentlyContinue | ForEach-Object { Join-Path $_.FullName 'Scripts\kaggle.exe' }
+  }
+  if ($env:LOCALAPPDATA) {
+    $pyLocal = Join-Path $env:LOCALAPPDATA 'Programs\Python'
+    $candidates += Get-ChildItem -Path $pyLocal -Directory -ErrorAction SilentlyContinue | ForEach-Object { Join-Path $_.FullName 'Scripts\kaggle.exe' }
+  }
+  foreach ($cand in $candidates) { if (Test-Path $cand) { return $cand } }
+  return $null
+}
+$kaggleCmd = Resolve-KaggleCLI
+if (-not $kaggleCmd) { $kaggleCmd = 'kaggle' }
+Write-Host "Using Kaggle CLI: $kaggleCmd"
 
 $kaggle = @(
   @{ k='ravishah1/job-description-dataset'; p='./datasets/skills/job-descriptions' },

@@ -1,0 +1,29 @@
+{
+  "github_token": "",
+  "repo_owner": "Muhammad-Fauzan22",
+  "repo_name": "NEXUS-SENTIENT-PLATFORM",
+  "sync_delay": 2,
+  "ignore_patterns": [
+    ".git",
+    "__pycache__",
+    ".pyc",
+    ".pyo",
+    ".pyd",
+    ".env",
+    ".venv",
+    "venv",
+    "node_modules",
+    ".next",
+    "dist",
+    "build",
+    ".DS_Store",
+    "*.log",
+    "*.tmp",
+    "*.temp",
+    "*.cache",
+    ".vscode/settings.json"
+  ],
+  "auto_commit": true,
+  "push_on_commit": true,
+  "commit_style": "detailed"
+}

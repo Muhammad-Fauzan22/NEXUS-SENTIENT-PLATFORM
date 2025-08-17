@@ -1,7 +1,5 @@
 import { toast as sonnerToast } from 'svelte-sonner';
 
-type ToastType = 'success' | 'info' | 'warning' | 'error' | 'action' | 'loading';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 
 export const toast = {
 	success: (message: string) => sonnerToast.success(message),
