@@ -1,10 +1,11 @@
 from __future__ import annotations
-from fastapi import FastAPI, Depends, HTTPException, Body
+from fastapi import FastAPI, Depends, HTTPException, Body, Header
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List, Optional
 import json
 from fastapi.responses import StreamingResponse
+import os
 
 from .db import create_all, get_session, Document, Chunk
 from .schemas import ChatRequest, ChatResponse, IDPRequest, IDPResponse, Opportunity, SearchRequest, SearchResult
@@ -33,10 +34,12 @@ def _local_chunk_text(text: str, max_chars: int = 1000, overlap: int = 200) -> L
         start = max(0, end - overlap)
     return chunks
 
-# CORS (sesuaikan origin pada deployment)
+# CORS origins configurable via env CORS_ORIGINS (comma-separated or "*")
+origins_env = os.getenv("CORS_ORIGINS", "*")
+allow_origins = ["*"] if origins_env.strip() == "*" else [o.strip() for o in origins_env.split(",") if o.strip()]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allow_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -92,9 +95,18 @@ def api_idp(req: IDPRequest) -> IDPResponse:
     idp_text = ai_core.generate_idp(req.profile)
     return IDPResponse(idp=idp_text)
 
+# Admin auth guard
+
+def admin_guard(x_admin_token: Optional[str] = Header(default=None)):
+    expected = os.getenv("ADMIN_TOKEN")
+    # If ADMIN_TOKEN is set, enforce it; if not set, allow by default
+    if expected and x_admin_token != expected:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    return True
+
 # Admin endpoints to manage ETL and dataset stats
 @app.post("/admin/etl/refresh")
-def admin_etl_refresh(categories: Optional[List[str]] = None):
+def admin_etl_refresh(categories: Optional[List[str]] = None, _: bool = Depends(admin_guard)):
     try:
         from scripts.etl import run_refresh
         run_refresh(categories=categories)
@@ -103,14 +115,14 @@ def admin_etl_refresh(categories: Optional[List[str]] = None):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/admin/stats")
-def admin_stats(db: Session = Depends(get_session)):
+def admin_stats(db: Session = Depends(get_session), _: bool = Depends(admin_guard)):
     docs = db.query(Document).count()
     chs = db.query(Chunk).count()
     return {"documents": docs, "chunks": chs}
 
 # Admin: manual indexing of arbitrary text
 @app.post("/admin/index")
-def admin_index(payload: dict = Body(...), db: Session = Depends(get_session)):
+def admin_index(payload: dict = Body(...), db: Session = Depends(get_session), _: bool = Depends(admin_guard)):
     title = (payload or {}).get("title")
     content = (payload or {}).get("content")
     source = (payload or {}).get("source", "Manual")
@@ -150,6 +162,50 @@ def api_list_docs(include_content: bool = False, category: Optional[str] = None)
     svc = NotionService()
     items = svc.list_documents(category=category, include_content=include_content)
     return items
+
+@app.post("/api/rag")
+def api_rag(payload: dict = Body(...), db: Session = Depends(get_session)):
+    query = (payload or {}).get("query")
+    k = int((payload or {}).get("k", 5))
+    temperature = float((payload or {}).get("temperature", 0.2))
+    if not query:
+        raise HTTPException(status_code=400, detail="query is required")
+    # Retrieve top-k
+    rows = db.query(Chunk, Document).join(Document, Chunk.document_id == Document.id).all()
+    if not rows:
+        return {"answer": "", "sources": []}
+    chunks = [row[0] for row in rows]
+    docs = [row[1] for row in rows]
+    import numpy as np
+    from numpy.linalg import norm
+    q_emb = embedding_service.embed_texts([query])[0]
+    m = np.array([c.embedding for c in chunks], dtype=float)
+    denom = (norm(m, axis=1) * norm(q_emb) + 1e-9)
+    sims = (m @ q_emb) / denom
+    top_idx = sims.argsort()[::-1][:k]
+    contexts = []
+    sources = []
+    for idx in top_idx:
+        idx = int(idx)
+        chunk = chunks[idx]
+        doc = docs[idx]
+        contexts.append(f"[{doc.title}#{chunk.chunk_index}]\n{chunk.text}")
+        sources.append({
+            "document_title": doc.title,
+            "chunk_index": chunk.chunk_index,
+            "score": float(sims[idx]),
+            "text": chunk.text,
+        })
+    system = ("Anda adalah NEXUS. Jawablah pertanyaan berbasis konteks berikut. "
+              "Jika jawaban tidak ada dalam konteks, katakan tidak tahu. "
+              "Cantumkan sumber sebagai [Judul#Chunk]. Jawab ringkas dan akurat.")
+    user = f"Konteks:\n\n" + "\n\n".join(contexts) + f"\n\nPertanyaan: {query}"
+    messages = [
+        {"role": "system", "content": system},
+        {"role": "user", "content": user},
+    ]
+    answer = ai_core.chat(messages, max_tokens=700, temperature=temperature)
+    return {"answer": answer, "sources": sources}
 
 @app.post("/api/search", response_model=List[SearchResult])
 def api_search(req: SearchRequest, db: Session = Depends(get_session)) -> List[SearchResult]:
