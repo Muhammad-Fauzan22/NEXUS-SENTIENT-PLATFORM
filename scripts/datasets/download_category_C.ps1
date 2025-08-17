@@ -66,4 +66,4 @@ New-Item -ItemType Directory -Force -Path ./datasets/academic/professional-certi
 New-Item -ItemType Directory -Force -Path ./datasets/academic/conferences | Out-Null
 New-Item -ItemType Directory -Force -Path ./datasets/academic/scholarships | Out-Null
 
-Write-Host "✅ Category C: Education, Academic & Career datasets downloaded successfully!"
+Write-Host "✅ Category C: Education, Academic & Career datasets downloaded (best-effort)"
