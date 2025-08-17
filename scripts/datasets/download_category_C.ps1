@@ -69,16 +69,25 @@ if ($uciHasFiles) {
 
 # Hugging Face datasets (via temp python file)
 $pyCode = @'
+import os
 from datasets import load_dataset
 
+def save_if_missing(path, *args, **kwargs):
+    if os.path.exists(path):
+        print(f"SKIP: {path} exists")
+        return
+    print(f"DOWNLOADING: {args[0]} -> {path}")
+    ds = load_dataset(*args, **kwargs)
+    ds.save_to_disk(path)
+
 # Academic Advising Dataset
-load_dataset("TIGER-Lab/Academic-Advising-Dataset").save_to_disk("./datasets/academic/hf-academic-advising")
+save_if_missing("./datasets/academic/hf-academic-advising", "TIGER-Lab/Academic-Advising-Dataset")
 
 # Research Paper Summarization
-load_dataset("billsum").save_to_disk("./datasets/academic/hf-summarization")
+save_if_missing("./datasets/academic/hf-summarization", "billsum")
 
 # Resume NER
-load_dataset("finetune/resume-entities-for-ner").save_to_disk("./datasets/academic/hf-resume-ner")
+save_if_missing("./datasets/academic/hf-resume-ner", "finetune/resume-entities-for-ner")
 '@
 $tmp = [System.IO.Path]::GetTempFileName()
 Set-Content -Path $tmp -Value $pyCode -Encoding UTF8
