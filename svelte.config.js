@@ -6,7 +6,7 @@ const config = {
 	preprocess: vitePreprocess(),
 
 	kit: {
-		adapter: adapter(),
+		adapter: adapter({ runtime: 'nodejs20.x' }),
 
 		// Mendefinisikan alias path '$lib' adalah krusial untuk impor yang bersih
 		// dan konsisten di seluruh aplikasi.
