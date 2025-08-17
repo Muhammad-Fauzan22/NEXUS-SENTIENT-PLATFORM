@@ -4,6 +4,9 @@ Blueprint Absolut & Final v2.0: Pembangunan Markas Digital HMM yang Mandiri di s
 
 Fokus: arsitektur gratis/open-source, LLM & Embeddings lokal (tanpa API berbayar), integrasi Notion/Slack/Teams/Drive, serta ETL RAG dokumen HMM.
 
+
+NOTE: This repo currently runs as a single SvelteKit app (adapter-node) with Supabase + Notion + RAG (pgvector). The legacy FastAPI references below reflect earlier plans; the live codebase here uses SvelteKit endpoints for APIs and TS-based ETL/ingestion.
+
 ---
 
 ## 1) Konsep Inti — Ekosistem Ganda
@@ -62,35 +65,35 @@ Set di Replit Secrets atau .env lokal:
 ---
 
 ## 5) Setup Replit
-1) Buat Repl baru (Python — FastAPI).  
-2) Tambahkan file replit.nix dan requirements.txt (lihat bagian 8 & 9).  
-3) Set Secrets (lihat bagian 4).  
-4) Inisialisasi frontend:  
-   - Jalankan: `npx create svelte@latest frontend`  
-   - Pilih: Skeleton + TypeScript + ESLint + Prettier  
-   - `cd frontend && npm install`  
-5) Unduh model lokal: `python models/download_models.py`  
-6) Jalankan backend: `uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload`  
+1) Buat Repl baru (Python — FastAPI).
+2) Tambahkan file replit.nix dan requirements.txt (lihat bagian 8 & 9).
+3) Set Secrets (lihat bagian 4).
+4) Inisialisasi frontend:
+   - Jalankan: `npx create svelte@latest frontend`
+   - Pilih: Skeleton + TypeScript + ESLint + Prettier
+   - `cd frontend && npm install`
+5) Unduh model lokal: `python models/download_models.py`
+6) Jalankan backend: `uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload`
 7) Jalankan frontend: `npm run dev -- --host 0.0.0.0 --port 5173`
 
 ---
 
 ## 6) Setup Lokal (opsional)
 - Prasyarat: Python 3.11, Node.js 20, cmake, gcc, OpenBLAS (untuk build llama-cpp-python)
-- Instal deps Python: `python -m venv .venv && .venv/Scripts/pip install -r requirements.txt` (Windows)  
-- Env vars: buat `.env` dengan isi variabel pada bagian 4.  
+- Instal deps Python: `python -m venv .venv && .venv/Scripts/pip install -r requirements.txt` (Windows)
+- Env vars: buat `.env` dengan isi variabel pada bagian 4.
 - Jalankan backend/frontend sesuai perintah di atas.
 
 ---
 
 ## 7) Alur Operasional
 - ETL dokumen:
-  - `python scripts/etl.py --refresh`  
+  - `python scripts/etl.py --refresh`
   - Menarik dokumen penting dari Notion (filter Kategori/SOP/Arsip), chunking, embed via MiniLM, simpan ke DB.
-- Chat Asesmen (LLM lokal) via `/api/chat`  
-- Generate IDP via `/api/idp`  
-- Peluang HMM (Open Projects) via `/api/opportunities`  
-- Dokumen tertentu via `/api/docs/{name}`  
+- Chat Asesmen (LLM lokal) via `/api/chat`
+- Generate IDP via `/api/idp`
+- Peluang HMM (Open Projects) via `/api/opportunities`
+- Dokumen tertentu via `/api/docs/{name}`
 - Pencarian RAG via `/api/search` (cosine similarity lokal)
 
 ---
