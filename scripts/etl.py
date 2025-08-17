@@ -2,6 +2,7 @@ from __future__ import annotations
 import argparse
 from typing import List
 from sqlalchemy.orm import Session
+from datetime import datetime
 from backend.db import get_session, Document, Chunk, create_all
 from backend.notion_service import NotionService
 from backend import embedding_service
@@ -42,21 +43,34 @@ def upsert_document(db: Session, title: str, content: str, notion_page_id: str |
     return doc
 
 
-def run_refresh(categories: List[str] | None = None):
+def run_refresh(categories: List[str] | None = None, incremental: bool = False):
     create_all()
     svc = NotionService()
-    with next(get_session()) as db:  # type: ignore
+    # Acquire a session explicitly
+    gen = get_session()
+    db = next(gen)  # type: ignore
+    try:
         # list docs (by category if provided), else all
         docs = []
         if categories:
             for c in categories:
-                docs.extend(svc.list_documents(category=c))
+                docs.extend(svc.list_documents(category=c, include_content=True))
         else:
-            docs = svc.list_documents()
+            docs = svc.list_documents(include_content=True)
+
         for d in docs:
             title = d.get("title", "Untitled")
             content = d.get("content", "")
             page_id = d.get("id")
+            last_edited = d.get("last_edited_time")
+
+            # incremental: skip if doc exists and not modified (simple heuristic via content length or timestamp)
+            if incremental and page_id:
+                existing = db.query(Document).filter(Document.notion_page_id == page_id).one_or_none()
+                if existing and existing.content == content:
+                    # unchanged content, skip
+                    continue
+
             # chunk
             pieces = chunk_text(content)
             if not pieces:
@@ -73,15 +87,21 @@ def run_refresh(categories: List[str] | None = None):
                 db.add(ch)
             db.commit()
             print(f"Indexed: {title} -> {len(pieces)} chunks")
+    finally:
+        try:
+            next(gen)
+        except StopIteration:
+            pass
 
 
 def main():
     parser = argparse.ArgumentParser(description="ETL Notion -> Embeddings -> Postgres")
     parser.add_argument("--refresh", action="store_true", help="Full refresh of all docs")
+    parser.add_argument("--incremental", action="store_true", help="Enable incremental refresh (skip unchanged)")
     parser.add_argument("--category", action="append", help="Filter category (can repeat)")
     args = parser.parse_args()
     if args.refresh:
-        run_refresh(categories=args.category)
+        run_refresh(categories=args.category, incremental=args.incremental)
     else:
         print("No action. Use --refresh")
 
