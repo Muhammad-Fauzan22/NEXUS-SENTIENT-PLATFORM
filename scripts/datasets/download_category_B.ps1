@@ -36,7 +36,15 @@ $kaggle = @(
   @{ k='ayushggarg/salary-prediction-dataset'; p='./datasets/skills/salary-prediction' }
 )
 
-foreach ($d in $kaggle) { & $kaggleCmd datasets download -d $d.k -p $d.p --unzip }
+foreach ($d in $kaggle) {
+  $hasFiles = (Test-Path $d.p) -and ((Get-ChildItem -Path $d.p -Recurse -File -ErrorAction SilentlyContinue | Measure-Object).Count -gt 0)
+  if ($hasFiles) {
+    Write-Host "SKIP Kaggle dataset (exists): $($d.k) -> $($d.p)"
+  } else {
+    Write-Host "DOWNLOADING Kaggle dataset: $($d.k) -> $($d.p)"
+    & $kaggleCmd datasets download -d $d.k -p $d.p --unzip
+  }
+}
 
 # Hugging Face (run via temp python file for Windows PowerShell)
 $pyCode = @'
@@ -49,8 +57,14 @@ Set-Content -Path $tmp -Value $pyCode -Encoding UTF8
 python $tmp
 Remove-Item $tmp
 
-# O*NET
-Invoke-WebRequest -Uri 'https://www.onetcenter.org/dl_files/database/db_28_2_text.zip' -OutFile './datasets/skills/onet_db.zip'
+# O*NET (idempotent)
+$onetZip = './datasets/skills/onet_db.zip'
+if (Test-Path $onetZip) {
+  Write-Host "SKIP O*NET (exists): $onetZip"
+} else {
+  Write-Host "DOWNLOADING O*NET -> $onetZip"
+  Invoke-WebRequest -Uri 'https://www.onetcenter.org/dl_files/database/db_28_2_text.zip' -OutFile $onetZip
+}
 
 # GitHub repos (optional)
 if (!(Test-Path './datasets/skills/skill-ner')) { git clone https://github.com/AnasAito/SkillNER.git ./datasets/skills/skill-ner }
