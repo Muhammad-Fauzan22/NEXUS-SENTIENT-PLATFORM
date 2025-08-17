@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 import fs from 'node:fs';
 import path from 'node:path';
 import { supabaseAdmin } from './utils/supabase.admin.ts';
-import { logger } from './utils/logger';
+import { logger } from './utils/logger.ts';
 import { getEmbedding as embed } from './utils/embedding';
 
 dotenv.config({ path: './.env' });
