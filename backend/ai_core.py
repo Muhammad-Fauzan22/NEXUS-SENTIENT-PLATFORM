@@ -12,6 +12,7 @@ SYSTEM_PROMPT = (
 
 
 def get_llm() -> Llama:
+    """Lazy-load LLM lokal (GGUF via llama-cpp)."""
     global _llm
     if _llm is None:
         _llm = Llama(
@@ -24,8 +25,9 @@ def get_llm() -> Llama:
 
 
 def _format_prompt(messages: List[Dict[str, str]]) -> str:
+    """Gabungkan pesan menjadi prompt instruksi generik."""
     system = SYSTEM_PROMPT
-    user_parts = []
+    user_parts: List[str] = []
     for m in messages:
         role = m.get("role", "user").lower()
         content = m.get("content", "")
@@ -33,12 +35,9 @@ def _format_prompt(messages: List[Dict[str, str]]) -> str:
             system = content
         else:
             user_parts.append(f"{role.upper()}: {content}")
-    convo = "
-".join(user_parts)
+    convo = "\n".join(user_parts)
     # Generic instruct style
-    prompt = f"<s>[INST] {system}
-
-{convo} [/INST]"
+    prompt = f"<s>[INST] {system}\n\n{convo} [/INST]"
     return prompt
 
 
@@ -64,10 +63,7 @@ def generate_idp(profile: dict, max_tokens: int = 700) -> str:
     )
     messages = [
         {"role": "system", "content": SYSTEM_PROMPT},
-        {"role": "user", "content": rubric + "
-
-Profil:
-" + str(profile)},
+        {"role": "user", "content": rubric + "\n\nProfil:\n" + str(profile)},
     ]
     prompt = _format_prompt(messages)
     out = llm(
