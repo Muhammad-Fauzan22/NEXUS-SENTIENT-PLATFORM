@@ -198,3 +198,20 @@ def main():
     psychometrics = [
         ("tunguz/big-five-personality-test", "big-five"),
         ("hafiznouman786/student-mental-health", "student-mental-health"),
+        ("datasnaek/mbti-type", "mbti-type"),
+        ("lucasgreenwell/depression-anxiety-stress-scales-responses", "dass-responses")
+    ]
+    
+    for dataset, folder in psychometrics:
+        if kaggle_ready:
+            success = download_kaggle_dataset(dataset, str(DATASETS_DIR / folder))
+            if success:
+                successful_downloads.append(f"Psychometrics/{folder}")
+            else:
+                failed_downloads.append(f"Psychometrics/{folder}")
+        else:
+            failed_downloads.append(f"Psychometrics/{folder}")
+    
+    # B. CV/Jobs/Skills datasets
+    print("\n💼 Downloading CV/Jobs/Skills datasets...")
+    
