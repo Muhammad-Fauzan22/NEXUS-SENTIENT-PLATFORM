@@ -1,110 +1,12 @@
-# requirements.txt
-# Daftar dependensi Python untuk NEXUS-SENTIENT-PLATFORM
-# Dihasilkan berdasarkan analisis repo-structure.txt.pdf dan casca_merged.pdf
-
-# --- 1. AI & Machine Learning Libraries ---
-# OpenAI API
-openai>=1.59.0,<2.0.0
-
-# Google Generative AI (Gemini)
-google-generativeai>=0.8.5,<0.9.0
-
-# Cohere API
-cohere>=5.13.0,<6.0.0
-
-# Hugging Face Transformers & Datasets (Opsional, jika diperlukan untuk model lokal/custom)
-# transformers>=4.40.0,<5.0.0
-# datasets>=3.0.0,<4.0.0
-# torch>=2.0.0,<3.0.0 # Untuk model PyTorch (opsional)
-# sentence-transformers>=3.0.0,<4.0.0 # Untuk embedding teks (opsional)
-
-# --- 2. Google Drive Integration ---
-# Google API Client Libraries
-google-api-python-client>=2.149.0,<3.0.0
-google-auth>=2.36.0,<3.0.0
-google-auth-oauthlib>=1.2.1,<2.0.0
-google-auth-httplib2>=0.2.0,<1.0.0
-
-# --- 3. PDF Generation & Manipulation ---
-# pdfkit (Python wrapper untuk wkhtmltopdf)
-# CATATAN: Ini memerlukan instalasi wkhtmltopdf di sistem Anda secara terpisah.
-pdfkit>=1.0.0,<2.0.0
-
-# WeasyPrint (Untuk konversi HTML ke PDF tanpa wkhtmltopdf)
-# CATATAN: Ini bisa memiliki dependensi sistem yang kompleks.
-weasyprint>=62.0,<63.0
-
-# pdf-parse (Untuk mengekstrak teks dari PDF)
-# pdf-parse>=1.3.0,<2.0.0 # Ini adalah paket npm, bukan pip. Dihapus dari sini.
-
-# --- 4. Document Processing ---
-# python-docx (Untuk membaca/menulis file .docx)
-python-docx>=1.1.0,<2.0.0
-
-# mammoth (Untuk mengekstrak teks dari file .docx - Alternatif untuk python-docx)
-# mammoth>=1.8.0,<2.0.0 # Ini adalah paket npm, bukan pip. Dihapus dari sini.
-
-# --- 5. Data Science & Utilities ---
-# pandas (Untuk manipulasi data)
-pandas>=2.2.0,<3.0.0
-
-# openpyxl (Untuk membaca/menulis file Excel .xlsx)
-openpyxl>=3.1.0,<4.0.0
-
-# numpy (Dependensi untuk pandas dan scientific computing)
-numpy>=1.26.0,<2.0.0
-
-# python-dotenv (Untuk memuat variabel lingkungan dari .env)
-python-dotenv>=1.0.0,<2.0.0
-
-# loguru (Untuk logging yang lebih baik)
-loguru>=0.7.0,<1.0.0
-
-# requests (Untuk HTTP requests)
-requests>=2.31.0,<3.0.0
-
-# beautifulsoup4 (Untuk parsing HTML/XML)
-beautifulsoup4>=4.12.0,<5.0.0
-
-# playwright (Untuk web scraping dan automation)
-playwright>=1.40.0,<2.0.0
-
-# --- 6. Web Framework & Server (Opsional, jika menggunakan FastAPI/Flask untuk microservice) ---
-# fastapi>=0.100.0,<1.0.0
-# uvicorn>=0.23.0,<1.0.0
-# flask>=3.0.0,<4.0.0
-
-# --- 7. Database Clients (Opsional, jika menggunakan Python untuk koneksi langsung) ---
-psycopg2-binary>=2.9.0,<3.0.0 # Untuk PostgreSQL
-supabase>=2.0.0,<3.0.0 # Client Python resmi Supabase (jika diperlukan)
-
-# --- 8. Lainnya ---
-# uuid (Biasanya sudah built-in, tapi bisa disebutkan jika diperlukan secara eksplisit)
-# uuid>=1.30,<2.0 # Paket 'uuid' di PyPI berbeda dari modul standar. Biasanya tidak perlu diinstal.
-
-# --- CATATAN PENTING ---
-# 1. Instalasi:
-#    Jalankan perintah berikut di terminal Anda:
-#    pip install -r requirements.txt
-#
-# 2. Virtual Environment:
-#    Sangat disarankan untuk menggunakan virtual environment Python.
-#    Buat: python -m venv .venv
-#    Aktifkan (Windows): .venv\Scripts\activate
-#    Aktifkan (Mac/Linux): source .venv/bin/activate
-#    Lalu jalankan pip install -r requirements.txt
-#
-# 3. Dependensi Sistem:
-#    - `weasyprint`: Mungkin memerlukan instalasi dependensi sistem seperti GTK, Cairo, Pango.
-#      Lihat dokumentasi resmi WeasyPrint untuk instruksi instalasi.
-#    - `pdfkit`: Memerlukan instalasi `wkhtmltopdf` di sistem Anda secara terpisah.
-#      Unduh dari: https://wkhtmltopdf.org/downloads.html
-#
-# 4. Versi:
-#    Versi yang ditentukan menggunakan >= dan < untuk memastikan kompatibilitas
-#    sambil memungkinkan patch releases. Anda bisa menyematkan versi spesifik
-#    (misalnya, openai==1.59.0) jika diperlukan untuk stabilitas.
-#
-# 5. Opsional:
-#    Beberapa library ditandai sebagai opsional karena mungkin tidak digunakan
-#    dalam setiap konfigurasi proyek. Hapus tanda komentar (#) jika diperlukan.
+fastapi==0.111.0
+uvicorn[standard]==0.30.0
+pydantic==2.7.1
+httpx==0.27.0
+python-dotenv==1.0.1
+sqlalchemy==2.0.30
+psycopg2-binary==2.9.9
+notion-client==2.2.1
+sentence-transformers==2.7.0
+numpy==1.26.4
+huggingface-hub==0.23.2
+llama-cpp-python==0.2.76
