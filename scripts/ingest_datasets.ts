@@ -29,42 +29,71 @@ function walkFiles(dir: string): string[] {
 	return out;
 }
 
-function chunkText(text: string, size = CHUNK_SIZE, overlap = OVERLAP): string[] {
-	const clean = (text || '').replace(/\s+/g, ' ').trim();
-	const chunks: string[] = [];
-	let i = 0;
-	while (i < clean.length) {
-		const end = Math.min(i + size, clean.length);
-		chunks.push(clean.slice(i, end));
-		i = end - overlap;
-		if (i < 0) i = 0;
-	}
-	return chunks;
-}
+const MAX_CHUNKS_PER_FILE = 200;
 
 async function ingestFile(filePath: string) {
 	try {
 		const ext = path.extname(filePath).toLowerCase();
 		if (!['.txt', '.csv', '.json', '.md'].includes(ext)) return;
-		const content = fs.readFileSync(filePath, 'utf8');
-		const chunks = chunkText(content);
+
 		const rel = path.relative(ROOT, filePath);
 		const segments = rel.split(path.sep);
 		const category = segments.length > 0 ? segments[0] : 'unknown';
 		const subpath = segments.slice(1, -1).join('/');
-		for (let idx = 0; idx < chunks.length; idx++) {
-			const chunk = chunks[idx];
-			const embedding = await embed(chunk);
-			const source_id = rel;
-			const { error } = await supabaseAdmin.from('knowledge_chunks').insert({
-				source_id,
-				content: chunk,
-				content_embedding: embedding,
-				metadata: { idx, ext, source: 'dataset', category, subpath }
+
+		// Stream read to avoid OOM
+		const rs = fs.createReadStream(filePath, { encoding: 'utf8', highWaterMark: 64 * 1024 });
+		let buffer = '';
+		let produced = 0;
+		let idx = 0;
+		await new Promise<void>((resolve, reject) => {
+			rs.on('data', async (chunk: string) => {
+				// accumulate and normalize whitespace
+				buffer += (chunk || '').replace(/\s+/g, ' ');
+				// produce fixed-size windows with overlap
+				while (buffer.length >= CHUNK_SIZE && produced < MAX_CHUNKS_PER_FILE) {
+					const piece = buffer.slice(0, CHUNK_SIZE);
+					try {
+						const embedding = await embed(piece);
+						const source_id = rel;
+						const { error } = await supabaseAdmin.from('knowledge_chunks').insert({
+							source_id,
+							content: piece,
+							content_embedding: embedding,
+							metadata: { idx, ext, source: 'dataset', category, subpath }
+						});
+						if (error) logger.error('Failed insert dataset chunk', { error, filePath });
+						idx++;
+						produced++;
+					} catch (err) {
+						logger.error('Embedding/insert failed', { filePath, error: err });
+					}
+					// keep overlap
+					buffer = buffer.slice(CHUNK_SIZE - OVERLAP);
+				}
 			});
-			if (error) logger.error('Failed insert dataset chunk', { error, filePath });
-		}
-		logger.info('Ingested file', { filePath, chunkCount: chunks.length, category });
+			rs.on('end', async () => {
+				try {
+					if (buffer.length > Math.max(OVERLAP, 50) && produced < MAX_CHUNKS_PER_FILE) {
+						const piece = buffer;
+						const embedding = await embed(piece);
+						await supabaseAdmin.from('knowledge_chunks').insert({
+							source_id: rel,
+							content: piece,
+							content_embedding: embedding,
+							metadata: { idx, ext, source: 'dataset', category, subpath }
+						});
+						idx++;
+						produced++;
+					}
+					logger.info('Ingested file', { filePath, chunkCount: produced, category });
+					resolve();
+				} catch (err) {
+					reject(err);
+				}
+			});
+			rs.on('error', (err) => reject(err));
+		});
 	} catch (e) {
 		logger.error('Ingest failed for file', { filePath, error: e });
 	}
