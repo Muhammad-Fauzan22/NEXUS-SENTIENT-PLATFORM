@@ -61,8 +61,7 @@ class NotionService:
             if not res.get("has_more"):
                 break
             cursor = res.get("next_cursor")
-        return "
-".join([x for x in texts if x])
+        return "\n".join([x for x in texts if x])
 
     def get_document(self, doc_name: str) -> Optional[str]:
         if not self.db_docs:
@@ -83,7 +82,12 @@ class NotionService:
         content = self._get_block_text_recursive(page_id)
         return content
 
-    def list_documents(self, category: Optional[str] = None, page_size: int = 50) -> List[Dict[str, Any]]:
+    def get_document_by_id(self, page_id: str) -> Optional[str]:
+        if not page_id:
+            return None
+        return self._get_block_text_recursive(page_id)
+
+    def list_documents(self, category: Optional[str] = None, page_size: int = 100, include_content: bool = True) -> List[Dict[str, Any]]:
         if not self.db_docs:
             return []
         payload: Dict[str, Any] = {
@@ -95,17 +99,27 @@ class NotionService:
                 "property": "Kategori",
                 "select": {"equals": category}
             }
-        res = self.client.databases.query(**payload)
-        docs = []
-        for page in res.get("results", []):
-            props = page.get("properties", {})
-            name = props.get("Name", {}).get("title", [])
-            title = "".join([t.get("plain_text", "") for t in name]) if name else "Untitled"
-            page_id = page.get("id")
-            content = self._get_block_text_recursive(page_id)
-            docs.append({
-                "id": page_id,
-                "title": title,
-                "content": content,
-            })
+        docs: List[Dict[str, Any]] = []
+        cursor = None
+        while True:
+            if cursor:
+                payload["start_cursor"] = cursor
+            res = self.client.databases.query(**payload)
+            for page in res.get("results", []):
+                props = page.get("properties", {})
+                name = props.get("Name", {}).get("title", [])
+                title = "".join([t.get("plain_text", "") for t in name]) if name else "Untitled"
+                page_id = page.get("id")
+                last_edited_time = page.get("last_edited_time")
+                item: Dict[str, Any] = {
+                    "id": page_id,
+                    "title": title,
+                    "last_edited_time": last_edited_time,
+                }
+                if include_content:
+                    item["content"] = self._get_block_text_recursive(page_id)
+                docs.append(item)
+            if not res.get("has_more"):
+                break
+            cursor = res.get("next_cursor")
         return docs
