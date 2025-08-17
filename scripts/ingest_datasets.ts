@@ -104,16 +104,16 @@ async function ingestFile(filePath: string) {
 }
 
 async function main() {
-	logger.info('Dataset ingestion started');
-	if (!fs.existsSync(ROOT)) {
-		logger.warn('No ./datasets folder found. Skipping.');
+	logger.info('Dataset ingestion started', { targetDir });
+	if (!fs.existsSync(targetDir)) {
+		logger.warn(`No dataset folder found at ${targetDir}. Skipping.`);
 		return;
 	}
-	const files = walkFiles(ROOT);
+	const files = walkFiles(targetDir);
 	for (const f of files) {
 		await ingestFile(f);
 	}
-	logger.info('Dataset ingestion completed');
+	logger.info('Dataset ingestion completed', { fileCount: files.length });
 }
 
 main();
