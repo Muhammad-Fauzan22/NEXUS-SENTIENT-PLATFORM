@@ -64,6 +64,14 @@
 		{:else}
 			<p class="mt-4 text-foreground/70">Anda belum memiliki pengajuan. Mulai buat sekarang!</p>
 		{/if}
+
+		<!-- Market Insights section -->
+		{#if session?.user?.user_metadata?.aspirations}
+			<MarketInsights aspirasi={session.user.user_metadata.aspirations} />
+		{:else}
+			<MarketInsights aspirasi={submissions?.[0]?.research_interest || 'engineering'} />
+		{/if}
+
 	</div>
 
 	<Button href="/" variant="primary">Create New IDP Submission</Button>
