@@ -316,3 +316,21 @@ def main():
     
     if failed_downloads:
         print(f"\n❌ Failed downloads ({len(failed_downloads)}):")
+        for item in failed_downloads:
+            print(f"   • {item}")
+    
+    # Create manual download guide for failed items
+    if failed_downloads:
+        create_manual_download_guide()
+    
+    print("\n🎯 Next Steps:")
+    if not kaggle_ready:
+        print("1. Set up Kaggle API credentials (see MANUAL_DOWNLOAD_GUIDE.md)")
+    if failed_downloads:
+        print("2. Use manual download commands for failed datasets")
+    print("3. Run: npm run ingest:datasets to process all downloaded data")
+    
+    print("\n📁 Check ./datasets/ directory for all downloaded files")
+
+if __name__ == "__main__":
+    main()
