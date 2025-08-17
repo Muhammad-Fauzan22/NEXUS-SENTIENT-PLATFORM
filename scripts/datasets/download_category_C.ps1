@@ -2,6 +2,8 @@
 # Pendidikan, Akademik & Karier - 25 Dataset Sempurna
 New-Item -ItemType Directory -Force -Path ./datasets/academic | Out-Null
 
+function Has-KaggleCred { Test-Path "$env:USERPROFILE\.kaggle\kaggle.json" }
+
 # Resolve Kaggle CLI (robust)
 function Resolve-KaggleCLI {
     try {
