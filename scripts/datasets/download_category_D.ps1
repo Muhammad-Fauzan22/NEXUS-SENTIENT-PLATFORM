@@ -2,6 +2,8 @@
 # Bahasa, Percakapan & Pengetahuan Umum - 25 Dataset Sempurna
 New-Item -ItemType Directory -Force -Path ./datasets/language | Out-Null
 
+function Has-KaggleCred { Test-Path "$env:USERPROFILE\.kaggle\kaggle.json" }
+
 # Hugging Face datasets (streaming and local) via temp python file
 $pyCode = @'
 import os
