@@ -4,7 +4,7 @@ import glob from 'fast-glob';
 import crypto from 'node:crypto';
 import { supabaseAdmin } from '../utils/supabase.admin.ts';
 import { logger } from '../utils/logger.ts';
-import { getEmbedding768 as getEmbedding } from '../utils/embedding.ts';
+import { getEmbedding1536 as getEmbedding } from '../utils/embedding.ts';
 
 function hash(text: string) {
 	return crypto.createHash('sha256').update(text).digest('hex');
