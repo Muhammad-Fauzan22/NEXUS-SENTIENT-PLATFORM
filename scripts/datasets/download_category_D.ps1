@@ -4,67 +4,76 @@ New-Item -ItemType Directory -Force -Path ./datasets/language | Out-Null
 
 # Hugging Face datasets (streaming and local) via temp python file
 $pyCode = @'
+import os
 from datasets import load_dataset
 
-# The Pile (streaming for large dataset)
-load_dataset("eleutherai/the_pile", "all", split="train", streaming=True)
+def save_if_missing(path, *args, **kwargs):
+    if os.path.exists(path):
+        print(f"SKIP: {path} exists")
+        return
+    print(f"DOWNLOADING: {args[0]} -> {path}")
+    ds = load_dataset(*args, **kwargs)
+    ds.save_to_disk(path)
+
+# The Pile (streaming only, no save)
+try:
+    load_dataset("eleutherai/the_pile", "all", split="train", streaming=True)
+except Exception as e:
+    print(f"WARN: the_pile streaming failed: {e}")
 
 # SQuAD (Stanford Q&A)
-load_dataset("squad").save_to_disk("./datasets/language/squad")
+save_if_missing("./datasets/language/squad", "squad")
 
 # Wikipedia English (FULL)
-load_dataset("wikipedia", "20220301.en", split="train").save_to_disk("./datasets/language/wikipedia-full")
+save_if_missing("./datasets/language/wikipedia-full", "wikipedia", "20220301.en", split="train")
 
 # Anthropic HH-RLHF
-load_dataset("Anthropic/hh-rlhf").save_to_disk("./datasets/language/anthropic-hh-rlhf")
-
-# Common Crawl C4 (streaming or shard to disk via helper)
-# For FULL-on-disk, run: python scripts/datasets/download_hf_sharded.py --dataset c4 --subset en --split train --records-per-shard 10000 --output ./datasets/language/c4-full
+save_if_missing("./datasets/language/anthropic-hh-rlhf", "Anthropic/hh-rlhf")
 
 # Dolly 15k (Instruction Following)
-load_dataset("databricks/databricks-dolly-15k").save_to_disk("./datasets/language/dolly-15k")
+save_if_missing("./datasets/language/dolly-15k", "databricks/databricks-dolly-15k")
 
 # OpenWebText
-load_dataset("openwebtext").save_to_disk("./datasets/language/openwebtext")
+save_if_missing("./datasets/language/openwebtext", "openwebtext")
 
 # Multi-News (Summarization)
-load_dataset("multi_news").save_to_disk("./datasets/language/multi-news")
+save_if_missing("./datasets/language/multi-news", "multi_news")
 
 # ELI5 (Explain Like I'm 5)
-load_dataset("eli5").save_to_disk("./datasets/language/eli5")
+save_if_missing("./datasets/language/eli5", "eli5")
 
 # BookCorpus
-load_dataset("bookcorpus").save_to_disk("./datasets/language/bookcorpus")
+save_if_missing("./datasets/language/bookcorpus", "bookcorpus")
 
 # CodeSearchNet
-load_dataset("code_search_net", "all").save_to_disk("./datasets/language/codesearchnet")
+save_if_missing("./datasets/language/codesearchnet", "code_search_net", "all")
 
 # CNN/Daily Mail (Summarization)
-load_dataset("cnn_dailymail", "3.0.0").save_to_disk("./datasets/language/cnn-dailymail")
+save_if_missing("./datasets/language/cnn-dailymail", "cnn_dailymail", "3.0.0")
 
 # LAMBADA (Language Modeling)
-load_dataset("lambada").save_to_disk("./datasets/language/lambada")
+save_if_missing("./datasets/language/lambada", "lambada")
 
 # GLUE Benchmark (MRPC)
-load_dataset("glue", "mrpc").save_to_disk("./datasets/language/glue-mrpc")
+save_if_missing("./datasets/language/glue-mrpc", "glue", "mrpc")
 
 # WikiText
-load_dataset("wikitext", "wikitext-103-v1").save_to_disk("./datasets/language/wikitext")
+save_if_missing("./datasets/language/wikitext", "wikitext", "wikitext-103-v1")
 
 # DailyDialog
-load_dataset("daily_dialog").save_to_disk("./datasets/language/daily-dialog")
+save_if_missing("./datasets/language/daily-dialog", "daily_dialog")
 
 # Commonsense QA
-load_dataset("commonsense_qa").save_to_disk("./datasets/language/commonsense-qa")
+save_if_missing("./datasets/language/commonsense-qa", "commonsense_qa")
 
 # Natural Questions (FULL)
-load_dataset("natural_questions", split="train").save_to_disk("./datasets/language/natural-questions-full")
+save_if_missing("./datasets/language/natural-questions-full", "natural_questions", split="train")
 
 # Story Cloze Test
-load_dataset("story_cloze", "2016").save_to_disk("./datasets/language/story-cloze")
+save_if_missing("./datasets/language/story-cloze", "story_cloze", "2016")
 
 # Code Alpaca (Instruction Following)
-load_dataset("sahil2801/CodeAlpaca-20k").save_to_disk("./datasets/language/code-alpaca")
+save_if_missing("./datasets/language/code-alpaca", "sahil2801/CodeAlpaca-20k")
 '@
 $tmp = [System.IO.Path]::GetTempFileName()
 Set-Content -Path $tmp -Value $pyCode -Encoding UTF8
@@ -97,14 +106,34 @@ $kaggle = @(
     @{ k='quora-question-pairs'; p='./datasets/language/quora-question-pairs' }
 )
 foreach ($d in $kaggle) {
-    & $kaggleCmd datasets download -d $d.k -p $d.p --unzip
+    $hasFiles = (Test-Path $d.p) -and ((Get-ChildItem -Path $d.p -Recurse -File -ErrorAction SilentlyContinue | Measure-Object).Count -gt 0)
+    if ($hasFiles) {
+        Write-Host "SKIP Kaggle dataset (exists): $($d.k) -> $($d.p)"
+    } else {
+        Write-Host "DOWNLOADING Kaggle dataset: $($d.k) -> $($d.p)"
+        & $kaggleCmd datasets download -d $d.k -p $d.p --unzip
+    }
 }
 
 # Direct downloads
-# Cornell Movie Dialogs Corpus
-Invoke-WebRequest -Uri 'https://www.cs.cornell.edu/~cristian/data/cornell_movie_dialogs_corpus.zip' -OutFile './datasets/language/movie-dialogs.zip'
-Expand-Archive -Path './datasets/language/movie-dialogs.zip' -DestinationPath './datasets/language/movie-dialogs' -Force
-Remove-Item './datasets/language/movie-dialogs.zip'
+# Cornell Movie Dialogs Corpus (idempotent)
+$zip = './datasets/language/movie-dialogs.zip'
+$dst = './datasets/language/movie-dialogs'
+$dstHasFiles = (Test-Path $dst) -and ((Get-ChildItem -Path $dst -Recurse -File -ErrorAction SilentlyContinue | Measure-Object).Count -gt 0)
+if ($dstHasFiles) {
+    Write-Host "SKIP Movie Dialogs (exists): $dst"
+} else {
+    if (!(Test-Path $zip)) {
+        Write-Host "DOWNLOADING Movie Dialogs zip -> $zip"
+        Invoke-WebRequest -Uri 'https://www.cs.cornell.edu/~cristian/data/cornell_movie_dialogs_corpus.zip' -OutFile $zip
+    } else {
+        Write-Host "FOUND existing zip: $zip"
+    }
+    try {
+        Expand-Archive -Path $zip -DestinationPath $dst -Force
+    } catch { Write-Host "WARN: failed to extract Movie Dialogs - $_" }
+    if (Test-Path $zip) { Remove-Item $zip }
+}
 
 # Manual directories for future content
 New-Item -ItemType Directory -Force -Path ./datasets/language/awesome-lists | Out-Null
