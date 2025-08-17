@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { supabaseAdmin } from '../src/lib/server/db/supabase.admin';
+import { supabaseAdmin } from './utils/supabase.admin';
 import { logger } from '../src/lib/server/utils/logger';
 import {
 	extractSkillsV2,
