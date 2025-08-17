@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { supabaseAdmin } from './utils/supabase.admin.ts';
-import { logger } from '../src/lib/server/utils/logger';
+import { logger } from './utils/logger.ts';
 import {
 	extractSkillsV2,
 	computeVelocity,
