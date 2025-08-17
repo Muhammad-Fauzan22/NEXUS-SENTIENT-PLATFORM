@@ -47,6 +47,7 @@ foreach ($d in $kaggle) {
     if ($hasFiles) {
         Write-Host "SKIP Kaggle dataset (exists): $($d.k) -> $($d.p)"
     } else {
+        if (-not (Has-KaggleCred)) { Write-Host "SKIP Kaggle (no credentials): $($d.k)"; continue }
         Write-Host "DOWNLOADING Kaggle dataset: $($d.k) -> $($d.p)"
         & $kaggleCmd datasets download -d $d.k -p $d.p --unzip
     }
