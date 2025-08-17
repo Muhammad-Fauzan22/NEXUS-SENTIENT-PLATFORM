@@ -1,5 +1,5 @@
 import { json, error, type RequestHandler } from '@sveltejs/kit';
-import { notionService } from '$lib/server/integrations/notion.service';
+import { NotionService } from '$lib/server/integrations/notion.service';
 import { z } from 'zod';
 
 const QuerySchema = z.object({ databaseId: z.string().min(10) });
@@ -10,7 +10,8 @@ export const GET: RequestHandler = async ({ url }) => {
   if (!parsed.success) throw error(400, 'Missing or invalid databaseId');
 
   try {
-    const projects = await notionService.findOpenProjects(parsed.data.databaseId);
+    const notion = new NotionService();
+    const projects = await notion.findOpenProjects(parsed.data.databaseId);
     return json({ projects });
   } catch (e) {
     console.error('Failed to retrieve open projects from Notion', e);
